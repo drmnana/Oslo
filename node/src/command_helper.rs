@@ -116,6 +116,7 @@ pub fn create_benchmark_extrinsic(
 	)
 }
 
+
 /// Generates inherent data for the `benchmark overhead` command.
 ///
 /// Note: Should only be used for benchmarking.
