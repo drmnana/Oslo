@@ -6,7 +6,7 @@ use storage_chain_runtime::{
 use sc_service::{ChainType, Properties};
 use hex_literal::hex;
 use sp_consensus_aura::sr25519::AuthorityId as AuraId;
-use sp_core::{ Pair, Public, H160, U256};
+use sp_core::{ Pair, Public, H160, U256, crypto::UncheckedInto};
 use sp_finality_grandpa::AuthorityId as GrandpaId;
 // use sp_runtime::traits::{IdentifyAccount, Verify};
 use std::{collections::BTreeMap, default::Default};
@@ -46,6 +46,50 @@ fn get_from_secret<TPublic: Public>(seed: &str) -> <TPublic::Pair as Pair>::Publ
 // 		get_from_secret::<GrandpaId>(seed),
 // 	)
 // }
+
+
+pub fn public_config() -> Result<ChainSpec, String> {
+	let wasm_binary = WASM_BINARY.ok_or_else(|| "Development wasm not available".to_string())?;
+
+	Ok(ChainSpec::from_genesis(
+		"Public Node",
+		"public_live",
+		ChainType::Live,
+		move || {
+			testnet_genesis(
+				wasm_binary,
+				// Initial PoA authorities
+				vec![
+					(array_bytes::hex_n_into_unchecked(ALITH),
+					 get_from_secret::<AuraId>("//Alice"),
+					 get_from_secret::<GrandpaId>("//Alice")),
+					(array_bytes::hex_n_into_unchecked(BALTATHAR),
+					 get_from_secret::<AuraId>("//Bob"),
+					 get_from_secret::<GrandpaId>("//Bob")),
+				],
+				// Sudo account
+				AccountId::from(hex!("55D5E776997198679A8774507CaA4b0F7841767e")),
+
+				// Pre-funded accounts
+				vec![
+					array_bytes::hex_n_into_unchecked(ALITH),
+					array_bytes::hex_n_into_unchecked(BALTATHAR),
+					array_bytes::hex_n_into_unchecked(CHARLETH),
+					array_bytes::hex_n_into_unchecked(DOROTHY),
+				],
+				true,
+			)
+		},
+		vec![],
+		None,
+		None,
+		None,
+		None,
+		None,
+	))
+}
+
+
 
 fn session_keys(
 	aura: AuraId,
