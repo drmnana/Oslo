@@ -286,7 +286,7 @@ impl pallet_timestamp::Config for Runtime {
 }
 
 /// Existential deposit.
-pub const EXISTENTIAL_DEPOSIT: u128 = 1 * currency::KILOWEI;
+pub const EXISTENTIAL_DEPOSIT: u128 = 1 * currency::KILOSTOR;
 
 impl pallet_balances::Config for Runtime {
 	/// The type for recording an account's balance.

@@ -84,7 +84,7 @@ pub fn public_config() -> Result<ChainSpec, String> {
 		None,
 		None,
 		None,
-		None,
+		Some(chainspec_properties()),
 		None,
 	))
 }
@@ -97,7 +97,7 @@ fn session_keys(
 ) -> SessionKeys {
 	SessionKeys { aura, grandpa }
 }
-
+ 
 pub fn chainspec_properties() -> Properties {
 	let mut properties = Properties::new();
 	properties.insert("tokenDecimals".into(), 18.into());
@@ -106,10 +106,10 @@ pub fn chainspec_properties() -> Properties {
 }
 
 
-const ALITH: &str = "0xf24FF3a9CF04c71Dbc94D0b566f7A27B94566cac";
-const BALTATHAR: &str = "0x3Cd0A705a2DC65e5b1E1205896BaA2be8A07c6e0";
-const CHARLETH: &str = "0x798d4Ba9baf0064Ec19eB4F0a1a45785ae9D6DFc";
-const DOROTHY: &str = "0x773539d4Ac0e786233D90A233654ccEE26a613D9";
+const ALITH: &str = "0x6B7CD45dfc550F12b4EdAFDFbBC68b53faAE6Fe2";
+const BALTATHAR: &str = "0x18119Bb0f49ee709104CA2804B297B08d5d0EDEc";
+const CHARLETH: &str = "0x71B18c74b51E2195c92C169504f7FAFA71308A9a";
+const DOROTHY: &str = "0xC03cfc225Ad4b42F96f612BA38bD4d9cBD4a419a";
 // const ETHAN: &str = "0xFf64d3F6efE2317EE2807d223a0Bdc4c0c49dfDB";
 
 /// Helper function to get an `AccountId` from an ECDSA Key Pair.
@@ -143,13 +143,13 @@ pub fn development_config() -> Result<ChainSpec, String> {
 					 get_from_secret::<GrandpaId>("//Alice")),
 				],
 				// Sudo account
-				AccountId::from(hex!("f24FF3a9CF04c71Dbc94D0b566f7A27B94566cac")),
+				AccountId::from(hex!("6B7CD45dfc550F12b4EdAFDFbBC68b53faAE6Fe2")),
 				// get_account_id_from_secret::<ed25519::Public>("//Alice"),
 				// Pre-funded accounts
 				vec![
-					AccountId::from(hex!("f24FF3a9CF04c71Dbc94D0b566f7A27B94566cac")),
-					AccountId::from(hex!("7ed8c8a0C4d1FeA01275fE13F0Ef23bce5CBF8C3")),
-					AccountId::from(hex!("3263236Cbc327B5519E373CC591318e56e7c5081")),
+					AccountId::from(hex!("6B7CD45dfc550F12b4EdAFDFbBC68b53faAE6Fe2")),
+					AccountId::from(hex!("18119Bb0f49ee709104CA2804B297B08d5d0EDEc")),
+					AccountId::from(hex!("71B18c74b51E2195c92C169504f7FAFA71308A9a")),
 					// get_account_id_from_seed::<ecdsa::Public>("Bob"),
 					// get_account_id_from_seed::<ecdsa::Public>("Alice//stash"),
 					// get_account_id_from_seed::<ecdsa::Public>("Bob//stash"),
@@ -197,7 +197,7 @@ pub fn local_testnet_config() -> Result<ChainSpec, String> {
 					 get_from_secret::<GrandpaId>("//Bob")),
 				],
 				// Sudo account
-				AccountId::from(hex!("55D5E776997198679A8774507CaA4b0F7841767e")),
+				AccountId::from(hex!("6B7CD45dfc550F12b4EdAFDFbBC68b53faAE6Fe2")),
 				// Pre-funded accounts
 				vec![
 					array_bytes::hex_n_into_unchecked(ALITH),
