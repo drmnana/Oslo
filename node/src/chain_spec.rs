@@ -136,6 +136,7 @@ pub fn development_config() -> Result<ChainSpec, String> {
 		move || {
 			testnet_genesis(
 				wasm_binary,
+				
 				// Initial PoA authorities
 				vec![
 					(array_bytes::hex_n_into_unchecked(ALITH),
@@ -144,19 +145,12 @@ pub fn development_config() -> Result<ChainSpec, String> {
 				],
 				// Sudo account
 				AccountId::from(hex!("6B7CD45dfc550F12b4EdAFDFbBC68b53faAE6Fe2")),
-				// get_account_id_from_secret::<ed25519::Public>("//Alice"),
+				
 				// Pre-funded accounts
 				vec![
 					AccountId::from(hex!("6B7CD45dfc550F12b4EdAFDFbBC68b53faAE6Fe2")),
 					AccountId::from(hex!("18119Bb0f49ee709104CA2804B297B08d5d0EDEc")),
 					AccountId::from(hex!("71B18c74b51E2195c92C169504f7FAFA71308A9a")),
-					// get_account_id_from_seed::<ecdsa::Public>("Bob"),
-					// get_account_id_from_seed::<ecdsa::Public>("Alice//stash"),
-					// get_account_id_from_seed::<ecdsa::Public>("Bob//stash"),
-					// get_account_id_from_secret::<ed25519::Public>("//Alice"),
-					// get_account_id_from_secret::<ed25519::Public>("//Bob"),
-					// get_account_id_from_secret::<sr25519::Public>("//Alice"),
-					// get_account_id_from_secret::<sr25519::Public>("//Bob"),
 				],
 				true,
 			)
