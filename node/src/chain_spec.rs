@@ -1,13 +1,13 @@
-use storage_chain_runtime::{
-	AccountId, BalancesConfig, GenesisConfig, SudoConfig, EVMConfig,
-	SystemConfig, WASM_BINARY, GenesisAccount, EthereumConfig, Balance, currency::*, SessionConfig,
-	opaque::SessionKeys,
-};
-use sc_service::{ChainType, Properties};
 use hex_literal::hex;
+use sc_service::{ChainType, Properties};
 use sp_consensus_aura::sr25519::AuthorityId as AuraId;
-use sp_core::{ Pair, Public, H160, U256, crypto::UncheckedInto};
+use sp_core::{crypto::UncheckedInto, Pair, Public, H160, U256};
 use sp_finality_grandpa::AuthorityId as GrandpaId;
+use storage_chain_runtime::{
+	currency::*, opaque::SessionKeys, AccountId, Balance, BalancesConfig, EVMConfig,
+	EthereumConfig, GenesisAccount, GenesisConfig, SessionConfig, SudoConfig, SystemConfig,
+	WASM_BINARY,
+};
 // use sp_runtime::traits::{IdentifyAccount, Verify};
 use std::{collections::BTreeMap, default::Default};
 // use frame_benchmarking::frame_support::metadata::StorageEntryModifier::Default;
@@ -47,6 +47,10 @@ fn get_from_secret<TPublic: Public>(seed: &str) -> <TPublic::Pair as Pair>::Publ
 // 	)
 // }
 
+const ALITH: &str = "0x6B7CD45dfc550F12b4EdAFDFbBC68b53faAE6Fe2";
+const BALTATHAR: &str = "0x18119Bb0f49ee709104CA2804B297B08d5d0EDEc";
+const CHARLETH: &str = "0x71B18c74b51E2195c92C169504f7FAFA71308A9a";
+const DOROTHY: &str = "0xC03cfc225Ad4b42F96f612BA38bD4d9cBD4a419a";
 
 pub fn public_config() -> Result<ChainSpec, String> {
 	let wasm_binary = WASM_BINARY.ok_or_else(|| "Development wasm not available".to_string())?;
@@ -60,16 +64,29 @@ pub fn public_config() -> Result<ChainSpec, String> {
 				wasm_binary,
 				// Initial PoA authorities
 				vec![
-					(array_bytes::hex_n_into_unchecked(ALITH),
-					 get_from_secret::<AuraId>("//Alice"),
-					 get_from_secret::<GrandpaId>("//Alice")),
-					(array_bytes::hex_n_into_unchecked(BALTATHAR),
-					 get_from_secret::<AuraId>("//Bob"),
-					 get_from_secret::<GrandpaId>("//Bob")),
+					(
+						array_bytes::hex_n_into_unchecked(ALITH),
+						get_from_secret::<AuraId>("//Alice"),
+						get_from_secret::<GrandpaId>("//Alice"),
+					),
+					(
+						array_bytes::hex_n_into_unchecked(BALTATHAR),
+						get_from_secret::<AuraId>("//Bob"),
+						get_from_secret::<GrandpaId>("//Bob"),
+					),
+					(
+						array_bytes::hex_n_into_unchecked(CHARLETH),
+						get_from_secret::<AuraId>("//Charlie"),
+						get_from_secret::<GrandpaId>("//Charlie"),
+					),
+					(
+						array_bytes::hex_n_into_unchecked(DOROTHY),
+						get_from_secret::<AuraId>("//Dave"),
+						get_from_secret::<GrandpaId>("//Dave"),
+					),
 				],
 				// Sudo account
 				AccountId::from(hex!("55D5E776997198679A8774507CaA4b0F7841767e")),
-
 				// Pre-funded accounts
 				vec![
 					array_bytes::hex_n_into_unchecked(ALITH),
@@ -89,15 +106,10 @@ pub fn public_config() -> Result<ChainSpec, String> {
 	))
 }
 
-
-
-fn session_keys(
-	aura: AuraId,
-	grandpa: GrandpaId,
-) -> SessionKeys {
+fn session_keys(aura: AuraId, grandpa: GrandpaId) -> SessionKeys {
 	SessionKeys { aura, grandpa }
 }
- 
+
 pub fn chainspec_properties() -> Properties {
 	let mut properties = Properties::new();
 	properties.insert("tokenDecimals".into(), 18.into());
@@ -105,11 +117,6 @@ pub fn chainspec_properties() -> Properties {
 	properties
 }
 
-
-const ALITH: &str = "0x6B7CD45dfc550F12b4EdAFDFbBC68b53faAE6Fe2";
-const BALTATHAR: &str = "0x18119Bb0f49ee709104CA2804B297B08d5d0EDEc";
-const CHARLETH: &str = "0x71B18c74b51E2195c92C169504f7FAFA71308A9a";
-const DOROTHY: &str = "0xC03cfc225Ad4b42F96f612BA38bD4d9cBD4a419a";
 // const ETHAN: &str = "0xFf64d3F6efE2317EE2807d223a0Bdc4c0c49dfDB";
 
 /// Helper function to get an `AccountId` from an ECDSA Key Pair.
@@ -136,16 +143,15 @@ pub fn development_config() -> Result<ChainSpec, String> {
 		move || {
 			testnet_genesis(
 				wasm_binary,
-				
 				// Initial PoA authorities
-				vec![
-					(array_bytes::hex_n_into_unchecked(ALITH),
-					 get_from_secret::<AuraId>("//Alice"),
-					 get_from_secret::<GrandpaId>("//Alice")),
-				],
+				vec![(
+					array_bytes::hex_n_into_unchecked(ALITH),
+					get_from_secret::<AuraId>("//Alice"),
+					get_from_secret::<GrandpaId>("//Alice"),
+				)],
 				// Sudo account
-				AccountId::from(hex!("6B7CD45dfc550F12b4EdAFDFbBC68b53faAE6Fe2")),
-				
+				// AccountId::from(hex!("6B7CD45dfc550F12b4EdAFDFbBC68b53faAE6Fe2")),
+				array_bytes::hex_n_into_unchecked(ALITH), 
 				// Pre-funded accounts
 				vec![
 					AccountId::from(hex!("6B7CD45dfc550F12b4EdAFDFbBC68b53faAE6Fe2")),
@@ -183,12 +189,16 @@ pub fn local_testnet_config() -> Result<ChainSpec, String> {
 				wasm_binary,
 				// Initial PoA authorities
 				vec![
-					(array_bytes::hex_n_into_unchecked(ALITH),
-					 get_from_secret::<AuraId>("//Alice"),
-					 get_from_secret::<GrandpaId>("//Alice")),
-					(array_bytes::hex_n_into_unchecked(BALTATHAR),
-					 get_from_secret::<AuraId>("//Bob"),
-					 get_from_secret::<GrandpaId>("//Bob")),
+					(
+						array_bytes::hex_n_into_unchecked(ALITH),
+						get_from_secret::<AuraId>("//Alice"),
+						get_from_secret::<GrandpaId>("//Alice"),
+					),
+					(
+						array_bytes::hex_n_into_unchecked(BALTATHAR),
+						get_from_secret::<AuraId>("//Bob"),
+						get_from_secret::<GrandpaId>("//Bob"),
+					),
 				],
 				// Sudo account
 				AccountId::from(hex!("6B7CD45dfc550F12b4EdAFDFbBC68b53faAE6Fe2")),
@@ -198,21 +208,6 @@ pub fn local_testnet_config() -> Result<ChainSpec, String> {
 					array_bytes::hex_n_into_unchecked(BALTATHAR),
 					array_bytes::hex_n_into_unchecked(CHARLETH),
 					array_bytes::hex_n_into_unchecked(DOROTHY),
-					// AccountId::from(hex!("f24FF3a9CF04c71Dbc94D0b566f7A27B94566cac")),
-					// AccountId::from(hex!("7ed8c8a0C4d1FeA01275fE13F0Ef23bce5CBF8C3")),
-					// AccountId::from(hex!("3263236Cbc327B5519E373CC591318e56e7c5081")),
-					// get_account_id_from_seed::<ecdsa::Public>("Alice"),
-					// get_account_id_from_seed::<ecdsa::Public>("Bob"),
-					// get_account_id_from_seed::<ecdsa::Public>("Charlie"),
-					// get_account_id_from_seed::<ecdsa::Public>("Dave"),
-					// get_account_id_from_seed::<ecdsa::Public>("Eve"),
-					// get_account_id_from_seed::<ecdsa::Public>("Ferdie"),
-					// get_account_id_from_seed::<ecdsa::Public>("Alice//stash"),
-					// get_account_id_from_seed::<ecdsa::Public>("Bob//stash"),
-					// get_account_id_from_seed::<ecdsa::Public>("Charlie//stash"),
-					// get_account_id_from_seed::<ecdsa::Public>("Dave//stash"),
-					// get_account_id_from_seed::<ecdsa::Public>("Eve//stash"),
-					// get_account_id_from_seed::<ecdsa::Public>("Ferdie//stash"),
 				],
 				true,
 			)
@@ -247,7 +242,11 @@ fn testnet_genesis(
 		},
 		balances: BalancesConfig {
 			// Configure endowed accounts with initial balance of 1 << 60.
-			balances: endowed_accounts.iter().cloned().map(|k| (k.clone(), ENDOWMENT / initial_authorities.len() as u128)).collect(),
+			balances: endowed_accounts
+				.iter()
+				.cloned()
+				.map(|k| (k.clone(), ENDOWMENT / initial_authorities.len() as u128))
+				.collect(),
 		},
 		aura: Default::default(),
 		// AuraConfig {
@@ -275,23 +274,27 @@ fn testnet_genesis(
 					},
 				);
 				accounts
-			}
+			},
 		},
 		session: SessionConfig {
 			keys: initial_authorities
-				.iter()
-				.map(|x| {
+				.into_iter()
+				.map(|(acc, aura, gran)|  {
 					(
-						x.0.clone(),
-						x.0.clone(),
+						acc.clone(), 
+						acc, 
 						session_keys(
-							x.1.clone(), x.2.clone(),
-						),
-					)
-				})
-				.collect::<Vec<_>>(),
+							aura, gran,
+						), 
+				)
+			})
+			.collect::<Vec<_>>(), 
 		},
-		ethereum: EthereumConfig {},
+
+
+		ethereum: Default::default(),
 		base_fee: Default::default(),
 	}
 }
+ 
+ 
