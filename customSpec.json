@@ -2,7 +2,9 @@
   "name": "Public Node",
   "id": "public_live",
   "chainType": "Live",
-  "bootNodes": [],
+  "bootNodes": [
+    "/ip4/127.0.0.1/tcp/30333/p2p/12D3KooWAYNSEJiNVecqhx7inrbZuaY1Y1c3Fr2HBujquKCfEQi2"
+  ],
   "telemetryEndpoints": null,
   "protocolId": null,
   "properties": {
@@ -25,19 +27,19 @@
         "balances": [
           [
             "0x6b7cd45dfc550f12b4edafdfbbc68b53faae6fe2",
-            625000000000000000000000000
+            1250000000000000000000000000
           ],
           [
             "0x18119bb0f49ee709104ca2804b297b08d5d0edec",
-            625000000000000000000000000
+            1250000000000000000000000000
           ],
           [
             "0x71b18c74b51e2195c92c169504f7fafa71308a9a",
-            625000000000000000000000000
+            1250000000000000000000000000
           ],
           [
             "0xc03cfc225ad4b42f96f612ba38bd4d9cbd4a419a",
-            625000000000000000000000000
+            1250000000000000000000000000
           ]
         ]
       },
