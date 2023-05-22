@@ -29,23 +29,6 @@ fn get_from_secret<TPublic: Public>(seed: &str) -> <TPublic::Pair as Pair>::Publ
 		.public()
 }
 
-/// Helper function to generate an account ID from seed
-// fn get_account_id_from_secret<TPublic: Public>(seed: &str) -> AccountId
-// 	where
-// 		AccountPublic: From<<TPublic::Pair as Pair>::Public>,
-// {
-// 	AccountPublic::from(get_from_secret::<TPublic>(seed)).into_account()
-// }
-
-/// Helper function to generate an authority key for Aura
-// fn get_authority_keys_from_secret(seed: &str) -> (AccountId, AuraId, GrandpaId) {
-// 	(
-// 		// get_account_id_from_secret::<ed25519::Public>(seed),
-// 		AccountId::from(hex!("f24FF3a9CF04c71Dbc94D0b566f7A27B94566cac")),
-// 		get_from_secret::<AuraId>(seed),
-// 		get_from_secret::<GrandpaId>(seed),
-// 	)
-// }
 
 const ALITH: &str = "0x6B7CD45dfc550F12b4EdAFDFbBC68b53faAE6Fe2";
 const BALTATHAR: &str = "0x18119Bb0f49ee709104CA2804B297B08d5d0EDEc";
@@ -157,6 +140,8 @@ pub fn development_config() -> Result<ChainSpec, String> {
 					AccountId::from(hex!("6B7CD45dfc550F12b4EdAFDFbBC68b53faAE6Fe2")),
 					AccountId::from(hex!("18119Bb0f49ee709104CA2804B297B08d5d0EDEc")),
 					AccountId::from(hex!("71B18c74b51E2195c92C169504f7FAFA71308A9a")),
+					AccountId::from(hex!("C03cfc225Ad4b42F96f612BA38bD4d9cBD4a419a")),
+
 				],
 				true,
 			)
@@ -234,7 +219,7 @@ fn testnet_genesis(
 	endowed_accounts: Vec<AccountId>,
 	_enable_println: bool,
 ) -> GenesisConfig {
-	const ENDOWMENT: Balance = 2_500_000_000 * STOR;
+	const ENDOWMENT: Balance = 5_000_000_000 * STOR;
 	GenesisConfig {
 		system: SystemConfig {
 			// Add Wasm runtime to storage.
@@ -245,7 +230,7 @@ fn testnet_genesis(
 			balances: endowed_accounts
 				.iter()
 				.cloned()
-				.map(|k| (k.clone(), ENDOWMENT / initial_authorities.len() as u128))
+				.map(|k| (k.clone(), ENDOWMENT / endowed_accounts.len() as u128))
 				.collect(),
 		},
 		aura: Default::default(),
