@@ -312,8 +312,8 @@ type NegativeImbalance = <Balances as Currency<AccountId>>::NegativeImbalance;
 impl OnUnbalanced<NegativeImbalance> for DealWithFees {
 	fn on_unbalanceds<B>(mut fees_then_tips: impl Iterator<Item=NegativeImbalance>) {
 		if let Some(fees) = fees_then_tips.next() {
-			// for fees, 10% to treasury, 90% to author
-			let mut split = fees.ration(10, 90);
+			// for fees, 0% to treasury, 100% to author
+			let mut split = fees.ration(0, 100);
 			if let Some(tips) = fees_then_tips.next() {
 				// for tips, if any, 100% (though this can be anything)
 				tips.merge_into(&mut split.1);
