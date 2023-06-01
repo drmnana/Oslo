@@ -69,7 +69,8 @@ pub fn public_config() -> Result<ChainSpec, String> {
 					),
 				],
 				// Sudo account
-				AccountId::from(hex!("55D5E776997198679A8774507CaA4b0F7841767e")),
+				array_bytes::hex_n_into_unchecked(ALITH), 
+
 				// Pre-funded accounts
 				vec![
 					array_bytes::hex_n_into_unchecked(ALITH),
@@ -129,7 +130,7 @@ pub fn development_config() -> Result<ChainSpec, String> {
 				// Initial PoA authorities
 				vec![(
 					array_bytes::hex_n_into_unchecked(ALITH),
-					get_from_secret::<AuraId>("//Alice"),
+					get_from_secret::<AuraId>("//Alice"), 
 					get_from_secret::<GrandpaId>("//Alice"),
 				)],
 				// Sudo account
@@ -186,7 +187,8 @@ pub fn local_testnet_config() -> Result<ChainSpec, String> {
 					),
 				],
 				// Sudo account
-				AccountId::from(hex!("6B7CD45dfc550F12b4EdAFDFbBC68b53faAE6Fe2")),
+				array_bytes::hex_n_into_unchecked(ALITH), 
+				// AccountId::from(hex!("6B7CD45dfc550F12b4EdAFDFbBC68b53faAE6Fe2")),
 				// Pre-funded accounts
 				vec![
 					array_bytes::hex_n_into_unchecked(ALITH),

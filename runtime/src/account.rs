@@ -37,13 +37,13 @@ impl std::fmt::Display for AccountId20 {
 		write!(f, "{:?}", self.0)
 	}
 }
-
+  
 impl core::fmt::Debug for AccountId20 {
 	fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
 		write!(f, "{:?}", H160(self.0))
 	}
 }
-
+  
 impl From<[u8; 20]> for AccountId20 {
 	fn from(bytes: [u8; 20]) -> Self {
 		Self(bytes)
