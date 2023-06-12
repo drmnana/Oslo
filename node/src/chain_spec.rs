@@ -1,14 +1,17 @@
 use hex_literal::hex;
 use sc_service::{ChainType, Properties};
 use sp_consensus_aura::sr25519::AuthorityId as AuraId;
-use sp_core::{crypto::UncheckedInto, Pair, Public, H160, U256};
+use sp_core::{crypto::UncheckedInto, Pair,sr25519, Public, H160, U256};
 use sp_finality_grandpa::AuthorityId as GrandpaId;
+// use sp_runtime::key_types::IM_ONLINE;
+use pallet_im_online::sr25519::AuthorityId as ImOnlineId;
+
 use storage_chain_runtime::{
-	currency::*, opaque::SessionKeys, AccountId, Balance, BalancesConfig, EVMConfig,
+	currency::*, opaque::SessionKeys, AccountId, Balance, BalancesConfig,Signature, EVMConfig,
 	EthereumConfig, GenesisAccount, GenesisConfig, SessionConfig, SudoConfig, SystemConfig,
-	WASM_BINARY,
+	WASM_BINARY, GrandpaConfig, AuraConfig , ValidatorSetConfig, ImOnlineConfig, 
 };
-// use sp_runtime::traits::{IdentifyAccount, Verify};
+use sp_runtime::traits::{IdentifyAccount, Verify};
 use std::{collections::BTreeMap, default::Default};
 // use frame_benchmarking::frame_support::metadata::StorageEntryModifier::Default;
 // use libsecp256k1::{PublicKey, PublicKeyFormat};
@@ -20,7 +23,7 @@ use std::{collections::BTreeMap, default::Default};
 /// Specialized `ChainSpec`. This is a specialization of the general Substrate ChainSpec type.
 pub type ChainSpec = sc_service::GenericChainSpec<GenesisConfig>;
 
-// type AccountPublic = <Signature as Verify>::Signer;
+type AccountPublic = <Signature as Verify>::Signer;
 
 /// Helper function to generate a crypto pair from seed
 fn get_from_secret<TPublic: Public>(seed: &str) -> <TPublic::Pair as Pair>::Public {
@@ -90,9 +93,40 @@ pub fn public_config() -> Result<ChainSpec, String> {
 	))
 }
 
-fn session_keys(aura: AuraId, grandpa: GrandpaId) -> SessionKeys {
-	SessionKeys { aura, grandpa }
+fn session_keys(aura: AuraId, grandpa: GrandpaId, im_online: ImOnlineId) -> SessionKeys {
+	SessionKeys { aura, grandpa, im_online }
 }
+
+
+/// Generate a crypto pair from seed.
+pub fn get_from_seed<TPublic: Public>(seed: &str) -> <TPublic::Pair as Pair>::Public {
+	TPublic::Pair::from_string(&format!("//{}", seed), None)
+		.expect("static values are valid; qed")
+		.public()
+}
+
+
+// Generate Account-ID from Seed
+pub fn get_account_id_from_seed<TPublic: Public>(seed: &str) -> AccountId
+	where
+		AccountPublic: From<<TPublic::Pair as Pair>::Public>,
+{
+	AccountPublic::from(get_from_seed::<TPublic>(seed)).into_account()
+}
+
+
+
+
+
+pub fn authority_keys_from_seed(s: &str) -> (AccountId, AuraId, GrandpaId, ImOnlineId) {
+	(
+		get_account_id_from_seed::<sr25519::Public>(s),
+		get_from_seed::<AuraId>(s),
+		get_from_seed::<GrandpaId>(s), 
+		get_from_seed::<ImOnlineId>(s),
+	)
+}
+
 
 pub fn chainspec_properties() -> Properties {
 	let mut properties = Properties::new();
@@ -216,7 +250,7 @@ pub fn local_testnet_config() -> Result<ChainSpec, String> {
 /// Configure initial storage state for FRAME modules.
 fn testnet_genesis(
 	wasm_binary: &[u8],
-	initial_authorities: Vec<(AccountId, AuraId, GrandpaId)>,
+	initial_authorities: Vec<(AccountId, AuraId, GrandpaId, ImOnlineId)>,
 	root_key: AccountId,
 	endowed_accounts: Vec<AccountId>,
 	_enable_println: bool,
@@ -235,17 +269,28 @@ fn testnet_genesis(
 				.map(|k| (k.clone(), ENDOWMENT / endowed_accounts.len() as u128))
 				.collect(),
 		},
-		aura: Default::default(),
-		// AuraConfig {
-		// 	authorities: initial_authorities.iter().map(|x| (x.0.clone())).collect(),
-		// },
-		grandpa: Default::default(),
-		// GrandpaConfig {
-		// 	authorities: initial_authorities.iter().map(|x| (x.1.clone(), 1)).collect(),
-		// },
+
+		validator_set: ValidatorSetConfig {
+			initial_validators: initial_authorities.iter().map(|x| x.0.clone()).collect::<Vec<_>>(),
+		},
+
+		// aura: Default::default(),
+		aura: AuraConfig {
+			// authorities: initial_authorities.iter().map(|x| (x.1.clone())).collect(),
+			authorities : vec![], 
+		},
+		// grandpa: Default::default(),
+		grandpa: GrandpaConfig {
+			// authorities: initial_authorities.iter().map(|x| (x.2.clone(), 1)).collect(),
+			authorities : vec![], 
+
+		},
 		sudo: SudoConfig {
 			// Assign network admin rights.
 			key: Some(root_key),
+		},
+		im_online: ImOnlineConfig {
+			keys: vec![],
 		},
 		transaction_payment: Default::default(),
 		evm: EVMConfig {
@@ -263,7 +308,7 @@ fn testnet_genesis(
 				accounts
 			},
 		},
-		session: SessionConfig {
+		session: SessionConfig {	
 			keys: initial_authorities
 				.into_iter()
 				.map(|(acc, aura, gran)|  {
@@ -271,13 +316,12 @@ fn testnet_genesis(
 						acc.clone(), 
 						acc, 
 						session_keys(
-							aura, gran,
+							aura, gran, im_online, 
 						), 
 				)
 			})
 			.collect::<Vec<_>>(), 
 		},
-
 
 		ethereum: Default::default(),
 		base_fee: Default::default(),

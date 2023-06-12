@@ -9,23 +9,36 @@ include!(concat!(env!("OUT_DIR"), "/wasm_binary.rs"));
 use pallet_grandpa::{
 	fg_primitives, AuthorityId as GrandpaId, AuthorityList as GrandpaAuthorityList,
 };
+
+// vvv
+use frame_system::EnsureRoot;
+
+
 use codec::{Encode, Decode};
 use sp_api::impl_runtime_apis;
 use sp_consensus_aura::sr25519::AuthorityId as AuraId;
 use sp_core::{crypto::KeyTypeId, OpaqueMetadata, U256, H160, H256};
+
 use sp_runtime::{
-	create_runtime_str, generic, impl_opaque_keys,
+	create_runtime_str, generic, impl_opaque_keys, generic::Era, 
 	traits::{
 		BlakeTwo256, Block as BlockT, NumberFor, One,
-		Dispatchable, PostDispatchInfoOf, DispatchInfoOf, UniqueSaturatedInto, OpaqueKeys,
+		Dispatchable, PostDispatchInfoOf, DispatchInfoOf, UniqueSaturatedInto, OpaqueKeys, AccountIdLookup, 
+		Verify , IdentifyAccount
 	},
 	transaction_validity::{
-		TransactionSource, TransactionValidity, TransactionValidityError}, ApplyExtrinsicResult, ConsensusEngineId,
+		TransactionSource,TransactionPriority, TransactionValidity, TransactionValidityError}, ApplyExtrinsicResult, ConsensusEngineId,
+		MultiSignature, SaturatedConversion,
 };
+
+
+
 use sp_std::prelude::*;
 #[cfg(feature = "std")]
 use sp_version::NativeVersion;
 use sp_version::RuntimeVersion;
+
+use pallet_im_online::sr25519::AuthorityId as ImOnlineId;
 
 
 use pallet_evm::{
@@ -42,7 +55,7 @@ pub use fp_evm::GenesisAccount;
 
 // A few exports that help ease life for downstream crates.
 pub use frame_support::{
-	construct_runtime, parameter_types, pallet_prelude::PhantomData,
+	construct_runtime, log, parameter_types, pallet_prelude::PhantomData,
 	traits::{
 		ConstU128, ConstU32, ConstU64, ConstU8, KeyOwnerProofSystem, Randomness, StorageInfo,
 		FindAuthor, OnUnbalanced, Currency, Imbalance
@@ -124,9 +137,25 @@ pub mod opaque {
 		pub struct SessionKeys {
 			pub aura: Aura,
 			pub grandpa: Grandpa,
+			pub im_online: ImOnline,
 		}
 	}
 }
+
+
+// vvv
+parameter_types! {
+	pub const MinAuthorities: u32 = 2;
+}
+
+impl validator_set::Config for Runtime {
+	type RuntimeEvent = RuntimeEvent;
+	type AddRemoveOrigin = EnsureRoot<AccountId>;
+	type MinAuthorities = MinAuthorities;
+	// type WeightInfo = validator_set::weights::SubstrateWeight<Runtime>;
+}
+
+
 
 // To learn more about runtime versioning, see:
 // https://docs.substrate.io/main-docs/build/upgrade#runtime-versioning
@@ -252,6 +281,10 @@ impl frame_system::Config for Runtime {
 
 impl pallet_randomness_collective_flip::Config for Runtime {}
 
+
+
+
+
 impl pallet_aura::Config for Runtime {
 	type AuthorityId = AuraId;
 	type MaxAuthorities = ConstU32<32>;
@@ -275,8 +308,9 @@ impl pallet_grandpa::Config for Runtime {
 
 	type WeightInfo = ();
 	type MaxAuthorities = ConstU32<32>;
-}
 
+}
+ 
 impl pallet_timestamp::Config for Runtime {
 	/// A timestamp: milliseconds since the unix epoch.
 	type Moment = u64;
@@ -323,7 +357,7 @@ impl OnUnbalanced<NegativeImbalance> for DealWithFees {
 		}
 	}
 }
-
+ 
 pub struct Author;
 
 impl OnUnbalanced<NegativeImbalance> for Author {
@@ -461,6 +495,83 @@ parameter_types! {
 // 	}
 // }
 
+
+// Impleminting the frame system off-chain
+// ////////////// // //////////////// //////////////// //////////////// //////////////// //////////////// //////////////// //////////////// //////////////// //////////////// //////////////
+
+impl<LocalCall> frame_system::offchain::CreateSignedTransaction<LocalCall> for Runtime
+where
+	RuntimeCall: From<LocalCall>,
+{
+	fn create_transaction<C: frame_system::offchain::AppCrypto<Self::Public, Self::Signature>>(
+		call: RuntimeCall,
+		public: <Signature as Verify>::Signer,
+		account: AccountId,
+		nonce: Index,
+	) -> Option<(RuntimeCall, <UncheckedExtrinsic as sp_runtime::traits::Extrinsic>::SignaturePayload)> {
+		let tip = 0;
+		let period =
+			BlockHashCount::get().checked_next_power_of_two().map(|c| c / 2).unwrap_or(2) as u64;
+		let current_block = System::block_number().saturated_into::<u64>().saturating_sub(1);
+		let era = Era::mortal(period, current_block);
+		let extra = (
+			frame_system::CheckNonZeroSender::<Runtime>::new(),
+			frame_system::CheckSpecVersion::<Runtime>::new(),
+			frame_system::CheckTxVersion::<Runtime>::new(),
+			frame_system::CheckGenesis::<Runtime>::new(),
+			frame_system::CheckEra::<Runtime>::from(era),
+			frame_system::CheckNonce::<Runtime>::from(nonce),
+			frame_system::CheckWeight::<Runtime>::new(),
+			pallet_transaction_payment::ChargeTransactionPayment::<Runtime>::from(tip),
+		);
+
+		let raw_payload = SignedPayload::new(call, extra)
+			.map_err(|e| {
+				log::warn!("Unable to create signed payload: {:?}", e);
+			})
+			.ok()?;
+		let signature = raw_payload.using_encoded(|payload| C::sign(payload, public))?;
+		let address = account;
+		let (call, extra, _) = raw_payload.deconstruct();
+		Some((call, (address, signature.into(), extra)))
+	}
+}
+
+impl frame_system::offchain::SigningTypes for Runtime {
+	type Public = <Signature as Verify>::Signer;
+	type Signature = Signature;
+}
+
+impl<C> frame_system::offchain::SendTransactionTypes<C> for Runtime
+where
+	RuntimeCall: From<C>,
+{
+	type Extrinsic = UncheckedExtrinsic;
+	type OverarchingCall = RuntimeCall;
+}
+
+impl pallet_im_online::Config for Runtime {
+	type AuthorityId = ImOnlineId;
+	// type Event = Event;
+	type NextSessionRotation = pallet_session::PeriodicSessions<Period, Offset>;
+	type ValidatorSet = ValidatorSet;
+	type ReportUnresponsiveness = ValidatorSet;
+	type UnsignedPriority = ImOnlineUnsignedPriority;
+	type WeightInfo = pallet_im_online::weights::SubstrateWeight<Runtime>;
+	type MaxKeys = MaxKeys;
+	type MaxPeerInHeartbeats = MaxPeerInHeartbeats;
+	type MaxPeerDataEncodingSize = MaxPeerDataEncodingSize;
+	type RuntimeEvent = RuntimeEvent;
+
+}
+
+
+// ////////////// // //////////////// //////////////// //////////////// //////////////// //////////////// //////////////// //////////////// //////////////// //////////////// //////////////
+
+
+
+
+
 impl pallet_authorship::Config for Runtime {
 	type FindAuthor = pallet_session::FindAccountFromAuthorIndex<Self, Aura>;
 	type UncleGenerations = UncleGenerations;
@@ -472,6 +583,15 @@ parameter_types! {
 	pub const Period: u32 = 0xFFFF_FFFF;
 	pub const Offset: u32 = 0xFFFF_FFFF;
 }
+
+
+parameter_types! {
+	pub const ImOnlineUnsignedPriority: TransactionPriority = TransactionPriority::max_value();
+	pub const MaxKeys: u32 = 10_000;
+	pub const MaxPeerInHeartbeats: u32 = 10_000;
+	pub const MaxPeerDataEncodingSize: u32 = 1_000;
+}
+
 
 impl pallet_session::Config for Runtime {
 	type RuntimeEvent = RuntimeEvent;
@@ -503,13 +623,16 @@ construct_runtime!(
 		RandomnessCollectiveFlip: pallet_randomness_collective_flip,
 		Timestamp: pallet_timestamp,
 
+		Balances: pallet_balances,
+
+		ValidatorSet: validator_set,
+		Session: pallet_session,
+		ImOnline: pallet_im_online,
 		Aura: pallet_aura,
 		Grandpa: pallet_grandpa,
-		Balances: pallet_balances,
 		TransactionPayment: pallet_transaction_payment,
 		Sudo: pallet_sudo,
 
-		Session: pallet_session,
 		Authorship: pallet_authorship,
 
 		EVM: pallet_evm,
@@ -564,6 +687,7 @@ pub type SignedExtra = (
 /// Unchecked extrinsic type as expected by this runtime.
 pub type UncheckedExtrinsic =
 fp_self_contained::UncheckedExtrinsic<Address, RuntimeCall, Signature, SignedExtra>;
+
 /// The payload being signed in transactions.
 pub type SignedPayload = generic::SignedPayload<RuntimeCall, SignedExtra>;
 /// Executive: handles dispatch to the various modules.
@@ -586,6 +710,8 @@ mod benches {
 		[frame_system, SystemBench::<Runtime>]
 		[pallet_balances, Balances]
 		[pallet_timestamp, Timestamp]
+		[pallet_im_online, ImOnline]
+
 	);
 }
 

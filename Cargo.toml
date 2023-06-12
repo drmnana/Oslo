@@ -5,7 +5,7 @@ members = [
 ]
 
 [workspace.package]
-authors = ["Usama Ali"]
+authors = ["Usama Ali, Asad Ali"]
 repository = "https://github.com/Ali-Usama/storage-chain"
 
 
@@ -15,6 +15,9 @@ repository = "https://github.com/Ali-Usama/storage-chain"
 inherits = "release"
 [profile.release]
 panic = "unwind"
+
+
+
 
 [workspace.dependencies]
 sha3 = { version = "0.10", default-features = false }
@@ -29,8 +32,13 @@ hex-literal = "0.4"
 futures = "0.3.25"
 
 
+
+
 codec = { package = "parity-scale-codec", version = "3.0.0", default-features = false }
 scale-info = { version = "2.3.0", default-features = false }
+
+
+# substrate-validator-set = { default-features = false, git = "https://github.com/gautamdhameja/substrate-validator-set.git", version = "0.9.42" }
 
 pallet-aura = { default-features = false, git = "https://github.com/paritytech/substrate.git", branch = "polkadot-v0.9.37" }
 pallet-session = { default-features = false, git = "https://github.com/paritytech/substrate.git", branch = "polkadot-v0.9.37" }
@@ -57,6 +65,7 @@ sp-session = { default-features = false, git = "https://github.com/paritytech/su
 sp-std = { default-features = false, git = "https://github.com/paritytech/substrate.git", branch = "polkadot-v0.9.37" }
 sp-transaction-pool = { default-features = false, git = "https://github.com/paritytech/substrate.git", branch = "polkadot-v0.9.37" }
 sp-version = { default-features = false, git = "https://github.com/paritytech/substrate.git", branch = "polkadot-v0.9.37" }
+
 
 # Used for the node template's RPCs
 frame-system-rpc-runtime-api = { default-features = false, git = "https://github.com/paritytech/substrate.git", branch = "polkadot-v0.9.37" }
@@ -111,6 +120,9 @@ sp-blockchain = { git = "https://github.com/paritytech/substrate.git", branch = 
 sc-basic-authorship = { git = "https://github.com/paritytech/substrate.git", branch = "polkadot-v0.9.37" }
 substrate-frame-rpc-system = { git = "https://github.com/paritytech/substrate.git", branch = "polkadot-v0.9.37" }
 pallet-transaction-payment-rpc = { git = "https://github.com/paritytech/substrate.git", branch = "polkadot-v0.9.37" }
+
+
+
 
 # These dependencies are used for runtime benchmarking
 frame-benchmarking = { git = "https://github.com/paritytech/substrate.git", branch = "polkadot-v0.9.37" }

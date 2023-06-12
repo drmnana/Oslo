@@ -46,6 +46,7 @@ pallet-transaction-payment = { workspace = true }
 hex-literal = "0.4.1"
 futures = "0.3.25"
 
+
 # These dependencies are used for the node template's RPCs
 jsonrpsee = { version = "0.16", features = [ "macros", "server" ] }
 sc-rpc = { workspace = true }
@@ -94,3 +95,8 @@ runtime-benchmarks = [
 # Enable features that allow the runtime to be tried and debugged. Name might be subject to change
 # in the near future.
 try-runtime = ["storage-chain-runtime/try-runtime", "try-runtime-cli"]
+
+[dependencies.pallet-im-online]
+default-features = false
+git = 'https://github.com/paritytech/substrate.git'
+branch = 'polkadot-v0.9.37'
