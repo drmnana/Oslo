@@ -1,7 +1,7 @@
 use hex_literal::hex;
 use sc_service::{ChainType, Properties};
 use sp_consensus_aura::sr25519::AuthorityId as AuraId;
-use sp_core::{crypto::UncheckedInto, Pair,sr25519, Public, H160, U256};
+use sp_core::{ Pair, sr25519, Public, H160, U256};
 use sp_finality_grandpa::AuthorityId as GrandpaId;
 // use sp_runtime::key_types::IM_ONLINE;
 use pallet_im_online::sr25519::AuthorityId as ImOnlineId;
@@ -54,21 +54,27 @@ pub fn public_config() -> Result<ChainSpec, String> {
 						array_bytes::hex_n_into_unchecked(ALITH),
 						get_from_secret::<AuraId>("//Alice"),
 						get_from_secret::<GrandpaId>("//Alice"),
+						get_from_secret::<ImOnlineId>("Alice"),
 					),
 					(
 						array_bytes::hex_n_into_unchecked(BALTATHAR),
 						get_from_secret::<AuraId>("//Bob"),
 						get_from_secret::<GrandpaId>("//Bob"),
+						get_from_secret::<ImOnlineId>("Bob"),
+
 					),
 					(
 						array_bytes::hex_n_into_unchecked(CHARLETH),
 						get_from_secret::<AuraId>("//Charlie"),
 						get_from_secret::<GrandpaId>("//Charlie"),
+						get_from_secret::<ImOnlineId>("Charlie"),
+
 					),
 					(
 						array_bytes::hex_n_into_unchecked(DOROTHY),
 						get_from_secret::<AuraId>("//Dave"),
 						get_from_secret::<GrandpaId>("//Dave"),
+						get_from_secret::<ImOnlineId>("Dave"),
 					),
 				],
 				// Sudo account
@@ -115,17 +121,14 @@ pub fn get_account_id_from_seed<TPublic: Public>(seed: &str) -> AccountId
 }
 
 
-
-
-
-pub fn authority_keys_from_seed(s: &str) -> (AccountId, AuraId, GrandpaId, ImOnlineId) {
-	(
-		get_account_id_from_seed::<sr25519::Public>(s),
-		get_from_seed::<AuraId>(s),
-		get_from_seed::<GrandpaId>(s), 
-		get_from_seed::<ImOnlineId>(s),
-	)
-}
+// pub fn authority_keys_from_seed(s: &str) -> (AccountId, AuraId, GrandpaId, ImOnlineId) {
+// 	(
+// 		get_account_id_from_seed::<sr25519::Public>(s),
+// 		get_from_seed::<AuraId>(s),
+// 		get_from_seed::<GrandpaId>(s), 
+// 		get_from_seed::<ImOnlineId>(s),
+// 	)
+// }
 
 
 pub fn chainspec_properties() -> Properties {
@@ -166,6 +169,7 @@ pub fn development_config() -> Result<ChainSpec, String> {
 					array_bytes::hex_n_into_unchecked(ALITH),
 					get_from_secret::<AuraId>("//Alice"), 
 					get_from_secret::<GrandpaId>("//Alice"),
+					get_from_secret::<ImOnlineId>("Alice"),
 				)],
 				// Sudo account
 				// AccountId::from(hex!("6B7CD45dfc550F12b4EdAFDFbBC68b53faAE6Fe2")),
@@ -213,11 +217,13 @@ pub fn local_testnet_config() -> Result<ChainSpec, String> {
 						array_bytes::hex_n_into_unchecked(ALITH),
 						get_from_secret::<AuraId>("//Alice"),
 						get_from_secret::<GrandpaId>("//Alice"),
+						get_from_secret::<ImOnlineId>("Alice"),
 					),
 					(
 						array_bytes::hex_n_into_unchecked(BALTATHAR),
 						get_from_secret::<AuraId>("//Bob"),
 						get_from_secret::<GrandpaId>("//Bob"),
+						get_from_secret::<ImOnlineId>("Bob"),
 					),
 				],
 				// Sudo account
@@ -308,20 +314,36 @@ fn testnet_genesis(
 				accounts
 			},
 		},
-		session: SessionConfig {	
+		// session: SessionConfig {	
+		// 	keys: initial_authorities
+		// 		.into_iter()
+		// 		.map(|(acc, aura, gran)|  {
+		// 			(
+		// 				acc.clone(), 
+		// 				acc, 
+		// 				session_keys(
+		// 					aura, gran, im_online, 
+		// 				), 
+		// 		)
+		// 	})
+		// 	.collect::<Vec<_>>(), 
+		// },
+
+		session: SessionConfig {
 			keys: initial_authorities
-				.into_iter()
-				.map(|(acc, aura, gran)|  {
+				.iter()
+				.map(|x| {
 					(
-						acc.clone(), 
-						acc, 
+						x.0.clone(),
+						x.0.clone(),
 						session_keys(
-							aura, gran, im_online, 
-						), 
-				)
-			})
-			.collect::<Vec<_>>(), 
+							x.1.clone(), x.2.clone(), x.3.clone(),
+						),
+					)
+				})
+				.collect::<Vec<_>>(),
 		},
+
 
 		ethereum: Default::default(),
 		base_fee: Default::default(),
