@@ -1,17 +1,17 @@
 use hex_literal::hex;
 use sc_service::{ChainType, Properties};
 use sp_consensus_aura::sr25519::AuthorityId as AuraId;
-use sp_core::{ Pair, sr25519, Public, H160, U256};
+use sp_core::{ Pair, Public, H160, U256};
 use sp_finality_grandpa::AuthorityId as GrandpaId;
 // use sp_runtime::key_types::IM_ONLINE;
 use pallet_im_online::sr25519::AuthorityId as ImOnlineId;
 
 use storage_chain_runtime::{
-	currency::*, opaque::SessionKeys, AccountId, Balance, BalancesConfig,Signature, EVMConfig,
-	EthereumConfig, GenesisAccount, GenesisConfig, SessionConfig, SudoConfig, SystemConfig,
+	currency::*, opaque::SessionKeys, AccountId, Balance, BalancesConfig, EVMConfig,
+	GenesisAccount, GenesisConfig, SessionConfig, SudoConfig, SystemConfig,
 	WASM_BINARY, GrandpaConfig, AuraConfig , ValidatorSetConfig, ImOnlineConfig, 
 };
-use sp_runtime::traits::{IdentifyAccount, Verify};
+// use sp_runtime::traits::{IdentifyAccount, Verify};
 use std::{collections::BTreeMap, default::Default};
 // use frame_benchmarking::frame_support::metadata::StorageEntryModifier::Default;
 // use libsecp256k1::{PublicKey, PublicKeyFormat};
@@ -23,7 +23,7 @@ use std::{collections::BTreeMap, default::Default};
 /// Specialized `ChainSpec`. This is a specialization of the general Substrate ChainSpec type.
 pub type ChainSpec = sc_service::GenericChainSpec<GenesisConfig>;
 
-type AccountPublic = <Signature as Verify>::Signer;
+// type AccountPublic = <Signature as Verify>::Signer;
 
 /// Helper function to generate a crypto pair from seed
 fn get_from_secret<TPublic: Public>(seed: &str) -> <TPublic::Pair as Pair>::Public {
@@ -54,27 +54,27 @@ pub fn public_config() -> Result<ChainSpec, String> {
 						array_bytes::hex_n_into_unchecked(ALITH),
 						get_from_secret::<AuraId>("//Alice"),
 						get_from_secret::<GrandpaId>("//Alice"),
-						get_from_secret::<ImOnlineId>("Alice"),
+						get_from_secret::<ImOnlineId>("//Alice"),
 					),
 					(
 						array_bytes::hex_n_into_unchecked(BALTATHAR),
 						get_from_secret::<AuraId>("//Bob"),
 						get_from_secret::<GrandpaId>("//Bob"),
-						get_from_secret::<ImOnlineId>("Bob"),
+						get_from_secret::<ImOnlineId>("//Bob"),
 
 					),
 					(
 						array_bytes::hex_n_into_unchecked(CHARLETH),
 						get_from_secret::<AuraId>("//Charlie"),
 						get_from_secret::<GrandpaId>("//Charlie"),
-						get_from_secret::<ImOnlineId>("Charlie"),
+						get_from_secret::<ImOnlineId>("//Charlie"),
 
 					),
 					(
 						array_bytes::hex_n_into_unchecked(DOROTHY),
 						get_from_secret::<AuraId>("//Dave"),
 						get_from_secret::<GrandpaId>("//Dave"),
-						get_from_secret::<ImOnlineId>("Dave"),
+						get_from_secret::<ImOnlineId>("//Dave"),
 					),
 				],
 				// Sudo account
@@ -103,34 +103,6 @@ fn session_keys(aura: AuraId, grandpa: GrandpaId, im_online: ImOnlineId) -> Sess
 	SessionKeys { aura, grandpa, im_online }
 }
 
-
-/// Generate a crypto pair from seed.
-pub fn get_from_seed<TPublic: Public>(seed: &str) -> <TPublic::Pair as Pair>::Public {
-	TPublic::Pair::from_string(&format!("//{}", seed), None)
-		.expect("static values are valid; qed")
-		.public()
-}
-
-
-// Generate Account-ID from Seed
-pub fn get_account_id_from_seed<TPublic: Public>(seed: &str) -> AccountId
-	where
-		AccountPublic: From<<TPublic::Pair as Pair>::Public>,
-{
-	AccountPublic::from(get_from_seed::<TPublic>(seed)).into_account()
-}
-
-
-// pub fn authority_keys_from_seed(s: &str) -> (AccountId, AuraId, GrandpaId, ImOnlineId) {
-// 	(
-// 		get_account_id_from_seed::<sr25519::Public>(s),
-// 		get_from_seed::<AuraId>(s),
-// 		get_from_seed::<GrandpaId>(s), 
-// 		get_from_seed::<ImOnlineId>(s),
-// 	)
-// }
-
-
 pub fn chainspec_properties() -> Properties {
 	let mut properties = Properties::new();
 	properties.insert("tokenDecimals".into(), 18.into());
@@ -138,19 +110,7 @@ pub fn chainspec_properties() -> Properties {
 	properties
 }
 
-// const ETHAN: &str = "0xFf64d3F6efE2317EE2807d223a0Bdc4c0c49dfDB";
 
-/// Helper function to get an `AccountId` from an ECDSA Key Pair.
-// pub fn get_account_id_from_pair(pair: ecdsa::Pair) -> Option<AccountId> {
-// 	let decompressed = PublicKey::parse_slice(&pair.public().0, Some(PublicKeyFormat::Compressed))
-// 		.ok()?
-// 		.serialize();
-//
-// 	let mut m = [0u8; 64];
-// 	m.copy_from_slice(&decompressed[1..65]);
-//
-// 	Some(H160::from(H256::from_slice(Keccak256::digest(&m).as_slice())).into())
-// }
 
 pub fn development_config() -> Result<ChainSpec, String> {
 	let wasm_binary = WASM_BINARY.ok_or_else(|| "Development wasm not available".to_string())?;
@@ -169,7 +129,7 @@ pub fn development_config() -> Result<ChainSpec, String> {
 					array_bytes::hex_n_into_unchecked(ALITH),
 					get_from_secret::<AuraId>("//Alice"), 
 					get_from_secret::<GrandpaId>("//Alice"),
-					get_from_secret::<ImOnlineId>("Alice"),
+					get_from_secret::<ImOnlineId>("//Alice"),
 				)],
 				// Sudo account
 				// AccountId::from(hex!("6B7CD45dfc550F12b4EdAFDFbBC68b53faAE6Fe2")),
@@ -217,13 +177,13 @@ pub fn local_testnet_config() -> Result<ChainSpec, String> {
 						array_bytes::hex_n_into_unchecked(ALITH),
 						get_from_secret::<AuraId>("//Alice"),
 						get_from_secret::<GrandpaId>("//Alice"),
-						get_from_secret::<ImOnlineId>("Alice"),
+						get_from_secret::<ImOnlineId>("//Alice"),
 					),
 					(
 						array_bytes::hex_n_into_unchecked(BALTATHAR),
 						get_from_secret::<AuraId>("//Bob"),
 						get_from_secret::<GrandpaId>("//Bob"),
-						get_from_secret::<ImOnlineId>("Bob"),
+						get_from_secret::<ImOnlineId>("//Bob"),
 					),
 				],
 				// Sudo account
@@ -314,20 +274,6 @@ fn testnet_genesis(
 				accounts
 			},
 		},
-		// session: SessionConfig {	
-		// 	keys: initial_authorities
-		// 		.into_iter()
-		// 		.map(|(acc, aura, gran)|  {
-		// 			(
-		// 				acc.clone(), 
-		// 				acc, 
-		// 				session_keys(
-		// 					aura, gran, im_online, 
-		// 				), 
-		// 		)
-		// 	})
-		// 	.collect::<Vec<_>>(), 
-		// },
 
 		session: SessionConfig {
 			keys: initial_authorities
