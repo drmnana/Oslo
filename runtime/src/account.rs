@@ -129,7 +129,6 @@ impl sp_runtime::traits::IdentifyAccount for EthereumSigner {
 }
 
 impl From<[u8; 20]> for EthereumSigner {
-	
 	fn from(x: [u8; 20]) -> Self {
 		EthereumSigner(x)
 	}
