@@ -46,7 +46,7 @@ pub fn public_config() -> Result<ChainSpec, String> {
 		"public_live",
 		ChainType::Live,
 		move || {
-			testnet_genesis(
+			mainnet_genesis(
 				wasm_binary,
 				// Initial PoA authorities
 				vec![
@@ -261,7 +261,7 @@ fn testnet_genesis(
 		transaction_payment: Default::default(),
 		evm: EVMConfig {
 			accounts: {
-				let mut accounts = BTreeMap::new();
+				let mut accounts: BTreeMap<H160, GenesisAccount> = BTreeMap::new();
 				accounts.insert(
 					H160::from_slice(&hex!("6Be02d1d3665660d22FF9624b7BE0551ee1Ac91b")),
 					GenesisAccount {
@@ -297,3 +297,85 @@ fn testnet_genesis(
 }
  
  
+
+fn mainnet_genesis(
+	wasm_binary: &[u8],
+	initial_authorities: Vec<(AccountId, AuraId, GrandpaId, ImOnlineId)>,
+	root_key: AccountId,
+	endowed_accounts: Vec<AccountId>,
+	_enable_println: bool,
+) -> GenesisConfig {
+	const ENDOWMENT: Balance = 5_000_000_000 * STOR;
+	GenesisConfig {
+		system: SystemConfig {
+			// Add Wasm runtime to storage.
+			code: wasm_binary.to_vec(),
+		},
+		balances: BalancesConfig {
+			// Configure endowed accounts with initial balance of 1 << 60.
+			balances: endowed_accounts
+				.iter()
+				.cloned()
+				.map(|k| (k.clone(), ENDOWMENT / endowed_accounts.len() as u128))
+				.collect(),
+		},
+
+		validator_set: ValidatorSetConfig {
+			initial_validators: initial_authorities.iter().map(|x| x.0.clone()).collect::<Vec<_>>(),
+		},
+
+		// aura: Default::default(),
+		aura: AuraConfig {
+			// authorities: initial_authorities.iter().map(|x| (x.1.clone())).collect(),
+			authorities : vec![], 
+		},
+		// grandpa: Default::default(),
+		grandpa: GrandpaConfig {
+			// authorities: initial_authorities.iter().map(|x| (x.2.clone(), 1)).collect(),
+			authorities : vec![], 
+
+		},
+		sudo: SudoConfig {
+			// Assign network admin rights.
+			key: Some(root_key),
+		},
+		im_online: ImOnlineConfig {
+			keys: vec![],
+		},
+		transaction_payment: Default::default(),
+		evm: EVMConfig {
+			accounts: {
+				let mut accounts: BTreeMap<H160, GenesisAccount> = BTreeMap::new();
+				accounts.insert(
+					H160::from_slice(&hex!("6Be02d1d3665660d22FF9624b7BE0551ee1Ac91b")),
+					GenesisAccount {
+						nonce: U256::zero(),
+						balance: Default::default(),
+						code: vec![],
+						storage: BTreeMap::new(),
+					},
+				);
+				accounts
+			},
+		},
+
+		session: SessionConfig {
+			keys: initial_authorities
+				.iter()
+				.map(|x| {
+					(
+						x.0.clone(),
+						x.0.clone(),
+						session_keys(
+							x.1.clone(), x.2.clone(), x.3.clone(),
+						),
+					)
+				})
+				.collect::<Vec<_>>(),
+		},
+
+
+		ethereum: Default::default(),
+		base_fee: Default::default(),
+	}
+}
