@@ -54,6 +54,7 @@ pub use fp_evm::GenesisAccount;
 // A few exports that help ease life for downstream crates.
 pub use frame_support::{
 	construct_runtime, log, parameter_types, pallet_prelude::PhantomData,
+	PalletId,
 	traits::{
 		ConstU128, ConstU32, ConstU64, ConstU8, KeyOwnerProofSystem, Randomness, StorageInfo,
 		FindAuthor, OnUnbalanced, Currency, Imbalance
@@ -85,6 +86,9 @@ pub type AccountId = AccountId20;
 
 /// Balance of an account.
 pub type Balance = u128;
+
+// treasury Pallet
+type RewardRemainder = Treasury;
 
 /// Index of a transaction in the chain.
 pub type Index = u32;
@@ -585,10 +589,37 @@ parameter_types! {
 
 parameter_types! {
 	pub const ImOnlineUnsignedPriority: TransactionPriority = TransactionPriority::max_value();
+	pub const TreasuryPalletId: PalletId = PalletId(*b"py/trsry");
 	pub const MaxKeys: u32 = 10_000;
 	pub const MaxPeerInHeartbeats: u32 = 10_000;
 	pub const MaxPeerDataEncodingSize: u32 = 1_000;
 }
+
+impl pallet_treasury::Config for Runtime {
+	type SpendOrigin = frame_support::traits::NeverEnsureOrigin<u128>;
+	type PalletId = TreasuryPalletId;
+	type Currency = Balances;
+	// type ApproveOrigin = EitherOfDiverse<
+		// EnsureRoot<AccountId>,
+		// pallet_collective::EnsureProportionAtLeast<AccountId, CouncilCollective, 3, 5>,
+	// >;
+	// type RejectOrigin = EitherOfDiverse<
+		// EnsureRoot<AccountId>,
+		// pallet_collective::EnsureProportionMoreThan<AccountId, CouncilCollective, 1, 2>,
+	// >;
+	type RuntimeEvent = RuntimeEvent;
+	type OnSlash = ();
+	// type ProposalBond = ProposalBond;
+	// type ProposalBondMinimum = ProposalBondMinimum;
+	// type ProposalBondMaximum = ();
+	// type SpendPeriod = SpendPeriod;
+	// type Burn = Burn;
+	type BurnDestination = ();
+	type SpendFunds = ();
+	type WeightInfo = pallet_treasury::weights::SubstrateWeight<Runtime>;
+	// type MaxApprovals = MaxApprovals;
+}
+
 
 
 impl pallet_session::Config for Runtime {
@@ -628,6 +659,7 @@ construct_runtime!(
 		ImOnline: pallet_im_online,
 		Aura: pallet_aura,
 		Grandpa: pallet_grandpa,
+		Treasury: pallet_treasury,
 		TransactionPayment: pallet_transaction_payment,
 		Sudo: pallet_sudo,
 
@@ -709,6 +741,7 @@ mod benches {
 		[pallet_balances, Balances]
 		[pallet_timestamp, Timestamp]
 		[pallet_im_online, ImOnline]
+		[pallet_treasury, Treasury]
 
 	);
 }
