@@ -9,7 +9,7 @@ use pallet_im_online::sr25519::AuthorityId as ImOnlineId;
 use storage_chain_runtime::{
 	currency::*, opaque::SessionKeys, AccountId, Balance, BalancesConfig, EVMConfig,
 	GenesisAccount, GenesisConfig, SessionConfig, SudoConfig, SystemConfig,
-	WASM_BINARY, GrandpaConfig, AuraConfig , ValidatorSetConfig, ImOnlineConfig, 
+	WASM_BINARY, GrandpaConfig, AuraConfig , ValidatorSetConfig, ImOnlineConfig, DemocracyConfig, 
 };
 // use sp_runtime::traits::{IdentifyAccount, Verify};
 use std::{collections::BTreeMap, default::Default};
@@ -258,6 +258,8 @@ fn testnet_genesis(
 		im_online: ImOnlineConfig {
 			keys: vec![],
 		},
+		democracy: DemocracyConfig::default(),
+		treasury: Default::default(),
 		transaction_payment: Default::default(),
 		evm: EVMConfig {
 			accounts: {

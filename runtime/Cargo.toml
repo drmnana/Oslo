@@ -27,6 +27,8 @@ serde = "1.0.151"
 codec = {package = "parity-scale-codec", workspace = true, features = ["derive"] }
 scale-info = { workspace = true, features = ["derive"] }
 
+pallet-collective = { workspace = true }
+pallet-democracy = { workspace = true }
 pallet-treasury = { workspace = true }
 pallet-aura = { workspace = true }
 pallet-session = { workspace = true, features = [ "historical" ] }
@@ -124,6 +126,10 @@ std = [
 	"sp-version/std",	
 	"validator-set/std", 
 	"pallet-im-online/std",
+	"pallet-collective/std",
+	"pallet-democracy/std",
+
+
 ]
 
 runtime-benchmarks = [
@@ -137,6 +143,10 @@ runtime-benchmarks = [
 	"pallet-treasury/runtime-benchmarks",
 	"sp-runtime/runtime-benchmarks",
 	"pallet-im-online/runtime-benchmarks",
+	"pallet-collective/runtime-benchmarks",
+	"pallet-democracy/runtime-benchmarks",
+
+
 ]
 
 try-runtime = [
