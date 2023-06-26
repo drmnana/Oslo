@@ -222,7 +222,7 @@ fn testnet_genesis(
 	endowed_accounts: Vec<AccountId>,
 	_enable_println: bool,
 ) -> GenesisConfig { 
-	const ENDOWMENT: Balance = 6_500_000_000 * STOR;
+	// const ENDOWMENT: Balance = 6_500_000_000 * STOR;
 	GenesisConfig {
 		system: SystemConfig {
 			// Add Wasm runtime to storage.
