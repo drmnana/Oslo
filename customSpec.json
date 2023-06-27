@@ -22,15 +22,15 @@
             1000000000000000000000
           ],
           [
-            "0xa81082ea6fd0a99d56425dac010a5fc48b6044cd",
+            "0x90e79dac498b35096d4d86cea4f2c3681b40f5c7",
             1755000000000000000000000000
           ],
           [
-            "0x18119bb0f49ee709104ca2804b297b08d5d0edec",
+            "0x6a321b74936cca0f549fef65f274c9e679258307",
             66000000000000000000000000
           ],
           [
-            "0x71b18c74b51e2195c92c169504f7fafa71308a9a",
+            "0x71599dedfec2ce347a804f9bbf9d18c6c2d7009e",
             194999000000000000000000000
           ]
         ]
@@ -38,9 +38,9 @@
       "validatorSet": {
         "initialValidators": [
           "0x6b7cd45dfc550f12b4edafdfbbc68b53faae6fe2",
-          "0xa81082ea6fd0a99d56425dac010a5fc48b6044cd",
-          "0x18119bb0f49ee709104ca2804b297b08d5d0edec",
-          "0x71b18c74b51e2195c92c169504f7fafa71308a9a"
+          "0x90e79dac498b35096d4d86cea4f2c3681b40f5c7",
+          "0x6a321b74936cca0f549fef65f274c9e679258307",
+          "0x71599dedfec2ce347a804f9bbf9d18c6c2d7009e"
         ]
       },
       "session": {
@@ -55,8 +55,8 @@
             }
           ],
           [
-            "0xa81082ea6fd0a99d56425dac010a5fc48b6044cd",
-            "0xa81082ea6fd0a99d56425dac010a5fc48b6044cd",
+            "0x90e79dac498b35096d4d86cea4f2c3681b40f5c7",
+            "0x90e79dac498b35096d4d86cea4f2c3681b40f5c7",
             {
               "aura": "5FHneW46xGXgs5mUiveU4sbTyGBzmstUspZC92UhjJM694ty",
               "grandpa": "5GoNkf6WdbxCFnPdAnYYQyCjAKPJgLNxXwPjwTh6DGg6gN3E",
@@ -64,8 +64,8 @@
             }
           ],
           [
-            "0x18119bb0f49ee709104ca2804b297b08d5d0edec",
-            "0x18119bb0f49ee709104ca2804b297b08d5d0edec",
+            "0x6a321b74936cca0f549fef65f274c9e679258307",
+            "0x6a321b74936cca0f549fef65f274c9e679258307",
             {
               "aura": "5FLSigC9HGRKVhB9FiEo4Y3koPsNmBmLJbpXg2mp1hXcS59Y",
               "grandpa": "5DbKjhNLpqX3zqZdNBc9BGb4fHU1cRBaDhJUskrvkwfraDi6",
@@ -73,8 +73,8 @@
             }
           ],
           [
-            "0x71b18c74b51e2195c92c169504f7fafa71308a9a",
-            "0x71b18c74b51e2195c92c169504f7fafa71308a9a",
+            "0x71599dedfec2ce347a804f9bbf9d18c6c2d7009e",
+            "0x71599dedfec2ce347a804f9bbf9d18c6c2d7009e",
             {
               "aura": "5DAAnrj7VHTznn2AWBemMuyBwZWs6FNFjdyVXUeYum3PTXFy",
               "grandpa": "5ECTwv6cZ5nJQPk6tWfaTrEk8YH2L7X1VT4EL5Tx2ikfFwb7",

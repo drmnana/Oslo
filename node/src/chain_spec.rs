@@ -34,9 +34,9 @@ fn get_from_secret<TPublic: Public>(seed: &str) -> <TPublic::Pair as Pair>::Publ
 
 
 const ALITH: &str = "0x6B7CD45dfc550F12b4EdAFDFbBC68b53faAE6Fe2";
-const BALTATHAR: &str = "0xA81082ea6fD0A99d56425daC010A5fC48b6044Cd";
-const CHARLETH: &str = "0x18119Bb0f49ee709104CA2804B297B08d5d0EDEc";
-const DOROTHY: &str = "0x71B18c74b51E2195c92C169504f7FAFA71308A9a";
+const BALTATHAR: &str = "0x90E79DAc498b35096d4d86CEa4f2c3681b40F5C7";
+const CHARLETH: &str = "0x6a321b74936ccA0F549FEF65F274c9E679258307";
+const DOROTHY: &str = "0x71599dEdfEc2CE347a804F9bbf9d18C6C2D7009E";
 
 
 pub fn public_config() -> Result<ChainSpec, String> {
