@@ -323,7 +323,7 @@ impl pallet_timestamp::Config for Runtime {
 }
 
 /// Existential deposit.
-pub const EXISTENTIAL_DEPOSIT: u128 = 1 * currency::MICROSTOR;
+pub const EXISTENTIAL_DEPOSIT: u128 = 0 * currency::MICROSTOR;
 
 impl pallet_balances::Config for Runtime {
 	/// The type for recording an account's balance.
@@ -552,7 +552,7 @@ where
 	type Extrinsic = UncheckedExtrinsic;
 	type OverarchingCall = RuntimeCall;
 }
-
+ 
 impl pallet_im_online::Config for Runtime {
 	type AuthorityId = ImOnlineId;
 	// type Event = Event;

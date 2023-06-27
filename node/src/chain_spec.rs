@@ -34,9 +34,10 @@ fn get_from_secret<TPublic: Public>(seed: &str) -> <TPublic::Pair as Pair>::Publ
 
 
 const ALITH: &str = "0x6B7CD45dfc550F12b4EdAFDFbBC68b53faAE6Fe2";
-const BALTATHAR: &str = "0x18119Bb0f49ee709104CA2804B297B08d5d0EDEc";
-const CHARLETH: &str = "0x71B18c74b51E2195c92C169504f7FAFA71308A9a";
-const DOROTHY: &str = "0xC03cfc225Ad4b42F96f612BA38bD4d9cBD4a419a";
+const BALTATHAR: &str = "0x90E79DAc498b35096d4d86CEa4f2c3681b40F5C7";
+const CHARLETH: &str = "0x6a321b74936ccA0F549FEF65F274c9E679258307";
+const DOROTHY: &str = "0x71599dEdfEc2CE347a804F9bbf9d18C6C2D7009E";
+
 
 pub fn public_config() -> Result<ChainSpec, String> {
 	let wasm_binary = WASM_BINARY.ok_or_else(|| "Development wasm not available".to_string())?;
@@ -220,8 +221,8 @@ fn testnet_genesis(
 	root_key: AccountId,
 	endowed_accounts: Vec<AccountId>,
 	_enable_println: bool,
-) -> GenesisConfig {
-	const ENDOWMENT: Balance = 5_000_000_000 * STOR;
+) -> GenesisConfig { 
+	// const ENDOWMENT: Balance = 6_500_000_000 * STOR;
 	GenesisConfig {
 		system: SystemConfig {
 			// Add Wasm runtime to storage.
@@ -229,11 +230,36 @@ fn testnet_genesis(
 		},
 		balances: BalancesConfig {
 			// Configure endowed accounts with initial balance of 1 << 60.
-			balances: endowed_accounts
+			// balances: endowed_accounts
+				// .iter()
+				// .cloned()
+				// .map(|k| (k.clone(), ENDOWMENT / endowed_accounts.len() as u128))
+				// .collect(),
+
+				balances: endowed_accounts
 				.iter()
 				.cloned()
-				.map(|k| (k.clone(), ENDOWMENT / endowed_accounts.len() as u128))
-				.collect(),
+				.map(|k| {
+	
+					// if k == AccountId::from("0x90E79DAc498b35096d4d86CEa4f2c3681b40F5C7"). {
+					if k == array_bytes::hex_n_into_unchecked(BALTATHAR) {
+						(k.clone(), 1_755_000_000 * STOR)
+					}
+					else if k == array_bytes::hex_n_into_unchecked(CHARLETH) {
+						(k.clone(), 66_000_000 * STOR )
+					}
+					else if k == array_bytes::hex_n_into_unchecked(DOROTHY) {
+						(k.clone(), 194_999_000 * STOR)
+					}					
+					else if k == array_bytes::hex_n_into_unchecked(ALITH) {
+						(k.clone(), 1000 * STOR)
+					}
+					else {	
+						(k.clone(), 0 * STOR)
+					}
+
+				})
+				.collect(),				
 		},
 
 		validator_set: ValidatorSetConfig {
@@ -291,7 +317,6 @@ fn testnet_genesis(
 				})
 				.collect::<Vec<_>>(),
 		},
-
 
 		ethereum: Default::default(),
 		base_fee: Default::default(),
