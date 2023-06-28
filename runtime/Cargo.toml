@@ -27,6 +27,7 @@ serde = "1.0.151"
 codec = {package = "parity-scale-codec", workspace = true, features = ["derive"] }
 scale-info = { workspace = true, features = ["derive"] }
 
+pallet-scheduler = { workspace = true }
 pallet-collective = { workspace = true }
 pallet-democracy = { workspace = true }
 pallet-treasury = { workspace = true }
@@ -86,6 +87,8 @@ substrate-wasm-builder = {  git = "https://github.com/paritytech/substrate.git",
 default = ["std"]
 std = [
 
+
+	"pallet-scheduler/std",
 	"pallet-balances/std",
 	"serde/std",
 	"frame-try-runtime?/std",
@@ -145,6 +148,8 @@ runtime-benchmarks = [
 	"pallet-im-online/runtime-benchmarks",
 	"pallet-collective/runtime-benchmarks",
 	"pallet-democracy/runtime-benchmarks",
+	"pallet-scheduler/runtime-benchmarks",
+
 
 
 ]
