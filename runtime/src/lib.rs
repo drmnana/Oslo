@@ -18,7 +18,7 @@ use codec::{Encode, Decode};
 use sp_api::impl_runtime_apis;
 use sp_consensus_aura::sr25519::AuthorityId as AuraId;
 use sp_core::{crypto::KeyTypeId, OpaqueMetadata, U256, H160, H256};
-use crate::currency::STOR;
+use crate::currency::*;
 
 use sp_runtime::{
 	create_runtime_str, generic, impl_opaque_keys, generic::Era, 
@@ -58,7 +58,7 @@ pub use frame_support::{
 	PalletId,
 	traits::{
 		ConstU128, ConstU32, ConstU64, ConstU8, KeyOwnerProofSystem, Randomness, StorageInfo,
-		FindAuthor, OnUnbalanced, Currency, Imbalance, EitherOfDiverse, 
+		FindAuthor, OnUnbalanced, Currency, Imbalance, EitherOfDiverse, EqualPrivilegeOnly,
 	},
 	weights::{
 		constants::{BlockExecutionWeight, ExtrinsicBaseWeight, RocksDbWeight, WEIGHT_REF_TIME_PER_SECOND},
@@ -386,6 +386,15 @@ impl pallet_sudo::Config for Runtime {
 }
 
 
+parameter_types! {
+	pub MaximumSchedulerWeight: Weight = Perbill::from_percent(80) *
+		BlockWeights::get().max_block;
+	// Retry a scheduled item every 10 blocks (1 minute) until the preimage exists.
+	pub const NoPreimagePostponement: Option<u32> = Some(10);
+}
+
+
+
 
 parameter_types! {
 	pub const LeetChainId: u64 = 8726;
@@ -652,6 +661,8 @@ parameter_types! {
 }
 
 
+
+
 type CouncilCollective = pallet_collective::Instance1;
 
 impl pallet_collective::Config<CouncilCollective> for Runtime {
@@ -725,7 +736,6 @@ impl pallet_democracy::Config for Runtime {
 	// type PreimageByteDeposit = PreimageByteDeposit;
 	// type OperationalPreimageOrigin = pallet_collective::EnsureMember<AccountId, CouncilCollective>;
 	type Slash = Treasury;
-	// type Scheduler = Scheduler;
 	type PalletsOrigin = OriginCaller;
 	type MaxVotes = frame_support::traits::ConstU32<100>;
 	type WeightInfo = pallet_democracy::weights::SubstrateWeight<Runtime>;
@@ -750,6 +760,38 @@ impl pallet_session::Config for Runtime {
 // 	type FullIdentificationOf = pallet_staking::ExposureOf<Runtime>;
 // }
 
+impl pallet_scheduler::Config for Runtime {
+	type RuntimeOrigin = RuntimeOrigin;
+	type RuntimeEvent = RuntimeEvent;
+	type PalletsOrigin = OriginCaller;
+	type RuntimeCall = RuntimeCall;
+	type MaximumWeight = MaximumSchedulerWeight;
+	type ScheduleOrigin = EnsureRoot<AccountId>;
+	type MaxScheduledPerBlock = ConstU32<50>;
+	type WeightInfo = pallet_scheduler::weights::SubstrateWeight<Runtime>;
+	type OriginPrivilegeCmp = EqualPrivilegeOnly;
+	type PreimageProvider = Preimage;
+	type NoPreimagePostponement = NoPreimagePostponement;
+}
+
+parameter_types! {
+	pub const PreimageMaxSize: u32 = 4096 * 1024;
+	pub const PreimageBaseDeposit: Balance = 1 * STOR;
+	// One cent: $10,000 / MB
+	pub const PreimageByteDeposit: Balance = 1 * MILLISTOR;
+}
+
+impl pallet_preimage::Config for Runtime {
+	type WeightInfo = pallet_preimage::weights::SubstrateWeight<Runtime>;
+	type RuntimeEvent = RuntimeEvent;
+	type Currency = Balances;
+	type ManagerOrigin = EnsureRoot<AccountId>;
+	type MaxSize = PreimageMaxSize;
+	type BaseDeposit = PreimageBaseDeposit;
+	type ByteDeposit = PreimageByteDeposit;
+}
+
+
 
 // Create the runtime by composing the FRAME pallets that were previously configured.
 construct_runtime!(
@@ -770,19 +812,26 @@ construct_runtime!(
 		ImOnline: pallet_im_online,
 		Aura: pallet_aura,
 		Grandpa: pallet_grandpa,
-		Treasury: pallet_treasury,
-		Democracy: pallet_democracy,
-		Council: pallet_collective::<Instance1>,
-		TechnicalCommittee: pallet_collective::<Instance2>,
+		
 		TransactionPayment: pallet_transaction_payment,
 		Sudo: pallet_sudo,
+		
+		// Governance Pallets
+		Treasury: pallet_treasury,
+		// Offences: pallet_offences,
 
+		Democracy: pallet_democracy,
 		Authorship: pallet_authorship,
 		Scheduler: pallet_scheduler,
+		Council: pallet_collective::<Instance1>,
+		TechnicalCommittee: pallet_collective::<Instance2>,
+		Preimage: pallet_preimage,
 
+		// Pallets for EVM 
 		EVM: pallet_evm,
 		Ethereum: pallet_ethereum,
 		BaseFee: pallet_base_fee,
+
 	}
 );
 
@@ -829,19 +878,15 @@ pub type SignedExtra = (
 	pallet_transaction_payment::ChargeTransactionPayment<Runtime>,
 );
 
-impl pallet_scheduler::Config for Runtime {
-	type RuntimeOrigin = RuntimeOrigin;
-	type RuntimeEvent = RuntimeEvent;
-	type PalletsOrigin = OriginCaller;
-	type RuntimeCall = RuntimeCall;
-	// type MaximumWeight = MaximumSchedulerWeight;
-	type ScheduleOrigin = EnsureRoot<AccountId>;
-	type MaxScheduledPerBlock = ConstU32<50>;
-	type WeightInfo = pallet_scheduler::weights::SubstrateWeight<Runtime>;
-	// type OriginPrivilegeCmp = EqualPrivilegeOnly;
-	// type PreimageProvider = Preimage;
-	// type NoPreimagePostponement = NoPreimagePostponement;
-}
+// impl pallet_offences::Config for Runtime {
+// 	type RuntimeEvent = RuntimeEvent;
+// 	type IdentificationTuple = pallet_session::historical::IdentificationTuple<Self>;
+// 	type OnOffenceHandler = Staking;
+// }
+
+
+
+
 
 
 /// Unchecked extrinsic type as expected by this runtime.
@@ -875,6 +920,8 @@ mod benches {
 		[pallet_democracy, Democracy]
 		[pallet_collective, Council]
 		[pallet_scheduler, Scheduler]
+		[pallet_preimage, Preimage]
+
 
 	);
 }

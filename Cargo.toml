@@ -40,6 +40,7 @@ scale-info = { version = "2.3.0", default-features = false }
 
 # substrate-validator-set = { default-features = false, git = "https://github.com/gautamdhameja/substrate-validator-set.git", version = "0.9.42" }
 
+pallet-preimage = { version = "4.0.0-dev", default-features = false, git = "https://github.com/paritytech/substrate.git", branch = "polkadot-v0.9.37" }
 pallet-collective = { version = "4.0.0-dev", default-features = false, git = "https://github.com/paritytech/substrate.git", branch = "polkadot-v0.9.37" }
 pallet-democracy = { version = "4.0.0-dev", default-features = false, git = "https://github.com/paritytech/substrate.git", branch = "polkadot-v0.9.37" }
 pallet-scheduler = { version = "4.0.0-dev", default-features = false, git = "https://github.com/paritytech/substrate.git", branch = "polkadot-v0.9.37" }
