@@ -181,7 +181,6 @@ pub fn new_partial(
 						*timestamp,
 						slot_duration,
 					);
-
 				Ok((slot, timestamp))
 			},
 			spawner: &task_manager.spawn_essential_handle(),

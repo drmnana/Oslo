@@ -1,15 +1,16 @@
 use hex_literal::hex;
 use sc_service::{ChainType, Properties};
 use sp_consensus_aura::sr25519::AuthorityId as AuraId;
-use sp_core::{ Pair, Public, H160, U256};
+use sp_core::{Pair, Public, H160, U256};
 use sp_finality_grandpa::AuthorityId as GrandpaId;
 // use sp_runtime::key_types::IM_ONLINE;
 use pallet_im_online::sr25519::AuthorityId as ImOnlineId;
 
 use storage_chain_runtime::{
-	currency::*, opaque::SessionKeys, AccountId, Balance, BalancesConfig, EVMConfig,
-	GenesisAccount, GenesisConfig, SessionConfig, SudoConfig, SystemConfig,
-	WASM_BINARY, GrandpaConfig, AuraConfig , ValidatorSetConfig, ImOnlineConfig, DemocracyConfig, 
+	currency::*, opaque::SessionKeys, AccountId, AuraConfig, Balance, BalancesConfig,
+	CouncilConfig, DemocracyConfig, EVMConfig, GenesisAccount, GenesisConfig, GrandpaConfig,
+	ImOnlineConfig, SessionConfig, SudoConfig, SystemConfig, TechnicalCommitteeConfig,
+	ValidatorSetConfig, WASM_BINARY, Treasury,
 };
 // use sp_runtime::traits::{IdentifyAccount, Verify};
 use std::{collections::BTreeMap, default::Default};
@@ -32,12 +33,10 @@ fn get_from_secret<TPublic: Public>(seed: &str) -> <TPublic::Pair as Pair>::Publ
 		.public()
 }
 
-
 const ALITH: &str = "0x6B7CD45dfc550F12b4EdAFDFbBC68b53faAE6Fe2";
 const BALTATHAR: &str = "0x90E79DAc498b35096d4d86CEa4f2c3681b40F5C7";
 const CHARLETH: &str = "0x6a321b74936ccA0F549FEF65F274c9E679258307";
 const DOROTHY: &str = "0x71599dEdfEc2CE347a804F9bbf9d18C6C2D7009E";
-
 
 pub fn public_config() -> Result<ChainSpec, String> {
 	let wasm_binary = WASM_BINARY.ok_or_else(|| "Development wasm not available".to_string())?;
@@ -62,14 +61,12 @@ pub fn public_config() -> Result<ChainSpec, String> {
 						get_from_secret::<AuraId>("//Bob"),
 						get_from_secret::<GrandpaId>("//Bob"),
 						get_from_secret::<ImOnlineId>("//Bob"),
-
 					),
 					(
 						array_bytes::hex_n_into_unchecked(CHARLETH),
 						get_from_secret::<AuraId>("//Charlie"),
 						get_from_secret::<GrandpaId>("//Charlie"),
 						get_from_secret::<ImOnlineId>("//Charlie"),
-
 					),
 					(
 						array_bytes::hex_n_into_unchecked(DOROTHY),
@@ -79,8 +76,7 @@ pub fn public_config() -> Result<ChainSpec, String> {
 					),
 				],
 				// Sudo account
-				array_bytes::hex_n_into_unchecked(ALITH), 
-
+				array_bytes::hex_n_into_unchecked(ALITH),
 				// Pre-funded accounts
 				vec![
 					array_bytes::hex_n_into_unchecked(ALITH),
@@ -111,8 +107,6 @@ pub fn chainspec_properties() -> Properties {
 	properties
 }
 
-
-
 pub fn development_config() -> Result<ChainSpec, String> {
 	let wasm_binary = WASM_BINARY.ok_or_else(|| "Development wasm not available".to_string())?;
 
@@ -128,20 +122,19 @@ pub fn development_config() -> Result<ChainSpec, String> {
 				// Initial PoA authorities
 				vec![(
 					array_bytes::hex_n_into_unchecked(ALITH),
-					get_from_secret::<AuraId>("//Alice"), 
+					get_from_secret::<AuraId>("//Alice"),
 					get_from_secret::<GrandpaId>("//Alice"),
 					get_from_secret::<ImOnlineId>("//Alice"),
 				)],
 				// Sudo account
 				// AccountId::from(hex!("6B7CD45dfc550F12b4EdAFDFbBC68b53faAE6Fe2")),
-				array_bytes::hex_n_into_unchecked(ALITH), 
+				array_bytes::hex_n_into_unchecked(ALITH),
 				// Pre-funded accounts
 				vec![
 					AccountId::from(hex!("6B7CD45dfc550F12b4EdAFDFbBC68b53faAE6Fe2")),
 					AccountId::from(hex!("18119Bb0f49ee709104CA2804B297B08d5d0EDEc")),
 					AccountId::from(hex!("71B18c74b51E2195c92C169504f7FAFA71308A9a")),
 					AccountId::from(hex!("C03cfc225Ad4b42F96f612BA38bD4d9cBD4a419a")),
-
 				],
 				true,
 			)
@@ -188,7 +181,7 @@ pub fn local_testnet_config() -> Result<ChainSpec, String> {
 					),
 				],
 				// Sudo account
-				array_bytes::hex_n_into_unchecked(ALITH), 
+				array_bytes::hex_n_into_unchecked(ALITH),
 				// AccountId::from(hex!("6B7CD45dfc550F12b4EdAFDFbBC68b53faAE6Fe2")),
 				// Pre-funded accounts
 				vec![
@@ -221,7 +214,8 @@ fn testnet_genesis(
 	root_key: AccountId,
 	endowed_accounts: Vec<AccountId>,
 	_enable_println: bool,
-) -> GenesisConfig { 
+) -> GenesisConfig {
+	let num_endowed_accounts = endowed_accounts.len();
 	// const ENDOWMENT: Balance = 6_500_000_000 * STOR;
 	GenesisConfig {
 		system: SystemConfig {
@@ -231,60 +225,62 @@ fn testnet_genesis(
 		balances: BalancesConfig {
 			// Configure endowed accounts with initial balance of 1 << 60.
 			// balances: endowed_accounts
-				// .iter()
-				// .cloned()
-				// .map(|k| (k.clone(), ENDOWMENT / endowed_accounts.len() as u128))
-				// .collect(),
-
-				balances: endowed_accounts
+			// .iter()
+			// .cloned()
+			// .map(|k| (k.clone(), ENDOWMENT / endowed_accounts.len() as u128))
+			// .collect(),
+			balances: endowed_accounts
 				.iter()
 				.cloned()
 				.map(|k| {
-	
 					// if k == AccountId::from("0x90E79DAc498b35096d4d86CEa4f2c3681b40F5C7"). {
 					if k == array_bytes::hex_n_into_unchecked(BALTATHAR) {
 						(k.clone(), 1_755_000_000 * STOR)
-					}
-					else if k == array_bytes::hex_n_into_unchecked(CHARLETH) {
-						(k.clone(), 66_000_000 * STOR )
-					}
-					else if k == array_bytes::hex_n_into_unchecked(DOROTHY) {
+					} else if k == array_bytes::hex_n_into_unchecked(CHARLETH) {
+						(k.clone(), 66_000_000 * STOR)
+					} else if k == array_bytes::hex_n_into_unchecked(DOROTHY) {
 						(k.clone(), 194_999_000 * STOR)
-					}					
-					else if k == array_bytes::hex_n_into_unchecked(ALITH) {
+					} else if k == array_bytes::hex_n_into_unchecked(ALITH) {
 						(k.clone(), 1000 * STOR)
-					}
-					else {	
+					} else {
 						(k.clone(), 0 * STOR)
 					}
-
 				})
-				.collect(),				
+				.collect(),
 		},
 
 		validator_set: ValidatorSetConfig {
 			initial_validators: initial_authorities.iter().map(|x| x.0.clone()).collect::<Vec<_>>(),
 		},
 
+		democracy: DemocracyConfig::default(),
+
+		council: CouncilConfig::default(),
+
+		technical_committee: TechnicalCommitteeConfig {
+			members: endowed_accounts
+				.iter()
+				.take((num_endowed_accounts + 1) / 2)
+				.cloned()
+				.collect(),
+			phantom: Default::default(),
+		},
+
 		// aura: Default::default(),
 		aura: AuraConfig {
 			// authorities: initial_authorities.iter().map(|x| (x.1.clone())).collect(),
-			authorities : vec![], 
+			authorities: vec![],
 		},
 		// grandpa: Default::default(),
 		grandpa: GrandpaConfig {
 			// authorities: initial_authorities.iter().map(|x| (x.2.clone(), 1)).collect(),
-			authorities : vec![], 
-
+			authorities: vec![],
 		},
 		sudo: SudoConfig {
 			// Assign network admin rights.
 			key: Some(root_key),
 		},
-		im_online: ImOnlineConfig {
-			keys: vec![],
-		},
-		democracy: DemocracyConfig::default(),
+		im_online: ImOnlineConfig { keys: vec![] },
 		treasury: Default::default(),
 		transaction_payment: Default::default(),
 		evm: EVMConfig {
@@ -307,13 +303,7 @@ fn testnet_genesis(
 			keys: initial_authorities
 				.iter()
 				.map(|x| {
-					(
-						x.0.clone(),
-						x.0.clone(),
-						session_keys(
-							x.1.clone(), x.2.clone(), x.3.clone(),
-						),
-					)
+					(x.0.clone(), x.0.clone(), session_keys(x.1.clone(), x.2.clone(), x.3.clone()))
 				})
 				.collect::<Vec<_>>(),
 		},
@@ -322,8 +312,6 @@ fn testnet_genesis(
 		base_fee: Default::default(),
 	}
 }
- 
- 
 
 fn mainnet_genesis(
 	wasm_binary: &[u8],
@@ -332,18 +320,50 @@ fn mainnet_genesis(
 	endowed_accounts: Vec<AccountId>,
 	_enable_println: bool,
 ) -> GenesisConfig {
-	const ENDOWMENT: Balance = 5_000_000_000 * STOR;
+	let num_endowed_accounts = endowed_accounts.len();
+
+	// const ENDOWMENT: Balance = 5_000_000_000 * STOR;
 	GenesisConfig {
+
+
+
+		treasury: Default::default(),
 		system: SystemConfig {
 			// Add Wasm runtime to storage.
 			code: wasm_binary.to_vec(),
 		},
+		// balances: BalancesConfig {
+		// 	// Configure endowed accounts with initial balance of 1 << 60.
+		// 	balances: endowed_accounts
+		// 		.iter()
+		// 		.cloned()
+		// 		.map(|k| (k.clone(), ENDOWMENT / endowed_accounts.len() as u128))
+		// 		.collect(),
+		// },
 		balances: BalancesConfig {
 			// Configure endowed accounts with initial balance of 1 << 60.
+			// balances: endowed_accounts
+			// .iter()
+			// .cloned()
+			// .map(|k| (k.clone(), ENDOWMENT / endowed_accounts.len() as u128))
+			// .collect(),
 			balances: endowed_accounts
 				.iter()
 				.cloned()
-				.map(|k| (k.clone(), ENDOWMENT / endowed_accounts.len() as u128))
+				.map(|k| {
+					// if k == AccountId::from("0x90E79DAc498b35096d4d86CEa4f2c3681b40F5C7"). {
+					if k == array_bytes::hex_n_into_unchecked(BALTATHAR) {
+						(k.clone(), 1_755_000_000 * STOR)
+					} else if k == array_bytes::hex_n_into_unchecked(CHARLETH) {
+						(k.clone(), 66_000_000 * STOR)
+					} else if k == array_bytes::hex_n_into_unchecked(DOROTHY) {
+						(k.clone(), 194_999_000 * STOR)
+					} else if k == array_bytes::hex_n_into_unchecked(ALITH) {
+						(k.clone(), 1000 * STOR)
+					} else {
+						(k.clone(), 0 * STOR)
+					}
+				})
 				.collect(),
 		},
 
@@ -354,21 +374,32 @@ fn mainnet_genesis(
 		// aura: Default::default(),
 		aura: AuraConfig {
 			// authorities: initial_authorities.iter().map(|x| (x.1.clone())).collect(),
-			authorities : vec![], 
+			authorities: vec![],
 		},
 		// grandpa: Default::default(),
 		grandpa: GrandpaConfig {
 			// authorities: initial_authorities.iter().map(|x| (x.2.clone(), 1)).collect(),
-			authorities : vec![], 
-
+			authorities: vec![],
 		},
 		sudo: SudoConfig {
 			// Assign network admin rights.
 			key: Some(root_key),
 		},
-		im_online: ImOnlineConfig {
-			keys: vec![],
+		im_online: ImOnlineConfig { keys: vec![] },
+
+		democracy: DemocracyConfig::default(),
+
+		council: CouncilConfig::default(),
+
+		technical_committee: TechnicalCommitteeConfig {
+			members: endowed_accounts
+				.iter()
+				.take((num_endowed_accounts + 1) / 2)
+				.cloned()
+				.collect(),
+			phantom: Default::default(),
 		},
+
 		transaction_payment: Default::default(),
 		evm: EVMConfig {
 			accounts: {
@@ -390,17 +421,10 @@ fn mainnet_genesis(
 			keys: initial_authorities
 				.iter()
 				.map(|x| {
-					(
-						x.0.clone(),
-						x.0.clone(),
-						session_keys(
-							x.1.clone(), x.2.clone(), x.3.clone(),
-						),
-					)
+					(x.0.clone(), x.0.clone(), session_keys(x.1.clone(), x.2.clone(), x.3.clone()))
 				})
 				.collect::<Vec<_>>(),
 		},
-
 
 		ethereum: Default::default(),
 		base_fee: Default::default(),

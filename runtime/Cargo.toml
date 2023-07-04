@@ -88,7 +88,7 @@ substrate-wasm-builder = {  git = "https://github.com/paritytech/substrate.git",
 default = ["std"]
 std = [
 
-
+	"pallet-treasury/std",
 	"pallet-scheduler/std",
 	"pallet-preimage/std",
 	"pallet-balances/std",
