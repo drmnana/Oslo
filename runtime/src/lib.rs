@@ -579,12 +579,6 @@ impl pallet_im_online::Config for Runtime {
 }
 
 
-// ////////////// // //////////////// //////////////// //////////////// //////////////// //////////////// //////////////// //////////////// //////////////// //////////////// //////////////
-
-
-
-
-
 impl pallet_authorship::Config for Runtime {
 	type FindAuthor = pallet_session::FindAccountFromAuthorIndex<Self, Aura>;
 	type UncleGenerations = UncleGenerations;
@@ -811,32 +805,33 @@ construct_runtime!(
 		Timestamp: pallet_timestamp,
 
 		Balances: pallet_balances,
+		TransactionPayment: pallet_transaction_payment,
 
-		ValidatorSet: validator_set,
+		Authorship: pallet_authorship,
 		Session: pallet_session,
-		ImOnline: pallet_im_online,
 		Aura: pallet_aura,
 		Grandpa: pallet_grandpa,
-		
-		TransactionPayment: pallet_transaction_payment,
-		Sudo: pallet_sudo,
-		
-		// Governance Pallets
-		Treasury: pallet_treasury,
-		// Offences: pallet_offences,
 
-		Democracy: pallet_democracy,
-		Authorship: pallet_authorship,
-		Scheduler: pallet_scheduler,
-		Council: pallet_collective::<Instance1>,
-		TechnicalCommittee: pallet_collective::<Instance2>,
-		Preimage: pallet_preimage,
+		Sudo: pallet_sudo,
+
 
 		// Pallets for EVM 
 		EVM: pallet_evm,
 		Ethereum: pallet_ethereum,
 		BaseFee: pallet_base_fee,
 
+		ValidatorSet: validator_set,
+		ImOnline: pallet_im_online,
+		
+		// Governance Pallets
+		Treasury: pallet_treasury,
+
+		// Governance
+		Democracy: pallet_democracy,
+		Scheduler: pallet_scheduler,
+		Council: pallet_collective::<Instance1>,
+		TechnicalCommittee: pallet_collective::<Instance2>,
+		Preimage: pallet_preimage,
 	}
 );
 
