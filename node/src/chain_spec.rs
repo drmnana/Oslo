@@ -179,10 +179,21 @@ pub fn local_testnet_config() -> Result<ChainSpec, String> {
 						get_from_secret::<GrandpaId>("//Bob"),
 						get_from_secret::<ImOnlineId>("//Bob"),
 					),
+					(
+						array_bytes::hex_n_into_unchecked(CHARLETH),
+						get_from_secret::<AuraId>("//Charlie"),
+						get_from_secret::<GrandpaId>("//Charlie"),
+						get_from_secret::<ImOnlineId>("//Charlie"),
+					),
+					(
+						array_bytes::hex_n_into_unchecked(DOROTHY),
+						get_from_secret::<AuraId>("//Dave"),
+						get_from_secret::<GrandpaId>("//Dave"),
+						get_from_secret::<ImOnlineId>("//Dave"),
+					),
 				],
 				// Sudo account
 				array_bytes::hex_n_into_unchecked(ALITH),
-				// AccountId::from(hex!("6B7CD45dfc550F12b4EdAFDFbBC68b53faAE6Fe2")),
 				// Pre-funded accounts
 				vec![
 					array_bytes::hex_n_into_unchecked(ALITH),
@@ -223,17 +234,10 @@ fn testnet_genesis(
 			code: wasm_binary.to_vec(),
 		},
 		balances: BalancesConfig {
-			// Configure endowed accounts with initial balance of 1 << 60.
-			// balances: endowed_accounts
-			// .iter()
-			// .cloned()
-			// .map(|k| (k.clone(), ENDOWMENT / endowed_accounts.len() as u128))
-			// .collect(),
 			balances: endowed_accounts
 				.iter()
 				.cloned()
 				.map(|k| {
-					// if k == AccountId::from("0x90E79DAc498b35096d4d86CEa4f2c3681b40F5C7"). {
 					if k == array_bytes::hex_n_into_unchecked(BALTATHAR) {
 						(k.clone(), 1_755_000_000 * STOR)
 					} else if k == array_bytes::hex_n_into_unchecked(CHARLETH) {
@@ -254,9 +258,9 @@ fn testnet_genesis(
 		},
 
 		democracy: DemocracyConfig::default(),
-
+ 
 		council: CouncilConfig::default(),
-
+ 
 		technical_committee: TechnicalCommitteeConfig {
 			members: endowed_accounts
 				.iter()
@@ -265,7 +269,7 @@ fn testnet_genesis(
 				.collect(),
 			phantom: Default::default(),
 		},
-
+ 
 		// aura: Default::default(),
 		aura: AuraConfig {
 			// authorities: initial_authorities.iter().map(|x| (x.1.clone())).collect(),
@@ -283,27 +287,36 @@ fn testnet_genesis(
 		im_online: ImOnlineConfig { keys: vec![] },
 		treasury: Default::default(),
 		transaction_payment: Default::default(),
-		evm: EVMConfig {
-			accounts: {
-				let mut accounts: BTreeMap<H160, GenesisAccount> = BTreeMap::new();
-				accounts.insert(
-					H160::from_slice(&hex!("6Be02d1d3665660d22FF9624b7BE0551ee1Ac91b")),
-					GenesisAccount {
-						nonce: U256::zero(),
-						balance: Default::default(),
-						code: vec![],
-						storage: BTreeMap::new(),
-					},
-				);
-				accounts
-			},
-		},
+
+		evm : Default::default(),
+
+		// evm: EVMConfig {
+		// 	accounts: {
+		// 		let mut accounts: BTreeMap<H160, GenesisAccount> = BTreeMap::new();
+		// 		accounts.insert(
+		// 			H160::from_slice(&hex!("6Be02d1d3665660d22FF9624b7BE0551ee1Ac91b")),
+		// 			GenesisAccount {
+		// 				nonce: U256::zero(),
+		// 				balance: Default::default(),
+		// 				code: vec![],
+		// 				storage: BTreeMap::new(),
+		// 			},
+		// 		);
+		// 		accounts
+		// 	},	
+		// },
 
 		session: SessionConfig {
 			keys: initial_authorities
-				.iter()
-				.map(|x| {
-					(x.0.clone(), x.0.clone(), session_keys(x.1.clone(), x.2.clone(), x.3.clone()))
+				.into_iter()
+				.map(|(acc, aura, gran, im_online)| {	
+					(
+						acc.clone(), acc,
+						session_keys(
+							aura, gran, im_online,
+						),
+					
+					)
 				})
 				.collect::<Vec<_>>(),
 		},
@@ -333,21 +346,9 @@ fn mainnet_genesis(
 			// Add Wasm runtime to storage.
 			code: wasm_binary.to_vec(),
 		},
-		// balances: BalancesConfig {
-		// 	// Configure endowed accounts with initial balance of 1 << 60.
-		// 	balances: endowed_accounts
-		// 		.iter()
-		// 		.cloned()
-		// 		.map(|k| (k.clone(), ENDOWMENT / endowed_accounts.len() as u128))
-		// 		.collect(),
-		// },
+
 		balances: BalancesConfig {
-			// Configure endowed accounts with initial balance of 1 << 60.
-			// balances: endowed_accounts
-			// .iter()
-			// .cloned()
-			// .map(|k| (k.clone(), ENDOWMENT / endowed_accounts.len() as u128))
-			// .collect(),
+
 			balances: endowed_accounts
 				.iter()
 				.cloned()
@@ -380,7 +381,7 @@ fn mainnet_genesis(
 		// grandpa: Default::default(),
 		grandpa: GrandpaConfig {
 			// authorities: initial_authorities.iter().map(|x| (x.2.clone(), 1)).collect(),
-			authorities: vec![],
+			authorities: vec![],	
 		},
 		sudo: SudoConfig {
 			// Assign network admin rights.
@@ -402,27 +403,16 @@ fn mainnet_genesis(
 		},
 
 		transaction_payment: Default::default(),
-		evm: EVMConfig {
-			accounts: {
-				let mut accounts: BTreeMap<H160, GenesisAccount> = BTreeMap::new();
-				accounts.insert(
-					H160::from_slice(&hex!("6Be02d1d3665660d22FF9624b7BE0551ee1Ac91b")),
-					GenesisAccount {
-						nonce: U256::zero(),
-						balance: Default::default(),
-						code: vec![],
-						storage: BTreeMap::new(),
-					},
-				);
-				accounts
-			},
-		},
+		evm : Default::default(),
 
 		session: SessionConfig {
 			keys: initial_authorities
 				.iter()
 				.map(|x| {
-					(x.0.clone(), x.0.clone(), session_keys(x.1.clone(), x.2.clone(), x.3.clone()))
+					(
+						x.0.clone(), 
+						x.0.clone(), 
+						session_keys(x.1.clone(), x.2.clone(), x.3.clone()))
 				})
 				.collect::<Vec<_>>(),
 		},

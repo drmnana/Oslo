@@ -7,6 +7,8 @@ use codec::{Decode, Encode, MaxEncodedLen};
 use scale_info::TypeInfo;
 use sha3::{Digest, Keccak256};
 use sp_core::{ecdsa, H160};
+use sp_runtime::traits::Convert;
+
 
 #[cfg(feature = "std")]
 pub use serde::{de::DeserializeOwned, Deserialize, Serialize};
@@ -170,5 +172,13 @@ pub struct IntoAddressMapping;
 impl<T: From<H160>> pallet_evm::AddressMapping<T> for IntoAddressMapping {
 	fn into_account_id(address: H160) -> T {
 		address.into()
+	}
+}
+
+
+pub struct IdentityCollator;
+impl<T> Convert<T, Option<T>> for IdentityCollator {
+	fn convert(t: T) -> Option<T> {
+		Some(t)
 	}
 }

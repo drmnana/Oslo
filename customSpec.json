@@ -1,5 +1,5 @@
 {
-  "name": "Local Testnet",
+  "name": "StorageChain",
   "id": "local_testnet",
   "chainType": "Local",
   "bootNodes": [],
@@ -57,6 +57,24 @@
               "grandpa": "5GoNkf6WdbxCFnPdAnYYQyCjAKPJgLNxXwPjwTh6DGg6gN3E",
               "im_online": "5FHneW46xGXgs5mUiveU4sbTyGBzmstUspZC92UhjJM694ty"
             }
+          ],
+          [
+            "0x6a321b74936cca0f549fef65f274c9e679258307",
+            "0x6a321b74936cca0f549fef65f274c9e679258307",
+            {
+              "aura": "5FLSigC9HGRKVhB9FiEo4Y3koPsNmBmLJbpXg2mp1hXcS59Y",
+              "grandpa": "5DbKjhNLpqX3zqZdNBc9BGb4fHU1cRBaDhJUskrvkwfraDi6",
+              "im_online": "5FLSigC9HGRKVhB9FiEo4Y3koPsNmBmLJbpXg2mp1hXcS59Y"
+            }
+          ],
+          [
+            "0x71599dedfec2ce347a804f9bbf9d18c6c2d7009e",
+            "0x71599dedfec2ce347a804f9bbf9d18c6c2d7009e",
+            {
+              "aura": "5DAAnrj7VHTznn2AWBemMuyBwZWs6FNFjdyVXUeYum3PTXFy",
+              "grandpa": "5ECTwv6cZ5nJQPk6tWfaTrEk8YH2L7X1VT4EL5Tx2ikfFwb7",
+              "im_online": "5DAAnrj7VHTznn2AWBemMuyBwZWs6FNFjdyVXUeYum3PTXFy"
+            }
           ]
         ]
       },
@@ -88,7 +106,9 @@
       "validatorSet": {
         "initialValidators": [
           "0x6b7cd45dfc550f12b4edafdfbbc68b53faae6fe2",
-          "0x90e79dac498b35096d4d86cea4f2c3681b40f5c7"
+          "0x90e79dac498b35096d4d86cea4f2c3681b40f5c7",
+          "0x6a321b74936cca0f549fef65f274c9e679258307",
+          "0x71599dedfec2ce347a804f9bbf9d18c6c2d7009e"
         ]
       },
       "imOnline": {

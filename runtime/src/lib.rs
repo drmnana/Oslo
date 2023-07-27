@@ -2,9 +2,16 @@
 // `construct_runtime!` does a lot of recursion and requires us to increase the limit to 256.
 #![recursion_limit = "256"]
 
+
+pub type AccountId = <<Signature as sp_runtime::traits::Verify>::Signer as sp_runtime::traits::IdentifyAccount>::AccountId;
+
+
 // Make the WASM binary available.
 #[cfg(feature = "std")]
 include!(concat!(env!("OUT_DIR"), "/wasm_binary.rs"));
+
+use pallet_session::SessionManager;
+
 
 use pallet_grandpa::{
 	fg_primitives, AuthorityId as GrandpaId, AuthorityList as GrandpaAuthorityList,
@@ -85,7 +92,7 @@ pub type Signature = account::EthereumSignature;
 
 /// Some way of identifying an account on the chain. We intentionally make it equivalent
 /// to the public key of our transaction signing scheme.
-pub type AccountId = AccountId20;
+// pub type AccountId = AccountId20;
 
 /// Balance of an account.
 pub type Balance = u128;
@@ -148,7 +155,6 @@ pub mod opaque {
 }
 
 
-// vvv
 parameter_types! {
 	pub const MinAuthorities: u32 = 2;
 }
@@ -587,8 +593,8 @@ impl pallet_authorship::Config for Runtime {
 }
 
 parameter_types! {
-	pub const Period: u32 = 0xFFFF_FFFF;
-	pub const Offset: u32 = 0xFFFF_FFFF;
+	pub const Period: u32 = 1 * MINUTES;
+	pub const Offset: u32 = 0;
 }
 
 
@@ -743,13 +749,24 @@ impl pallet_democracy::Config for Runtime {
 }
 
 
+/// Special `ValidatorIdOf` implementation that is just returning the input as result.
+pub struct ValidatorIdOf;
+impl sp_runtime::traits::Convert<AccountId, Option<AccountId>> for ValidatorIdOf {
+	fn convert(a: AccountId) -> Option<AccountId> {
+		Some(a)
+	}
+}
+
+
 impl pallet_session::Config for Runtime {
 	type RuntimeEvent = RuntimeEvent;
-	type ValidatorId =AccountId;
-	type ValidatorIdOf = ();
+	type ValidatorId =<Self as frame_system::Config>::AccountId;
+	// type ValidatorIdOf = account::IdentityCollator;
+	type ValidatorIdOf = validator_set::ValidatorOf<Self>;
 	type ShouldEndSession = pallet_session::PeriodicSessions<Period, Offset>;
-	type NextSessionRotation = ();
-	type SessionManager = ();
+	type NextSessionRotation = pallet_session::PeriodicSessions<Period, Offset>;
+	// to be updated
+	type SessionManager = ValidatorSet; 
 	type SessionHandler = <opaque::SessionKeys as OpaqueKeys>::KeyTypeIdProviders;
 	type Keys = opaque::SessionKeys;
 	type WeightInfo = pallet_session::weights::SubstrateWeight<Runtime>;
@@ -807,6 +824,7 @@ construct_runtime!(
 		Balances: pallet_balances,
 		TransactionPayment: pallet_transaction_payment,
 
+		ValidatorSet: validator_set,
 		Authorship: pallet_authorship,
 		Session: pallet_session,
 		Aura: pallet_aura,
@@ -820,7 +838,6 @@ construct_runtime!(
 		Ethereum: pallet_ethereum,
 		BaseFee: pallet_base_fee,
 
-		ValidatorSet: validator_set,
 		ImOnline: pallet_im_online,
 		
 		// Governance Pallets
