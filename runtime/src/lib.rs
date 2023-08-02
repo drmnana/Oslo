@@ -330,7 +330,7 @@ impl pallet_timestamp::Config for Runtime {
 }
 
 /// Existential deposit.
-pub const EXISTENTIAL_DEPOSIT: u128 = 0 * currency::MICROSTOR;
+pub const EXISTENTIAL_DEPOSIT: u128 = 1 * currency::MICROSTOR;
 
 impl pallet_balances::Config for Runtime {
 	/// The type for recording an account's balance.
@@ -356,18 +356,19 @@ type NegativeImbalance = <Balances as Currency<AccountId>>::NegativeImbalance;
 impl OnUnbalanced<NegativeImbalance> for DealWithFees {
 	fn on_unbalanceds<B>(mut fees_then_tips: impl Iterator<Item=NegativeImbalance>) {
 		if let Some(fees) = fees_then_tips.next() {
-			// for fees, 0% to treasury, 100% to author
-			let mut split = fees.ration(0, 100);
+			// for fees, 20% to treasury, 80% to author
+			let mut split = fees.ration(20, 80);
 			if let Some(tips) = fees_then_tips.next() {
 				// for tips, if any, 100% (though this can be anything)
-				tips.merge_into(&mut split.1);
+				// tips.merge_into(&mut split.1);
+				tips.ration_merge_into(30, 70, &mut split);
 			}
-			// Treasury::on_unbalanced(split.0);
+			Treasury::on_unbalanced(split.0);
 			Author::on_unbalanced(split.1);
 		}
 	}
 }
- 
+
 pub struct Author;
 
 impl OnUnbalanced<NegativeImbalance> for Author {
@@ -378,14 +379,21 @@ impl OnUnbalanced<NegativeImbalance> for Author {
 	}
 }
 
+
+
+
+
 impl pallet_transaction_payment::Config for Runtime {
 	type RuntimeEvent = RuntimeEvent;
 	type OnChargeTransaction = CurrencyAdapter<Balances, DealWithFees>;
 	type OperationalFeeMultiplier = ConstU8<5>;
 	type WeightToFee = IdentityFee<Balance>;
 	type LengthToFee = IdentityFee<Balance>;
-	type FeeMultiplierUpdate = ConstFeeMultiplier<FeeMultiplier>;
+	// type FeeMultiplierUpdate = ConstFeeMultiplier<FeeMultiplier>;
+	type FeeMultiplierUpdate = ();
 }
+
+
 
 impl pallet_sudo::Config for Runtime {
 	type RuntimeEvent = RuntimeEvent;
@@ -592,6 +600,15 @@ impl pallet_authorship::Config for Runtime {
 	type EventHandler = ();
 }
 
+
+// impl pallet_authorship::Config for Runtime {
+//     type FindAuthor = pallet_session::FindAccountFromAuthorIndex<Self, Aura>;
+//     type UncleGenerations = UncleGenerations;
+//     type FilterUncle = ();
+//     type EventHandler = (CollatorSelection,);
+// }
+
+
 parameter_types! {
 	pub const Period: u32 = 1 * MINUTES;
 	pub const Offset: u32 = 0;
@@ -771,6 +788,8 @@ impl pallet_session::Config for Runtime {
 	type Keys = opaque::SessionKeys;
 	type WeightInfo = pallet_session::weights::SubstrateWeight<Runtime>;
 }
+
+
 
 // impl pallet_session::historical::Config for Runtime {
 // 	type FullIdentification = pallet_staking::Exposure<AccountId, Balance>;
