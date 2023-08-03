@@ -352,7 +352,7 @@ parameter_types! {
 
 pub struct DealWithFees;
 type NegativeImbalance = <Balances as Currency<AccountId>>::NegativeImbalance;
-
+ 
 impl OnUnbalanced<NegativeImbalance> for DealWithFees {
 	fn on_unbalanceds<B>(mut fees_then_tips: impl Iterator<Item=NegativeImbalance>) {
 		if let Some(fees) = fees_then_tips.next() {
@@ -370,7 +370,7 @@ impl OnUnbalanced<NegativeImbalance> for DealWithFees {
 }
 
 pub struct Author;
-
+ 
 impl OnUnbalanced<NegativeImbalance> for Author {
 	fn on_nonzero_unbalanced(amount: NegativeImbalance) {
 		if let Some(author) = Authorship::author() {
@@ -378,10 +378,7 @@ impl OnUnbalanced<NegativeImbalance> for Author {
 		}
 	}
 }
-
-
-
-
+ 
 
 impl pallet_transaction_payment::Config for Runtime {
 	type RuntimeEvent = RuntimeEvent;
@@ -393,8 +390,8 @@ impl pallet_transaction_payment::Config for Runtime {
 	type FeeMultiplierUpdate = ();
 }
 
-
-
+ 
+ 
 impl pallet_sudo::Config for Runtime {
 	type RuntimeEvent = RuntimeEvent;
 	type RuntimeCall = RuntimeCall;
