@@ -14,6 +14,7 @@ use storage_chain_runtime::{
 };
 // use sp_runtime::traits::{IdentifyAccount, Verify};
 use std::{collections::BTreeMap, default::Default};
+
 // use frame_benchmarking::frame_support::metadata::StorageEntryModifier::Default;
 // use libsecp256k1::{PublicKey, PublicKeyFormat};
 // use sha3::{Digest};
@@ -38,6 +39,7 @@ const BALTATHAR: &str = "0x18119Bb0f49ee709104CA2804B297B08d5d0EDEc";
 const CHARLETH: &str = "0x71B18c74b51E2195c92C169504f7FAFA71308A9a";
 const DOROTHY: &str = "0xC03cfc225Ad4b42F96f612BA38bD4d9cBD4a419a";
 
+// Endowed Accounts for Mainnet
 // const BALTATHAR: &str = "0x90E79DAc498b35096d4d86CEa4f2c3681b40F5C7";
 // const CHARLETH: &str = "0x6a321b74936ccA0F549FEF65F274c9E679258307";
 // const DOROTHY: &str = "0x71599dEdfEc2CE347a804F9bbf9d18C6C2D7009E";
@@ -46,7 +48,7 @@ pub fn public_config() -> Result<ChainSpec, String> {
 	let wasm_binary = WASM_BINARY.ok_or_else(|| "Development wasm not available".to_string())?;
 
 	Ok(ChainSpec::from_genesis(
-		"Public Node",
+		"StorageChain Mainnet",
 		"public_live",
 		ChainType::Live,
 		move || {
@@ -162,7 +164,7 @@ pub fn local_testnet_config() -> Result<ChainSpec, String> {
 
 	Ok(ChainSpec::from_genesis(
 		// Name
-		"Local Testnet",
+		"StorageChain Testnet",
 		// ID
 		"local_testnet",
 		ChainType::Local,
@@ -231,7 +233,6 @@ fn testnet_genesis(
 	_enable_println: bool,
 ) -> GenesisConfig {
 	let num_endowed_accounts = endowed_accounts.len();
-	// const ENDOWMENT: Balance = 6_500_000_000 * STOR;
 	GenesisConfig {
 		system: SystemConfig {
 			// Add Wasm runtime to storage.
@@ -276,12 +277,11 @@ fn testnet_genesis(
  
 		// aura: Default::default(),
 		aura: AuraConfig {
-			// authorities: initial_authorities.iter().map(|x| (x.1.clone())).collect(),
+
 			authorities: vec![],
 		},
-		// grandpa: Default::default(),
 		grandpa: GrandpaConfig {
-			// authorities: initial_authorities.iter().map(|x| (x.2.clone(), 1)).collect(),
+
 			authorities: vec![],
 		},
 		sudo: SudoConfig {
@@ -293,22 +293,6 @@ fn testnet_genesis(
 		transaction_payment: Default::default(),
 
 		evm : Default::default(),
-
-		// evm: EVMConfig {
-		// 	accounts: {
-		// 		let mut accounts: BTreeMap<H160, GenesisAccount> = BTreeMap::new();
-		// 		accounts.insert(
-		// 			H160::from_slice(&hex!("6Be02d1d3665660d22FF9624b7BE0551ee1Ac91b")),
-		// 			GenesisAccount {
-		// 				nonce: U256::zero(),
-		// 				balance: Default::default(),
-		// 				code: vec![],
-		// 				storage: BTreeMap::new(),
-		// 			},
-		// 		);
-		// 		accounts
-		// 	},	
-		// },
 
 		session: SessionConfig {
 			keys: initial_authorities
@@ -340,10 +324,7 @@ fn mainnet_genesis(
 ) -> GenesisConfig {
 	let num_endowed_accounts = endowed_accounts.len();
 
-	// const ENDOWMENT: Balance = 5_000_000_000 * STOR;
 	GenesisConfig {
-
-
 
 		treasury: Default::default(),
 		system: SystemConfig {
@@ -377,14 +358,10 @@ fn mainnet_genesis(
 			initial_validators: initial_authorities.iter().map(|x| x.0.clone()).collect::<Vec<_>>(),
 		},
 
-		// aura: Default::default(),
 		aura: AuraConfig {
-			// authorities: initial_authorities.iter().map(|x| (x.1.clone())).collect(),
 			authorities: vec![],
 		},
-		// grandpa: Default::default(),
 		grandpa: GrandpaConfig {
-			// authorities: initial_authorities.iter().map(|x| (x.2.clone(), 1)).collect(),
 			authorities: vec![],	
 		},
 		sudo: SudoConfig {

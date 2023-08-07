@@ -1,8 +1,10 @@
 {
-  "name": "Local Testnet",
+  "name": "StorageChain Testnet",
   "id": "local_testnet",
   "chainType": "Local",
-  "bootNodes": [],
+  "bootNodes": [
+    "/ip4/127.0.0.1/tcp/30333/p2p/12D3KooWBFHeTFUUVQTVWxx7WaFueHMpzEzYjjSkLy5NhV6sQFNE"
+  ],
   "telemetryEndpoints": null,
   "protocolId": null,
   "properties": {
