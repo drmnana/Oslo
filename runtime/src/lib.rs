@@ -750,7 +750,7 @@ impl pallet_democracy::Config for Runtime {
 	type CooloffPeriod = CooloffPeriod;
 	// type PreimageByteDeposit = PreimageByteDeposit;
 	// type OperationalPreimageOrigin = pallet_collective::EnsureMember<AccountId, CouncilCollective>;
-	type Slash = Treasury;
+	type Slash = Treasury;	
 	type MaxDeposits = ConstU32<100>;
 
 	type Preimages = Preimage;
