@@ -3,8 +3,8 @@
   "id": "public_live",
   "chainType": "Live",
   "bootNodes": [
-    "/ip4/134.209.121.166/tcp/30334/p2p/12D3KooWM5mkGRnYr4r6z6TwLAmcnaTFDicNAEtqD74Hn1Lh2hGp",
-    "/ip4/157.230.233.32/tcp/30333/p2p/12D3KooWDXWWEeFzAhiTYrnv7HGGU6V3QYbg1fFC2KZoXiLjQbQM",
+    "/ip4/167.71.244.181/tcp/30333/p2p/12D3KooWR99vJeAwvtFfQHRCsCWvB1Q8Ay9mX3raohLtqQyJho55",
+    "/ip4/157.230.233.32/tcp/30333/p2p/12D3KooWM64C9JqTVBE4xm4FNq4u1XZfR1bG7uKLcYBSr1ouLF1e",
     "/ip4/134.209.121.166/tcp/30335/p2p/12D3KooWS5qssUFhyqMGBFMjvidyMpZ9H7RK2LqpTEp9qtjTaLsB"
   ],
   "telemetryEndpoints": null,
@@ -22,19 +22,19 @@
       "balances": {
         "balances": [
           [
-            "0x6b7cd45dfc550f12b4edafdfbbc68b53faae6fe2",
-            1000000000000000000000
+            "0x71599dedfec2ce347a804f9bbf9d18c6c2d7009e",
+            194999000000000000000000000
           ],
           [
-            "0x18119bb0f49ee709104ca2804b297b08d5d0edec",
+            "0x90e79dac498b35096d4d86cea4f2c3681b40f5c7",
             1755000000000000000000000000
           ],
           [
-            "0x71b18c74b51e2195c92c169504f7fafa71308a9a",
+            "0x6a321b74936cca0f549fef65f274c9e679258307",
             66000000000000000000000000
           ],
           [
-            "0xc03cfc225ad4b42f96f612ba38bd4d9cbd4a419a",
+            "0x71599dedfec2ce347a804f9bbf9d18c6c2d7009e",
             194999000000000000000000000
           ]
         ]
@@ -44,35 +44,35 @@
       },
       "validatorSet": {
         "initialValidators": [
-          "0x6b7cd45dfc550f12b4edafdfbbc68b53faae6fe2",
-          "0x18119bb0f49ee709104ca2804b297b08d5d0edec",
-          "0x71b18c74b51e2195c92c169504f7fafa71308a9a",
-          "0xc03cfc225ad4b42f96f612ba38bd4d9cbd4a419a"
+          "0x71599dedfec2ce347a804f9bbf9d18c6c2d7009e",
+          "0x90e79dac498b35096d4d86cea4f2c3681b40f5c7",
+          "0x6a321b74936cca0f549fef65f274c9e679258307",
+          "0x71599dedfec2ce347a804f9bbf9d18c6c2d7009e"
         ]
       },
       "session": {
         "keys": [
           [
-            "0x6b7cd45dfc550f12b4edafdfbbc68b53faae6fe2",
-            "0x6b7cd45dfc550f12b4edafdfbbc68b53faae6fe2",
+            "0x71599dedfec2ce347a804f9bbf9d18c6c2d7009e",
+            "0x71599dedfec2ce347a804f9bbf9d18c6c2d7009e",
             {
-              "aura": "5E7AS7fJ7ZJoKzY2wRJjDAvsw4xv4LZFijxfvVdcFqbaCzT4",
-              "grandpa": "5H5bK4vzeKZ2fmfUpiMb6WTDLFVdJDL8Jh1nUWM8JvHKuWtV",
-              "im_online": "5E7AS7fJ7ZJoKzY2wRJjDAvsw4xv4LZFijxfvVdcFqbaCzT4"
+              "aura": "5Ct6VcSQCwMTSi9sPLuefjq9J9JZGwBTAx3JWb3u37LdjVb3",
+              "grandpa": "5EQjJVunT59fwTPT6BWtMS6ueQ7bLTZvUnxgFT2DDr3od1L4",
+              "im_online": "5Ct6VcSQCwMTSi9sPLuefjq9J9JZGwBTAx3JWb3u37LdjVb3"
             }
           ],
           [
-            "0x18119bb0f49ee709104ca2804b297b08d5d0edec",
-            "0x18119bb0f49ee709104ca2804b297b08d5d0edec",
+            "0x90e79dac498b35096d4d86cea4f2c3681b40f5c7",
+            "0x90e79dac498b35096d4d86cea4f2c3681b40f5c7",
             {
-              "aura": "5DoXpAVtEd5wxEA1qh3iERwobEZbsEGgZ1afTgYudnYVp9kc",
-              "grandpa": "5GNEXQ9awunHWCNaM71FfzNo2UGpjZZ8unr6zBRXJCzncs5x",
-              "im_online": "5DoXpAVtEd5wxEA1qh3iERwobEZbsEGgZ1afTgYudnYVp9kc"
+              "aura": "5EnTu9jm6X7iEfgK2BJZmcEnyE26pXL5mwQNQE14yV5pvssq",
+              "grandpa": "5EDugTxBnbFvPFV31KMvshfYfta2rrzigxtHjqVRPrh1fADs",
+              "im_online": "5EnTu9jm6X7iEfgK2BJZmcEnyE26pXL5mwQNQE14yV5pvssq"
             }
           ],
           [
-            "0x71b18c74b51e2195c92c169504f7fafa71308a9a",
-            "0x71b18c74b51e2195c92c169504f7fafa71308a9a",
+            "0x6a321b74936cca0f549fef65f274c9e679258307",
+            "0x6a321b74936cca0f549fef65f274c9e679258307",
             {
               "aura": "5H9MdqeBv9EiicSAuowdkeD3wgTF1zdBvoxQo2kPACaHo6dA",
               "grandpa": "5ECbzoYoaJJtT33NEpGaLjsf2xMJaTjBvLDdTHYfN7uoU5RY",
@@ -80,8 +80,8 @@
             }
           ],
           [
-            "0xc03cfc225ad4b42f96f612ba38bd4d9cbd4a419a",
-            "0xc03cfc225ad4b42f96f612ba38bd4d9cbd4a419a",
+            "0x71599dedfec2ce347a804f9bbf9d18c6c2d7009e",
+            "0x71599dedfec2ce347a804f9bbf9d18c6c2d7009e",
             {
               "aura": "5GgXcLxjzDAqZiWXsTpvy7G1yXKMQxY3FxcAAJtU8wtBWcHK",
               "grandpa": "5Ee8uH4gHpwkf4pMvKCAMdHJ8ZGx8U5qfZDzi8Y9PHfNkMix",
@@ -97,7 +97,7 @@
         "authorities": []
       },
       "sudo": {
-        "key": "0x6b7cd45dfc550f12b4edafdfbbc68b53faae6fe2"
+        "key": "0x71599dedfec2ce347a804f9bbf9d18c6c2d7009e"
       },
       "evm": {
         "accounts": {}
@@ -122,10 +122,10 @@
       "technicalCommittee": {
         "phantom": null,
         "members": [
-          "0x6b7cd45dfc550f12b4edafdfbbc68b53faae6fe2",
-          "0x18119bb0f49ee709104ca2804b297b08d5d0edec",
-          "0x71b18c74b51e2195c92c169504f7fafa71308a9a",
-          "0xc03cfc225ad4b42f96f612ba38bd4d9cbd4a419a"
+          "0x71599dedfec2ce347a804f9bbf9d18c6c2d7009e",
+          "0x90e79dac498b35096d4d86cea4f2c3681b40f5c7",
+          "0x6a321b74936cca0f549fef65f274c9e679258307",
+          "0x71599dedfec2ce347a804f9bbf9d18c6c2d7009e"
         ]
       }
     }

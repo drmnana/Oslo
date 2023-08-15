@@ -30,15 +30,10 @@ fn get_from_secret<TPublic: Public>(seed: &str) -> <TPublic::Pair as Pair>::Publ
 		.public()
 }
 
-const ALITH: &str = "0x6B7CD45dfc550F12b4EdAFDFbBC68b53faAE6Fe2";
-const BALTATHAR: &str = "0x18119Bb0f49ee709104CA2804B297B08d5d0EDEc";
-const CHARLETH: &str = "0x71B18c74b51E2195c92C169504f7FAFA71308A9a";
-const DOROTHY: &str = "0xC03cfc225Ad4b42F96f612BA38bD4d9cBD4a419a";
-
-// Endowed Accounts for Mainnet
-// const BALTATHAR: &str = "0x90E79DAc498b35096d4d86CEa4f2c3681b40F5C7";
-// const CHARLETH: &str = "0x6a321b74936ccA0F549FEF65F274c9E679258307";
-// const DOROTHY: &str = "0x71599dEdfEc2CE347a804F9bbf9d18C6C2D7009E";
+const ALITH: &str = "0x71599dEdfEc2CE347a804F9bbf9d18C6C2D7009E";
+const BALTATHAR: &str = "0x90E79DAc498b35096d4d86CEa4f2c3681b40F5C7";
+const CHARLETH: &str = "0x6a321b74936ccA0F549FEF65F274c9E679258307";
+const DOROTHY: &str = "0x71599dEdfEc2CE347a804F9bbf9d18C6C2D7009E";
 
 pub fn public_config() -> Result<ChainSpec, String> {
 	let wasm_binary = WASM_BINARY.ok_or_else(|| "Development wasm not available".to_string())?;
@@ -54,15 +49,15 @@ pub fn public_config() -> Result<ChainSpec, String> {
 				vec![
 					(
 						array_bytes::hex_n_into_unchecked(ALITH),
-						hex!["5a586c3a33049d1ff4923890bffe3e433412100df8cc97151f5e361921a79336"].unchecked_into(),
-						hex!["ddda617c8671c6761ac63a00637676ba2abcb7ce181447f0a4a7341da8765f6b"].unchecked_into(),
-						hex!["5a586c3a33049d1ff4923890bffe3e433412100df8cc97151f5e361921a79336"].unchecked_into(),
+						hex!["2424bc9ceb258a8f74aa3f99d0211b51e88d16882754d43dc6511c1a5aea5b46"].unchecked_into(),
+						hex!["67be3d9095d1275ede2e30795938707e5cf407851a7e9d673d8764d09fc8f583"].unchecked_into(),
+						hex!["2424bc9ceb258a8f74aa3f99d0211b51e88d16882754d43dc6511c1a5aea5b46"].unchecked_into(),
 					),
 					(
 						array_bytes::hex_n_into_unchecked(BALTATHAR),
-						hex!["4ce5fa3d52f632babc5bd9568f86092326212f0c89fe8ae5a0765ddc100e902a"].unchecked_into(),
-						hex!["be4f57b6bbfc83ce7ccfe78c11e152de85bf5788020a0c360bb9068d2c8f7bb6"].unchecked_into(),
-						hex!["4ce5fa3d52f632babc5bd9568f86092326212f0c89fe8ae5a0765ddc100e902a"].unchecked_into(),					),
+						hex!["7851ca2f417fcaa8fb6c5e6e05c1f2f139d31dbdbe501a98432e46d7930f2431"].unchecked_into(),
+						hex!["5f7d7a9ca599a6400ee8b7564174b97b14cbd7f4e7d4a42ace1a6f33de1bc115"].unchecked_into(),
+						hex!["7851ca2f417fcaa8fb6c5e6e05c1f2f139d31dbdbe501a98432e46d7930f2431"].unchecked_into(),					),
 					(	
 						array_bytes::hex_n_into_unchecked(CHARLETH),
 						hex!["e0b952dc8556d7a5fbfe538e8fb2adb445989e12f6c9e97748eaf5df982d640c"].unchecked_into(),
@@ -87,8 +82,8 @@ pub fn public_config() -> Result<ChainSpec, String> {
 			)
 		},
 		vec![
-			"/ip4/134.209.121.166/tcp/30334/p2p/12D3KooWM5mkGRnYr4r6z6TwLAmcnaTFDicNAEtqD74Hn1Lh2hGp".parse().unwrap(),
-			"/ip4/157.230.233.32/tcp/30333/p2p/12D3KooWDXWWEeFzAhiTYrnv7HGGU6V3QYbg1fFC2KZoXiLjQbQM".parse().unwrap(),
+			"/ip4/167.71.244.181/tcp/30333/p2p/12D3KooWR99vJeAwvtFfQHRCsCWvB1Q8Ay9mX3raohLtqQyJho55".parse().unwrap(),
+			"/ip4/157.230.233.32/tcp/30333/p2p/12D3KooWM64C9JqTVBE4xm4FNq4u1XZfR1bG7uKLcYBSr1ouLF1e".parse().unwrap(),
 			"/ip4/134.209.121.166/tcp/30335/p2p/12D3KooWS5qssUFhyqMGBFMjvidyMpZ9H7RK2LqpTEp9qtjTaLsB".parse().unwrap(),
 		],
 		None,
