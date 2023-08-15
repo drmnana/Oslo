@@ -70,9 +70,9 @@ pub fn public_config() -> Result<ChainSpec, String> {
 						hex!["e0b952dc8556d7a5fbfe538e8fb2adb445989e12f6c9e97748eaf5df982d640c"].unchecked_into(),					),
 					(
 						array_bytes::hex_n_into_unchecked(DOROTHY),
-						hex!["5a586c3a33049d1ff4923890bffe3e433412100df8cc97151f5e361921a79336"].unchecked_into(),
-						hex!["ddda617c8671c6761ac63a00637676ba2abcb7ce181447f0a4a7341da8765f6b"].unchecked_into(),
-						hex!["5a586c3a33049d1ff4923890bffe3e433412100df8cc97151f5e361921a79336"].unchecked_into(),					),
+						hex!["cc4346263d27a5eb0f1bcbd9e53ab218b7e56af34951e1459334515c0dcacf70"].unchecked_into(),
+						hex!["71f7dfca2808730aa2c5fb4233cc9600f060bcf5842025b878ebb4614db863d6"].unchecked_into(),
+						hex!["cc4346263d27a5eb0f1bcbd9e53ab218b7e56af34951e1459334515c0dcacf70"].unchecked_into(),					),
 				],
 				// Sudo account
 				array_bytes::hex_n_into_unchecked(ALITH),
