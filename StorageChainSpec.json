@@ -22,8 +22,8 @@
       "balances": {
         "balances": [
           [
-            "0x71599dedfec2ce347a804f9bbf9d18c6c2d7009e",
-            194999000000000000000000000
+            "0x9643b6d120345604d1e93133c6a9efd8cb5f6181",
+            1000000000000000000000
           ],
           [
             "0x90e79dac498b35096d4d86cea4f2c3681b40f5c7",
@@ -44,7 +44,7 @@
       },
       "validatorSet": {
         "initialValidators": [
-          "0x71599dedfec2ce347a804f9bbf9d18c6c2d7009e",
+          "0x9643b6d120345604d1e93133c6a9efd8cb5f6181",
           "0x90e79dac498b35096d4d86cea4f2c3681b40f5c7",
           "0x6a321b74936cca0f549fef65f274c9e679258307",
           "0x71599dedfec2ce347a804f9bbf9d18c6c2d7009e"
@@ -53,8 +53,8 @@
       "session": {
         "keys": [
           [
-            "0x71599dedfec2ce347a804f9bbf9d18c6c2d7009e",
-            "0x71599dedfec2ce347a804f9bbf9d18c6c2d7009e",
+            "0x9643b6d120345604d1e93133c6a9efd8cb5f6181",
+            "0x9643b6d120345604d1e93133c6a9efd8cb5f6181",
             {
               "aura": "5Ct6VcSQCwMTSi9sPLuefjq9J9JZGwBTAx3JWb3u37LdjVb3",
               "grandpa": "5EQjJVunT59fwTPT6BWtMS6ueQ7bLTZvUnxgFT2DDr3od1L4",
@@ -97,7 +97,7 @@
         "authorities": []
       },
       "sudo": {
-        "key": "0x71599dedfec2ce347a804f9bbf9d18c6c2d7009e"
+        "key": "0x9643b6d120345604d1e93133c6a9efd8cb5f6181"
       },
       "evm": {
         "accounts": {}
@@ -122,7 +122,7 @@
       "technicalCommittee": {
         "phantom": null,
         "members": [
-          "0x71599dedfec2ce347a804f9bbf9d18c6c2d7009e",
+          "0x9643b6d120345604d1e93133c6a9efd8cb5f6181",
           "0x90e79dac498b35096d4d86cea4f2c3681b40f5c7",
           "0x6a321b74936cca0f549fef65f274c9e679258307",
           "0x71599dedfec2ce347a804f9bbf9d18c6c2d7009e"

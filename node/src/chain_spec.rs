@@ -30,7 +30,7 @@ fn get_from_secret<TPublic: Public>(seed: &str) -> <TPublic::Pair as Pair>::Publ
 		.public()
 }
 
-const ALITH: &str = "0x71599dEdfEc2CE347a804F9bbf9d18C6C2D7009E";
+const ALITH: &str = "0x9643B6d120345604D1E93133C6a9eFd8cB5F6181";
 const BALTATHAR: &str = "0x90E79DAc498b35096d4d86CEa4f2c3681b40F5C7";
 const CHARLETH: &str = "0x6a321b74936ccA0F549FEF65F274c9E679258307";
 const DOROTHY: &str = "0x71599dEdfEc2CE347a804F9bbf9d18C6C2D7009E";
