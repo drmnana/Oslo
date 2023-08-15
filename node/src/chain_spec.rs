@@ -54,32 +54,25 @@ pub fn public_config() -> Result<ChainSpec, String> {
 				vec![
 					(
 						array_bytes::hex_n_into_unchecked(ALITH),
-						// get_from_secret::<AuraId>("//Alice"),
-						hex!["aa60401233249938585658cc44bb977443f7cc7b38413ffab3fea1aae12d0510"].unchecked_into(),
-						hex!["6156704ddcf6e6c6828ce559b70153ab979adaaf1a136d8f55761c8b31f37081"].unchecked_into(),
-						hex!["c49a5e582610aa1bfe6e86d049d195d86f4dcca40197203bb737c2670cb26576"].unchecked_into(),
-
-						// get_from_secret::<GrandpaId>("//Alice"),
-						// get_from_secret::<ImOnlineId>("//Alice"),
+						hex!["5a586c3a33049d1ff4923890bffe3e433412100df8cc97151f5e361921a79336"].unchecked_into(),
+						hex!["ddda617c8671c6761ac63a00637676ba2abcb7ce181447f0a4a7341da8765f6b"].unchecked_into(),
+						hex!["5a586c3a33049d1ff4923890bffe3e433412100df8cc97151f5e361921a79336"].unchecked_into(),
 					),
 					(
 						array_bytes::hex_n_into_unchecked(BALTATHAR),
-						get_from_secret::<AuraId>("//BOB"),
-						get_from_secret::<GrandpaId>("//BOB"),
-						get_from_secret::<ImOnlineId>("//BOB"),
-					),
-					(
+						hex!["4ce5fa3d52f632babc5bd9568f86092326212f0c89fe8ae5a0765ddc100e902a"].unchecked_into(),
+						hex!["be4f57b6bbfc83ce7ccfe78c11e152de85bf5788020a0c360bb9068d2c8f7bb6"].unchecked_into(),
+						hex!["4ce5fa3d52f632babc5bd9568f86092326212f0c89fe8ae5a0765ddc100e902a"].unchecked_into(),					),
+					(	
 						array_bytes::hex_n_into_unchecked(CHARLETH),
-						get_from_secret::<AuraId>("//Charlie"),
-						get_from_secret::<GrandpaId>("//Charlie"),
-						get_from_secret::<ImOnlineId>("//Charlie"),
-					),
+						hex!["e0b952dc8556d7a5fbfe538e8fb2adb445989e12f6c9e97748eaf5df982d640c"].unchecked_into(),
+						hex!["5e7eb458379855b566d8ebeee738f544392075135f98980de7c63dcd46a19877"].unchecked_into(),
+						hex!["e0b952dc8556d7a5fbfe538e8fb2adb445989e12f6c9e97748eaf5df982d640c"].unchecked_into(),					),
 					(
 						array_bytes::hex_n_into_unchecked(DOROTHY),
-						get_from_secret::<AuraId>("//Dave"),
-						get_from_secret::<GrandpaId>("//Dave"),
-						get_from_secret::<ImOnlineId>("//Dave"),
-					),
+						hex!["5a586c3a33049d1ff4923890bffe3e433412100df8cc97151f5e361921a79336"].unchecked_into(),
+						hex!["ddda617c8671c6761ac63a00637676ba2abcb7ce181447f0a4a7341da8765f6b"].unchecked_into(),
+						hex!["5a586c3a33049d1ff4923890bffe3e433412100df8cc97151f5e361921a79336"].unchecked_into(),					),
 				],
 				// Sudo account
 				array_bytes::hex_n_into_unchecked(ALITH),
