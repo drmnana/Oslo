@@ -82,9 +82,9 @@ pub fn public_config() -> Result<ChainSpec, String> {
 			)
 		},
 		vec![
-			"/ip4/167.71.244.181/tcp/30333/p2p/12D3KooWR99vJeAwvtFfQHRCsCWvB1Q8Ay9mX3raohLtqQyJho55".parse().unwrap(),
-			"/ip4/157.230.233.32/tcp/30333/p2p/12D3KooWM64C9JqTVBE4xm4FNq4u1XZfR1bG7uKLcYBSr1ouLF1e".parse().unwrap(),
-			"/ip4/134.209.121.166/tcp/30335/p2p/12D3KooWS5qssUFhyqMGBFMjvidyMpZ9H7RK2LqpTEp9qtjTaLsB".parse().unwrap(),
+			// "/ip4/167.71.244.181/tcp/30333/p2p/12D3KooWR99vJeAwvtFfQHRCsCWvB1Q8Ay9mX3raohLtqQyJho55".parse().unwrap(),
+			// "/ip4/157.230.233.32/tcp/30333/p2p/12D3KooWM64C9JqTVBE4xm4FNq4u1XZfR1bG7uKLcYBSr1ouLF1e".parse().unwrap(),
+			// "/ip4/134.209.121.166/tcp/30335/p2p/12D3KooWS5qssUFhyqMGBFMjvidyMpZ9H7RK2LqpTEp9qtjTaLsB".parse().unwrap(),
 		],
 		None,
 		None,
