@@ -10,14 +10,11 @@ pub type AccountId = <<Signature as sp_runtime::traits::Verify>::Signer as sp_ru
 #[cfg(feature = "std")]
 include!(concat!(env!("OUT_DIR"), "/wasm_binary.rs"));
 
-use pallet_session::SessionManager;
-
 
 use pallet_grandpa::{
 	fg_primitives, AuthorityId as GrandpaId, AuthorityList as GrandpaAuthorityList,
 };
 
-// vvv
 use frame_system::EnsureRoot;
 
 
@@ -78,7 +75,7 @@ pub use frame_support::{
 pub use frame_system::Call as SystemCall;
 pub use pallet_balances::Call as BalancesCall;
 pub use pallet_timestamp::Call as TimestampCall;
-use pallet_transaction_payment::{ConstFeeMultiplier, CurrencyAdapter, Multiplier};
+use pallet_transaction_payment::{ CurrencyAdapter, Multiplier};
 #[cfg(any(feature = "std", test))]
 pub use sp_runtime::BuildStorage;
 pub use sp_runtime::{Perbill, Permill};
@@ -96,9 +93,6 @@ pub type Signature = account::EthereumSignature;
 
 /// Balance of an account.
 pub type Balance = u128;
-
-// treasury Pallet
-type RewardRemainder = Treasury;
 
 /// Index of a transaction in the chain.
 pub type Index = u32;
@@ -167,7 +161,6 @@ impl validator_set::Config for Runtime {
 }
 
 
-
 // To learn more about runtime versioning, see:
 // https://docs.substrate.io/main-docs/build/upgrade#runtime-versioning
 #[sp_version::runtime_version]
@@ -180,11 +173,11 @@ pub const VERSION: RuntimeVersion = RuntimeVersion {
 	//   `spec_version`, and `authoring_version` are the same between Wasm and native.
 	// This value is set to 100 to notify Polkadot-JS App (https://polkadot.js.org/apps) to use
 	//   the compatible custom types.
-	spec_version: 102,
-	impl_version: 2,
+	spec_version: 100	,
+	impl_version: 1,
 	apis: RUNTIME_API_VERSIONS,
-	transaction_version: 2,
-	state_version: 2,
+	transaction_version: 1,
+	state_version: 1,
 	
 };
 
@@ -220,7 +213,6 @@ mod precompiles;
 mod account;
 
 use precompiles::SubstratePrecompiles;
-use account::AccountId20;
 
 parameter_types! {
 	pub const BlockHashCount: BlockNumber = 2400;
@@ -386,7 +378,6 @@ impl pallet_transaction_payment::Config for Runtime {
 	type OperationalFeeMultiplier = ConstU8<5>;
 	type WeightToFee = IdentityFee<Balance>;
 	type LengthToFee = IdentityFee<Balance>;
-	// type FeeMultiplierUpdate = ConstFeeMultiplier<FeeMultiplier>;
 	type FeeMultiplierUpdate = ();
 }
 
@@ -508,17 +499,6 @@ parameter_types! {
 	pub const UncleGenerations: BlockNumber = 0;
 }
 
-// pub struct AuraAccountAdapter;
-// impl FindAuthor<AccountId> for AuraAccountAdapter {
-// 	fn find_author<'a, I>(digests: I) -> Option<AccountId>
-// 		where I: 'a + IntoIterator<Item=(ConsensusEngineId, &'a [u8])>
-// 	{
-// 		pallet_aura::AuraAuthorId::<Runtime>::find_author(digests).and_then(|k| {
-// 			AccountId::try_from(k).ok()
-// 		})
-// 	}
-// }
-
 
 // Impleminting the frame system off-chain
 // ////////////// // //////////////// //////////////// //////////////// //////////////// //////////////// //////////////// //////////////// //////////////// //////////////// //////////////
@@ -598,16 +578,9 @@ impl pallet_authorship::Config for Runtime {
 }
 
 
-// impl pallet_authorship::Config for Runtime {
-//     type FindAuthor = pallet_session::FindAccountFromAuthorIndex<Self, Aura>;
-//     type UncleGenerations = UncleGenerations;
-//     type FilterUncle = ();
-//     type EventHandler = (CollatorSelection,);
-// }
-
 
 parameter_types! {
-	pub const Period: u32 = 1 * MINUTES;
+	pub const Period: u32 = 60 * MINUTES;
 	pub const Offset: u32 = 0;
 }
 
@@ -728,7 +701,7 @@ impl pallet_democracy::Config for Runtime {
 	pallet_collective::EnsureProportionAtLeast<AccountId, CouncilCollective, 1, 1>;
 	/// Two thirds of the technical committee can have an ExternalMajority/ExternalDefault vote
 	/// be tabled immediately and with a shorter voting/enactment period.
-	type FastTrackOrigin =
+	type FastTrackOrigin = 
 	pallet_collective::EnsureProportionAtLeast<AccountId, TechnicalCollective, 2, 3>;
 	type InstantOrigin =
 	pallet_collective::EnsureProportionAtLeast<AccountId, TechnicalCollective, 1, 1>;
@@ -741,7 +714,7 @@ impl pallet_democracy::Config for Runtime {
 	// To cancel a proposal before it has been passed, the technical committee must be unanimous or
 	// Root must agree.
 	type CancelProposalOrigin = EitherOfDiverse<
-		EnsureRoot<AccountId>,
+		EnsureRoot<AccountId>,	
 		pallet_collective::EnsureProportionAtLeast<AccountId, TechnicalCollective, 1, 1>,
 	>;
 	// Any single technical committee member may veto a coming council proposal, however they can

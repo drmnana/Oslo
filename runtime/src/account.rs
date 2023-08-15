@@ -129,7 +129,7 @@ impl sp_runtime::traits::IdentifyAccount for EthereumSigner {
 		AccountId20(self.0)
 	}
 }
-
+ 
 impl From<[u8; 20]> for EthereumSigner {
 	fn from(x: [u8; 20]) -> Self {
 		EthereumSigner(x)
@@ -150,7 +150,7 @@ impl From<ecdsa::Public> for EthereumSigner {
 		EthereumSigner(account.into())
 	}
 }
-
+ 
 impl From<libsecp256k1::PublicKey> for EthereumSigner {
 	fn from(x: libsecp256k1::PublicKey) -> Self {
 		let mut m = [0u8; 64];

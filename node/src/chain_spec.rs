@@ -1,23 +1,19 @@
 use hex_literal::hex;
 use sc_service::{ChainType, Properties};
 use sp_consensus_aura::sr25519::AuthorityId as AuraId;
-use sp_core::{Pair, Public, H160, U256};
+use sp_core::{Pair, Public};
 use sp_finality_grandpa::AuthorityId as GrandpaId;
 // use sp_runtime::key_types::IM_ONLINE;
 use pallet_im_online::sr25519::AuthorityId as ImOnlineId;
+use sp_core::crypto::UncheckedInto;
 
 use storage_chain_runtime::{
-	currency::*, opaque::SessionKeys, AccountId, AuraConfig, Balance, BalancesConfig,
-	CouncilConfig, DemocracyConfig, EVMConfig, GenesisAccount, GenesisConfig, GrandpaConfig,
+	currency::*, opaque::SessionKeys, AccountId, AuraConfig, BalancesConfig,
+	CouncilConfig, DemocracyConfig, GenesisConfig, GrandpaConfig,
 	ImOnlineConfig, SessionConfig, SudoConfig, SystemConfig, TechnicalCommitteeConfig,
-	ValidatorSetConfig, WASM_BINARY, Treasury,
+	ValidatorSetConfig, WASM_BINARY,
 };
-// use sp_runtime::traits::{IdentifyAccount, Verify};
-use std::{collections::BTreeMap, default::Default};
-
-// use frame_benchmarking::frame_support::metadata::StorageEntryModifier::Default;
-// use libsecp256k1::{PublicKey, PublicKeyFormat};
-// use sha3::{Digest};
+use std::{ default::Default};
 
 // The URL for the telemetry server.
 // const STAGING_TELEMETRY_URL: &str = "wss://telemetry.polkadot.io/submit/";
@@ -58,15 +54,19 @@ pub fn public_config() -> Result<ChainSpec, String> {
 				vec![
 					(
 						array_bytes::hex_n_into_unchecked(ALITH),
-						get_from_secret::<AuraId>("//Alice"),
-						get_from_secret::<GrandpaId>("//Alice"),
-						get_from_secret::<ImOnlineId>("//Alice"),
+						// get_from_secret::<AuraId>("//Alice"),
+						hex!["aa60401233249938585658cc44bb977443f7cc7b38413ffab3fea1aae12d0510"].unchecked_into(),
+						hex!["6156704ddcf6e6c6828ce559b70153ab979adaaf1a136d8f55761c8b31f37081"].unchecked_into(),
+						hex!["c49a5e582610aa1bfe6e86d049d195d86f4dcca40197203bb737c2670cb26576"].unchecked_into(),
+
+						// get_from_secret::<GrandpaId>("//Alice"),
+						// get_from_secret::<ImOnlineId>("//Alice"),
 					),
 					(
 						array_bytes::hex_n_into_unchecked(BALTATHAR),
-						get_from_secret::<AuraId>("//Bob"),
-						get_from_secret::<GrandpaId>("//Bob"),
-						get_from_secret::<ImOnlineId>("//Bob"),
+						get_from_secret::<AuraId>("//BOB"),
+						get_from_secret::<GrandpaId>("//BOB"),
+						get_from_secret::<ImOnlineId>("//BOB"),
 					),
 					(
 						array_bytes::hex_n_into_unchecked(CHARLETH),
@@ -93,7 +93,11 @@ pub fn public_config() -> Result<ChainSpec, String> {
 				true,
 			)
 		},
-		vec![],
+		vec![
+			"/ip4/134.209.121.166/tcp/30334/p2p/12D3KooWM5mkGRnYr4r6z6TwLAmcnaTFDicNAEtqD74Hn1Lh2hGp".parse().unwrap(),
+			"/ip4/157.230.233.32/tcp/30333/p2p/12D3KooWDXWWEeFzAhiTYrnv7HGGU6V3QYbg1fFC2KZoXiLjQbQM".parse().unwrap(),
+			"/ip4/134.209.121.166/tcp/30335/p2p/12D3KooWS5qssUFhyqMGBFMjvidyMpZ9H7RK2LqpTEp9qtjTaLsB".parse().unwrap(),
+		],
 		None,
 		None,
 		None,
@@ -117,7 +121,7 @@ pub fn development_config() -> Result<ChainSpec, String> {
 	let wasm_binary = WASM_BINARY.ok_or_else(|| "Development wasm not available".to_string())?;
 
 	Ok(ChainSpec::from_genesis(
-		// Name
+		// Names
 		"Development",
 		// ID
 		"dev",
@@ -133,7 +137,6 @@ pub fn development_config() -> Result<ChainSpec, String> {
 					get_from_secret::<ImOnlineId>("//Alice"),
 				)],
 				// Sudo account
-				// AccountId::from(hex!("6B7CD45dfc550F12b4EdAFDFbBC68b53faAE6Fe2")),
 				array_bytes::hex_n_into_unchecked(ALITH),
 				// Pre-funded accounts
 				vec![
@@ -211,7 +214,9 @@ pub fn local_testnet_config() -> Result<ChainSpec, String> {
 			)
 		},
 		// Bootnodes
-		vec![],
+		vec![
+
+		],
 		// Telemetry
 		None,
 		// Protocol ID
@@ -377,7 +382,7 @@ fn mainnet_genesis(
 		technical_committee: TechnicalCommitteeConfig {
 			members: endowed_accounts
 				.iter()
-				.take((num_endowed_accounts + 1) / 2)
+				.take(num_endowed_accounts  )
 				.cloned()
 				.collect(),
 			phantom: Default::default(),
