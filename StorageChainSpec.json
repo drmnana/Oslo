@@ -3,7 +3,8 @@
   "id": "public_live",
   "chainType": "Live",
   "bootNodes": [
-    "/ip4/167.71.244.181/tcp/30333/p2p/12D3KooWFmPUQp1DfmVaDh11eV87QcWwDCETtJhAVUTux3MHas8T"
+    "/ip4/167.71.244.181/tcp/30333/p2p/12D3KooWLcvopKbnKGY8W6VM8zfUTJXxqBm2UPJFq85xJk65JBYg",
+    "/ip4/157.230.233.32/tcp/30333/p2p/12D3KooWJTDJbdcjqKNqKKUYHXeyNtuWXQ9ehBTuEgMpy8kE3e2u"
   ],
   "telemetryEndpoints": null,
   "protocolId": null,
