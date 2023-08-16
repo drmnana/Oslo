@@ -43,7 +43,9 @@
       "validatorSet": {
         "initialValidators": [
           "0x9643b6d120345604d1e93133c6a9efd8cb5f6181",
-          "0x90e79dac498b35096d4d86cea4f2c3681b40f5c7"
+          "0x90e79dac498b35096d4d86cea4f2c3681b40f5c7",
+          "0x6a321b74936cca0f549fef65f274c9e679258307",
+          "0x71599dedfec2ce347a804f9bbf9d18c6c2d7009e"
         ]
       },
       "session": {
@@ -52,18 +54,36 @@
             "0x9643b6d120345604d1e93133c6a9efd8cb5f6181",
             "0x9643b6d120345604d1e93133c6a9efd8cb5f6181",
             {
-              "aura": "5GF9ZrrLpMhLVyFtRQpoVJeKmcAyctTnuaGz94x7VNHqrrdh",
-              "grandpa": "5FHkGvRSURSKuJJTS2u29gsEHUnkuVhUdBuejfM4vKdvbheg",
-              "im_online": "5CLnvSfjVk2dTELRtHUZAsWd86DZQs2R7uWzzX8uUJ68VY5X"
+              "aura": "5DZHvsVWj54mkwNDFSYGXwrLH76YFKdquK3NUaNiKqrqkXYY",
+              "grandpa": "5Gcp74eUNq8Bq2xehoXDbHQdsKLDTHgmxzcS6LrbhQEh3Qdn",
+              "im_online": "5HQuoigDPAHfTu1m5sRtHCkBDDLLpbfDQmQbG4skWgXBDDFz"
             }
           ],
           [
             "0x90e79dac498b35096d4d86cea4f2c3681b40f5c7",
             "0x90e79dac498b35096d4d86cea4f2c3681b40f5c7",
             {
-              "aura": "5GYRdChKLUTWQ46z8HnZiRgW7ppe13Dr6H7WS2A1qGg8TjB6",
-              "grandpa": "5FBPERM7EyUtxs43vEkBKCZvUjM6M9AaqQvo6vncD9N5kp3E",
-              "im_online": "5FnFeJyvognvmqGy3ag7krkwBS2bRMKdh77vccmFfY6ZZjZX"
+              "aura": "5DvM1wrtnDneMcvfVzod6xxo8wR9TCVi9WSDFVVrW5nxvJ7j",
+              "grandpa": "5EEBH8ETjfwkG8veQwdJzn2ZHQ7QGWdz6zoLu8WKT83KFE5a",
+              "im_online": "5DHa9ZQyRnCTgiPCdvt8tFt4eG1YFBQuKLY2LFVmzZMimSDx"
+            }
+          ],
+          [
+            "0x6a321b74936cca0f549fef65f274c9e679258307",
+            "0x6a321b74936cca0f549fef65f274c9e679258307",
+            {
+              "aura": "5EhxKQMQtqm9XP5T6JGXPGHCfrpXDpUX3hS1eqU5uhhaUn6F",
+              "grandpa": "5HMHPRDJDzfzAwmBKfPQKXjZX2JfbGpgCeTQcQCrV272y5Xz",
+              "im_online": "5GpnwA87Q8SyKiBm6gdFmt6iH68jsDrFYpFGKPhXqGxyYhgS"
+            }
+          ],
+          [
+            "0x71599dedfec2ce347a804f9bbf9d18c6c2d7009e",
+            "0x71599dedfec2ce347a804f9bbf9d18c6c2d7009e",
+            {
+              "aura": "5EpssyTrU7v228HPcqndhYdhZFSsCuHZur9c1GT3DwojiGvD",
+              "grandpa": "5DsDpYvDW9w7Cy8urqB8q6eisiFT6qcDDsZN4hqjGJ2NJdur",
+              "im_online": "5HC9Kjenw8QXPXSwEAjYHgjgTyxXWwoSN7AcxCTZxHyHSwdL"
             }
           ]
         ]

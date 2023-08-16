@@ -49,25 +49,25 @@ pub fn public_config() -> Result<ChainSpec, String> {
 				vec![
 					(
 						array_bytes::hex_n_into_unchecked(ALITH),
-						hex!["b8e7efa4579a9f6fd822e130fdc2bf9f5734fd9a1b60c54f8de364d60dea1a66"].unchecked_into(),
-						hex!["8ea707e65b5dc03f134c0268e66b83095d6db33b21294ad250c23238cc4b8f62"].unchecked_into(),
-						hex!["0c44fa1fc7abc50f5fde96be60e672cb9c8998ef77a3843d90f51f192c645321"].unchecked_into(),
+						hex!["4209cd8a926070a89a4bd06b814f2593084a6ee9577e3e84290e2ea4de779f47"].unchecked_into(),
+						hex!["c96dd1ed657fe12c6d64cd6323f35b5cbe1e39c73956b6aea0b95bc1431269ba"].unchecked_into(),
+						hex!["ec964cbdda7e5d0b3b78bd3ea6d4f972a5685541a9a895b190fb55e638970f37"].unchecked_into(),
 					),
 					(
 						array_bytes::hex_n_into_unchecked(BALTATHAR),
-						hex!["c61529aa39d1e30da2f5bd3585bc4e93751e577cda6f6bb3615ab224131ce338"].unchecked_into(),
-						hex!["89ccb890a4e0a0ea5ae72cc0cfcfdef0a6070758d0aa1122fe7071dd399651f9"].unchecked_into(),
-						hex!["a464c42bac0f3d1d2c65e74f4167316c6a02a557d577365c7ccc2732c54c9c20"].unchecked_into(),					),
-					// (	
-					// 	array_bytes::hex_n_into_unchecked(CHARLETH),
-					// 	hex!["e0b952dc8556d7a5fbfe538e8fb2adb445989e12f6c9e97748eaf5df982d640c"].unchecked_into(),
-					// 	hex!["5e7eb458379855b566d8ebeee738f544392075135f98980de7c63dcd46a19877"].unchecked_into(),
-					// 	hex!["e0b952dc8556d7a5fbfe538e8fb2adb445989e12f6c9e97748eaf5df982d640c"].unchecked_into(),					),
-					// (
-					// 	array_bytes::hex_n_into_unchecked(DOROTHY),
-					// 	hex!["cc4346263d27a5eb0f1bcbd9e53ab218b7e56af34951e1459334515c0dcacf70"].unchecked_into(),
-					// 	hex!["71f7dfca2808730aa2c5fb4233cc9600f060bcf5842025b878ebb4614db863d6"].unchecked_into(),
-					// 	hex!["cc4346263d27a5eb0f1bcbd9e53ab218b7e56af34951e1459334515c0dcacf70"].unchecked_into(),					),
+						hex!["52185990413a5ddf1679d16cdb849051b7ac61955d63b40b70d5931159c9153c"].unchecked_into(),
+						hex!["5fb1fc3019eab9967cdee80291a0ecda51c4eafa943ba35ed9c3ada1589ccb9e"].unchecked_into(),
+						hex!["360c79414209aeb1fd37f4f5a2bdf5731f295727dc6ecdb41538be56cb47af22"].unchecked_into(),					),
+					(	
+						array_bytes::hex_n_into_unchecked(CHARLETH),
+						hex!["74e13a0ba6ee2a1e69d0f546d6d37e6fa299afb177661500582cfb167a1e0720"].unchecked_into(),
+						hex!["e9d1f7614bc1f5364da83a5b8d4898428b48d955b464c844464ad4234f8c7fb8"].unchecked_into(),
+						hex!["d290d2dbaeeb01d4c57610c63e2b068998792542eacfcda4fc83937845328007"].unchecked_into(),					),
+					(
+						array_bytes::hex_n_into_unchecked(DOROTHY),
+						hex!["7a2900e39dc5a92bc8aef53fbc779e42f72ef4099d1cfd0815344a2692cfa737"].unchecked_into(),
+						hex!["4fb6635dbe881e2cc38bd0b44507c6058f51419ecbf0aee291d6d0aac40c6cf9"].unchecked_into(),
+						hex!["e2d99d13b6c7d90705bd679019793f25bc5732492eae3f5ef86ef7bd17cd6309"].unchecked_into(),					),
 				],
 				// Sudo account
 				array_bytes::hex_n_into_unchecked(ALITH),
