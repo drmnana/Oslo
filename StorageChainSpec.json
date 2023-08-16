@@ -3,7 +3,7 @@
   "id": "public_live",
   "chainType": "Live",
   "bootNodes": [
-    "/ip4/167.71.244.181/tcp/30333/p2p/12D3KooWR99vJeAwvtFfQHRCsCWvB1Q8Ay9mX3raohLtqQyJho55"
+    "/ip4/127.0.0.1/tcp/30333/p2p/12D3KooWAYNSEJiNVecqhx7inrbZuaY1Y1c3Fr2HBujquKCfEQi2"
   ],
   "telemetryEndpoints": null,
   "protocolId": null,
@@ -43,9 +43,7 @@
       "validatorSet": {
         "initialValidators": [
           "0x9643b6d120345604d1e93133c6a9efd8cb5f6181",
-          "0x90e79dac498b35096d4d86cea4f2c3681b40f5c7",
-          "0x6a321b74936cca0f549fef65f274c9e679258307",
-          "0x71599dedfec2ce347a804f9bbf9d18c6c2d7009e"
+          "0x90e79dac498b35096d4d86cea4f2c3681b40f5c7"
         ]
       },
       "session": {
@@ -54,36 +52,18 @@
             "0x9643b6d120345604d1e93133c6a9efd8cb5f6181",
             "0x9643b6d120345604d1e93133c6a9efd8cb5f6181",
             {
-              "aura": "5Ct6VcSQCwMTSi9sPLuefjq9J9JZGwBTAx3JWb3u37LdjVb3",
-              "grandpa": "5EQjJVunT59fwTPT6BWtMS6ueQ7bLTZvUnxgFT2DDr3od1L4",
-              "im_online": "5Ct6VcSQCwMTSi9sPLuefjq9J9JZGwBTAx3JWb3u37LdjVb3"
+              "aura": "5GF9ZrrLpMhLVyFtRQpoVJeKmcAyctTnuaGz94x7VNHqrrdh",
+              "grandpa": "5FHkGvRSURSKuJJTS2u29gsEHUnkuVhUdBuejfM4vKdvbheg",
+              "im_online": "5CLnvSfjVk2dTELRtHUZAsWd86DZQs2R7uWzzX8uUJ68VY5X"
             }
           ],
           [
             "0x90e79dac498b35096d4d86cea4f2c3681b40f5c7",
             "0x90e79dac498b35096d4d86cea4f2c3681b40f5c7",
             {
-              "aura": "5EnTu9jm6X7iEfgK2BJZmcEnyE26pXL5mwQNQE14yV5pvssq",
-              "grandpa": "5EDugTxBnbFvPFV31KMvshfYfta2rrzigxtHjqVRPrh1fADs",
-              "im_online": "5EnTu9jm6X7iEfgK2BJZmcEnyE26pXL5mwQNQE14yV5pvssq"
-            }
-          ],
-          [
-            "0x6a321b74936cca0f549fef65f274c9e679258307",
-            "0x6a321b74936cca0f549fef65f274c9e679258307",
-            {
-              "aura": "5H9MdqeBv9EiicSAuowdkeD3wgTF1zdBvoxQo2kPACaHo6dA",
-              "grandpa": "5ECbzoYoaJJtT33NEpGaLjsf2xMJaTjBvLDdTHYfN7uoU5RY",
-              "im_online": "5H9MdqeBv9EiicSAuowdkeD3wgTF1zdBvoxQo2kPACaHo6dA"
-            }
-          ],
-          [
-            "0x71599dedfec2ce347a804f9bbf9d18c6c2d7009e",
-            "0x71599dedfec2ce347a804f9bbf9d18c6c2d7009e",
-            {
-              "aura": "5GgXcLxjzDAqZiWXsTpvy7G1yXKMQxY3FxcAAJtU8wtBWcHK",
-              "grandpa": "5Ee8uH4gHpwkf4pMvKCAMdHJ8ZGx8U5qfZDzi8Y9PHfNkMix",
-              "im_online": "5GgXcLxjzDAqZiWXsTpvy7G1yXKMQxY3FxcAAJtU8wtBWcHK"
+              "aura": "5GYRdChKLUTWQ46z8HnZiRgW7ppe13Dr6H7WS2A1qGg8TjB6",
+              "grandpa": "5FBPERM7EyUtxs43vEkBKCZvUjM6M9AaqQvo6vncD9N5kp3E",
+              "im_online": "5FnFeJyvognvmqGy3ag7krkwBS2bRMKdh77vccmFfY6ZZjZX"
             }
           ]
         ]
