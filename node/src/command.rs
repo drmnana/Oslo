@@ -102,7 +102,7 @@ pub fn run() -> sc_cli::Result<()> {
 				let aux_revert = Box::new(|client, _, blocks| {
 					sc_finality_grandpa::revert(client, blocks)?;
 					Ok(())
-				});
+				});	
 				Ok((cmd.run(client, backend, Some(aux_revert)), task_manager))
 			})
 		},
