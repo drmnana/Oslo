@@ -6,7 +6,7 @@ members = [
 
 [workspace.package]
 authors = ["Asad Ali (asad.sial.4142@gmail.com)"]
-repository = "https://github.com/Ali-Usama/storage-chain"
+repository = "https://github.com/asadalisiyal/oslo-network"
 
 
 # make sure dev builds with backtrace do
@@ -134,7 +134,7 @@ frame-benchmarking = { git = "https://github.com/paritytech/substrate.git", bran
 frame-benchmarking-cli = { git = "https://github.com/paritytech/substrate.git", branch = "polkadot-v0.9.37" }
 
 # Local Dependencies
-storage-chain-runtime = { path = "runtime" }
+oslo-network-runtime = { path = "runtime" }
 
 # CLI-specific dependencies
 try-runtime-cli = { git = "https://github.com/paritytech/substrate.git", branch = "polkadot-v0.9.37" }
