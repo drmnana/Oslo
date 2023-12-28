@@ -7,7 +7,7 @@ use sp_finality_grandpa::AuthorityId as GrandpaId;
 use pallet_im_online::sr25519::AuthorityId as ImOnlineId;
 use sp_core::crypto::UncheckedInto;
 
-use storage_chain_runtime::{
+use oslo_network_runtime::{
 	currency::*, opaque::SessionKeys, AccountId, AuraConfig, BalancesConfig,
 	CouncilConfig, DemocracyConfig, GenesisConfig, GrandpaConfig,
 	ImOnlineConfig, SessionConfig, SudoConfig, SystemConfig, TechnicalCommitteeConfig,
@@ -30,16 +30,16 @@ fn get_from_secret<TPublic: Public>(seed: &str) -> <TPublic::Pair as Pair>::Publ
 		.public()
 }
 
-const ALITH: &str = "0x9643B6d120345604D1E93133C6a9eFd8cB5F6181";
-const BALTATHAR: &str = "0x90E79DAc498b35096d4d86CEa4f2c3681b40F5C7";
-const CHARLETH: &str = "0x6a321b74936ccA0F549FEF65F274c9E679258307";
-const DOROTHY: &str = "0x71599dEdfEc2CE347a804F9bbf9d18C6C2D7009E";
+const ALITH: &str = "0x83451391e196556A66ebfCe472165d37E6575F5e";
+const BALTATHAR: &str = "0xB78ef962F15Fb30d70fE7f5e00aA042869a2293A";
+const CHARLETH: &str = "0x8ff34400aAb1Ee14Ee26BE799e107BDAAD88df8d";
+const DOROTHY: &str = "0x8cBcD18e730eFD8c9C26e6791455CD100477DAEe";
 
 pub fn public_config() -> Result<ChainSpec, String> {
 	let wasm_binary = WASM_BINARY.ok_or_else(|| "Development wasm not available".to_string())?;
 
 	Ok(ChainSpec::from_genesis(
-		"StorageChain Mainnet",
+		"OsloNetwork Mainnet",
 		"public_live",
 		ChainType::Live,
 		move || {
@@ -49,9 +49,9 @@ pub fn public_config() -> Result<ChainSpec, String> {
 				vec![
 					(
 						array_bytes::hex_n_into_unchecked(ALITH),
-						hex!["4209cd8a926070a89a4bd06b814f2593084a6ee9577e3e84290e2ea4de779f47"].unchecked_into(),
-						hex!["c96dd1ed657fe12c6d64cd6323f35b5cbe1e39c73956b6aea0b95bc1431269ba"].unchecked_into(),
-						hex!["ec964cbdda7e5d0b3b78bd3ea6d4f972a5685541a9a895b190fb55e638970f37"].unchecked_into(),
+						hex!["74a256a9bc324c3ab5c4702a136fe54dab94d5cb6c62a07b493c2ee326adc063"].unchecked_into(),
+						hex!["153b1d1530fbc81e838fdd1295ab63afb95ef4c6e127e65966e7f1aa16d67cff"].unchecked_into(),
+						hex!["70f95a75bfb4d4d13f0da0ba588bb68b1e90e408e0cd817e7401946db3359372"].unchecked_into(),
 					),
 					(
 						array_bytes::hex_n_into_unchecked(BALTATHAR),
@@ -82,11 +82,11 @@ pub fn public_config() -> Result<ChainSpec, String> {
 			)
 		},
 		vec![
-			"/ip4/134.209.121.53/tcp/30333/p2p/12D3KooWLcvopKbnKGY8W6VM8zfUTJXxqBm2UPJFq85xJk65JBYg".parse().unwrap(),
-			"/ip4/157.230.233.32/tcp/30333/p2p/12D3KooWJTDJbdcjqKNqKKUYHXeyNtuWXQ9ehBTuEgMpy8kE3e2u".parse().unwrap(),
-			"/ip4/134.209.121.166/tcp/30333/p2p/12D3KooWFE3Tum6PjNo2KgbmLnXtTduZ12gqK3vu7qWURhvjW51J".parse().unwrap(),
-
+			"/ip4/54.91.46.186/tcp/30333/p2p/12D3KooWLcvopKbnKGY8W6VM8zfUTJXxqBm2UPJFq85xJk65JBYg".parse().unwrap(),
+			"/ip4/52.90.82.75/tcp/30333/p2p/12D3KooWJTDJbdcjqKNqKKUYHXeyNtuWXQ9ehBTuEgMpy8kE3e2u".parse().unwrap(),
+			"/ip4/50.16.158.55/tcp/30333/p2p/12D3KooWFE3Tum6PjNo2KgbmLnXtTduZ12gqK3vu7qWURhvjW51J".parse().unwrap(),
 		],
+
 		None,
 		None,
 		None,
@@ -102,7 +102,7 @@ fn session_keys(aura: AuraId, grandpa: GrandpaId, im_online: ImOnlineId) -> Sess
 pub fn chainspec_properties() -> Properties {
 	let mut properties = Properties::new();
 	properties.insert("tokenDecimals".into(), 18.into());
-	properties.insert("tokenSymbol".into(), "STOR".into());
+	properties.insert("tokenSymbol".into(), "OSLO".into());
 	properties
 }
 
@@ -119,21 +119,44 @@ pub fn development_config() -> Result<ChainSpec, String> {
 			testnet_genesis(
 				wasm_binary,
 				// Initial PoA authorities
-				vec![(
+				vec![
+				(
 					array_bytes::hex_n_into_unchecked(ALITH),
 					get_from_secret::<AuraId>("//Alice"),
 					get_from_secret::<GrandpaId>("//Alice"),
 					get_from_secret::<ImOnlineId>("//Alice"),
-				)],
+				), 
+
+				(
+					array_bytes::hex_n_into_unchecked(BALTATHAR),
+					get_from_secret::<AuraId>("//Bob"),
+					get_from_secret::<GrandpaId>("//Bob"),
+					get_from_secret::<ImOnlineId>("//Bob"),
+				), 
+
+				(
+					array_bytes::hex_n_into_unchecked(CHARLETH),
+					get_from_secret::<AuraId>("//Charlie"),
+					get_from_secret::<GrandpaId>("//Charlie"),
+					get_from_secret::<ImOnlineId>("//Charlie"),
+				), 
+
+				(
+					array_bytes::hex_n_into_unchecked(DOROTHY),
+					get_from_secret::<AuraId>("//Dave"),
+					get_from_secret::<GrandpaId>("//Dave"),
+					get_from_secret::<ImOnlineId>("//Dave"),
+				), 
+
+				],
 				// Sudo account
 				array_bytes::hex_n_into_unchecked(ALITH),
 				// Pre-funded accounts
 				vec![
-					AccountId::from(hex!("6B7CD45dfc550F12b4EdAFDFbBC68b53faAE6Fe2")),
-					AccountId::from(hex!("18119Bb0f49ee709104CA2804B297B08d5d0EDEc")),
-					AccountId::from(hex!("71B18c74b51E2195c92C169504f7FAFA71308A9a")),
-					AccountId::from(hex!("C03cfc225Ad4b42F96f612BA38bD4d9cBD4a419a")),
-				],
+					array_bytes::hex_n_into_unchecked(ALITH),
+					array_bytes::hex_n_into_unchecked(BALTATHAR),
+					array_bytes::hex_n_into_unchecked(CHARLETH),
+					array_bytes::hex_n_into_unchecked(DOROTHY),				],
 				true,
 			)
 		},
@@ -151,14 +174,14 @@ pub fn development_config() -> Result<ChainSpec, String> {
 	))
 }
 
-pub fn local_testnet_config() -> Result<ChainSpec, String> {
+pub fn testnet_config() -> Result<ChainSpec, String> {
 	let wasm_binary = WASM_BINARY.ok_or_else(|| "Development wasm not available".to_string())?;
 
 	Ok(ChainSpec::from_genesis(
 		// Name
-		"StorageChain Testnet",
+		"Oslo-Network Testnet",
 		// ID
-		"local_testnet",
+		"Oslo-Network_Testnet",
 		ChainType::Local,
 		move || {
 			testnet_genesis(
@@ -167,28 +190,25 @@ pub fn local_testnet_config() -> Result<ChainSpec, String> {
 				vec![
 					(
 						array_bytes::hex_n_into_unchecked(ALITH),
-						get_from_secret::<AuraId>("//Alice"),
-						get_from_secret::<GrandpaId>("//Alice"),
-						get_from_secret::<ImOnlineId>("//Alice"),
+						hex!["bee4af052cb7b5d26a18565e9d3fe711d71dac78c80b99fb031a0d8a0f44e334"].unchecked_into(),
+						hex!["153b1d1530fbc81e838fdd1295ab63afb95ef4c6e127e65966e7f1aa16d67cff"].unchecked_into(),
+						hex!["70f95a75bfb4d4d13f0da0ba588bb68b1e90e408e0cd817e7401946db3359372"].unchecked_into(),
 					),
 					(
 						array_bytes::hex_n_into_unchecked(BALTATHAR),
-						get_from_secret::<AuraId>("//Bob"),
-						get_from_secret::<GrandpaId>("//Bob"),
-						get_from_secret::<ImOnlineId>("//Bob"),
-					),
-					(
+						hex!["ae9467654308063a5b18702c9f3643979cb0fc0874faf984f823b6a428cc761c"].unchecked_into(),
+						hex!["04b1cd6d6cecafe60a77e10e486bae799acd0fe4304dafaaac5363f3292da27b"].unchecked_into(),
+						hex!["7a6919d7bda5e843b76f9a81bf0661198207a985208446a478ad363722d03f87"].unchecked_into(),					),
+					(	
 						array_bytes::hex_n_into_unchecked(CHARLETH),
-						get_from_secret::<AuraId>("//Charlie"),
-						get_from_secret::<GrandpaId>("//Charlie"),
-						get_from_secret::<ImOnlineId>("//Charlie"),
-					),
+						hex!["a40276e3ecbeacc040ac4c6ecd175e3cb2c56ef08e098ca94b191b3d0450605e"].unchecked_into(),
+						hex!["794d9d7557e84b135368c70e6d3cd0c3b9e467382e416e52dc693e1216990431"].unchecked_into(),
+						hex!["4ef19ca699a442497419c85743dbd74294d2f615784bb0ea59ec89474ffbef44"].unchecked_into(),					),
 					(
 						array_bytes::hex_n_into_unchecked(DOROTHY),
-						get_from_secret::<AuraId>("//Dave"),
-						get_from_secret::<GrandpaId>("//Dave"),
-						get_from_secret::<ImOnlineId>("//Dave"),
-					),
+						hex!["2ef8edfb4f34f4ab87bc07d3c08e9e49220fb4e3384f5f90c2368e0974e35111"].unchecked_into(),
+						hex!["e581d5042a799186dd5e95896edc68470b5f90ea0f55e51ffc753fdb8f321106"].unchecked_into(),
+						hex!["caa0f01977f32ea37fb0f056fabb5d10e6a80834dc9e6e614a3984a81cb08727"].unchecked_into(),					),
 				],
 				// Sudo account
 				array_bytes::hex_n_into_unchecked(ALITH),
@@ -204,7 +224,10 @@ pub fn local_testnet_config() -> Result<ChainSpec, String> {
 		},
 		// Bootnodes
 		vec![
-
+			"/ip4/35.173.188.46/tcp/30333/p2p/12D3KooWC9ptbtXAGv2omPsckQ9wgvqjEtc72BfCZWXXbkVQZ1y2".parse().unwrap(),
+			"/ip4/35.173.188.46/tcp/30334/p2p/12D3KooWAHYbFdT3kv8GrLgDoBPERzez8C6sjGfQf8qJZEWVeP4f".parse().unwrap(),
+			"/ip4/35.173.188.46/tcp/30335/p2p/12D3KooWFdG1KySNaeksJv76vZauDk51zLTHHkxAmmGogGUEjpcu".parse().unwrap(),
+			"/ip4/35.173.188.46/tcp/30336/p2p/12D3KooWEsNNh1Ldsc8nDD9A3Z2Ww15cp3zUKGuSYwawftoKoL3s".parse().unwrap(),
 		],
 		// Telemetry
 		None,
@@ -238,15 +261,15 @@ fn testnet_genesis(
 				.cloned()
 				.map(|k| {
 					if k == array_bytes::hex_n_into_unchecked(BALTATHAR) {
-						(k.clone(), 1_755_000_000 * STOR)
+						(k.clone(), 2_500_000_000_000 * OSLO)
 					} else if k == array_bytes::hex_n_into_unchecked(CHARLETH) {
-						(k.clone(), 66_000_000 * STOR)
+						(k.clone(), 2_500_000_000_000 * OSLO)
 					} else if k == array_bytes::hex_n_into_unchecked(DOROTHY) {
-						(k.clone(), 194_999_000 * STOR)
+						(k.clone(), 2_500_000_000_000 * OSLO)
 					} else if k == array_bytes::hex_n_into_unchecked(ALITH) {
-						(k.clone(), 1000 * STOR)
+						(k.clone(), 2_500_000_000_000 * OSLO)
 					} else {
-						(k.clone(), 0 * STOR)
+						(k.clone(), 0 * OSLO)
 					}
 				})
 				.collect(),
@@ -334,15 +357,15 @@ fn mainnet_genesis(
 				.map(|k| {
 					// if k == AccountId::from("0x90E79DAc498b35096d4d86CEa4f2c3681b40F5C7"). {
 					if k == array_bytes::hex_n_into_unchecked(BALTATHAR) {
-						(k.clone(), 1_755_000_000 * STOR)
+						(k.clone(), 2_500_000_000_000 * OSLO)
 					} else if k == array_bytes::hex_n_into_unchecked(CHARLETH) {
-						(k.clone(), 66_000_000 * STOR)
+						(k.clone(), 2_500_000_000_000 * OSLO)
 					} else if k == array_bytes::hex_n_into_unchecked(DOROTHY) {
-						(k.clone(), 194_999_000 * STOR)
+						(k.clone(), 2_500_000_000_000 * OSLO)
 					} else if k == array_bytes::hex_n_into_unchecked(ALITH) {
-						(k.clone(), 1000 * STOR)
+						(k.clone(), 2_500_000_000_000 * OSLO)
 					} else {
-						(k.clone(), 0 * STOR)
+						(k.clone(), 0 * OSLO)
 					}
 				})
 				.collect(),
@@ -368,7 +391,7 @@ fn mainnet_genesis(
 
 		council: CouncilConfig::default(),
 
-		technical_committee: TechnicalCommitteeConfig {
+		technical_committee: TechnicalCommitteeConfig {								
 			members: endowed_accounts
 				.iter()
 				.take(num_endowed_accounts  )

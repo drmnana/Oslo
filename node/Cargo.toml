@@ -1,8 +1,8 @@
 [package]
-name = "storage-chain"
+name = "oslo-network"
 version = "4.0.0-dev"
 description = "A fresh FRAME-based Substrate node, ready for hacking."
-authors = ["Usama Ali", "Asad Ali"]
+authors = ["Asad Ali (asad.sial.4142@gmail.com)"]
 homepage = "https://substrate.io/"
 edition = "2021"
 license = "Unlicense"
@@ -14,7 +14,7 @@ build = "build.rs"
 targets = ["x86_64-unknown-linux-gnu"]
 
 [[bin]]
-name = "storage-chain"
+name = "oslo-network"
 
 [dependencies]
 clap = { workspace = true, features = ["derive"] }
@@ -63,7 +63,7 @@ frame-benchmarking = { workspace = true }
 frame-benchmarking-cli = { workspace = true }
 
 # Local Dependencies
-storage-chain-runtime = { path = "../runtime" }
+oslo-network-runtime = { path = "../runtime" }
 
 # CLI-specific dependencies
 try-runtime-cli = { optional = true, workspace = true }
@@ -88,13 +88,13 @@ substrate-build-script-utils = { git = "https://github.com/paritytech/substrate.
 default = []
 # Dependencies that are only required if runtime benchmarking should be build.
 runtime-benchmarks = [
-	"storage-chain-runtime/runtime-benchmarks",
+	"oslo-network-runtime/runtime-benchmarks",
 	"frame-benchmarking/runtime-benchmarks",
 	"frame-benchmarking-cli/runtime-benchmarks",
 ]
 # Enable features that allow the runtime to be tried and debugged. Name might be subject to change
 # in the near future.
-try-runtime = ["storage-chain-runtime/try-runtime", "try-runtime-cli"]
+try-runtime = ["oslo-network-runtime/try-runtime", "try-runtime-cli"]
 
 [dependencies.pallet-im-online]
 default-features = false

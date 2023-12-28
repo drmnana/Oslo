@@ -1,6 +1,6 @@
 //! Service and ServiceFactory implementation. Specialized wrapper over substrate service.
 
-use storage_chain_runtime::{self, opaque::Block, RuntimeApi};
+use oslo_network_runtime::{self, opaque::Block, RuntimeApi};
 use sc_client_api::{BlockBackend, BlockchainEvents};
 use sc_consensus_aura::{CompatibilityMode, ImportQueueParams, SlotProportion, StartAuraParams};
 pub use sc_executor::NativeElseWasmExecutor;
@@ -27,11 +27,11 @@ impl sc_executor::NativeExecutionDispatch for ExecutorDispatch {
 	type ExtendHostFunctions = ();
 
 	fn dispatch(method: &str, data: &[u8]) -> Option<Vec<u8>> {
-		storage_chain_runtime::api::dispatch(method, data)
+		oslo_network_runtime::api::dispatch(method, data)
 	}
 
 	fn native_version() -> sc_executor::NativeVersion {
-		storage_chain_runtime::native_version()
+		oslo_network_runtime::native_version()
 	}
 }
 

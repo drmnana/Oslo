@@ -21,7 +21,7 @@
 
 use crate::service::FullClient;
 
-use storage_chain_runtime as runtime;
+use oslo_network_runtime as runtime;
 use runtime::SystemCall;
 use sc_cli::Result;
 use sc_client_api::BlockBackend;

@@ -109,17 +109,17 @@ pub mod currency {
 	pub const KILOWEI: Balance = 1_000;
 	pub const MEGAWEI: Balance = 1_000_000;
 	pub const GIGAWEI: Balance = 1_000_000_000;
-	pub const MICROSTOR: Balance = 1_000_000_000_000;
-	pub const MILLISTOR: Balance = 1_000_000_000_000_000;
-	pub const STOR: Balance = 1_000_000_000_000_000_000;
-	pub const KILOSTOR: Balance = 1_000_000_000_000_000_000_000;
+	pub const MICROOSLO: Balance = 1_000_000_000_000;
+	pub const MILLIOSLO: Balance = 1_000_000_000_000_000;
+	pub const OSLO: Balance = 1_000_000_000_000_000_000;
+	pub const KILOOSLO: Balance = 1_000_000_000_000_000_000_000;
 
 	pub const TRANSACTION_BYTE_FEE: Balance = 1 * GIGAWEI * SUPPLY_FACTOR;
-	pub const STORAGE_BYTE_FEE: Balance = 100 * MICROSTOR * SUPPLY_FACTOR;
+	pub const STORAGE_BYTE_FEE: Balance = 100 * MICROOSLO * SUPPLY_FACTOR;
 	pub const WEIGHT_FEE: Balance = 50 * KILOWEI * SUPPLY_FACTOR;
 
 	pub const fn deposit(items: u32, bytes: u32) -> Balance {
-		items as Balance * 100 * MILLISTOR * SUPPLY_FACTOR + (bytes as Balance) * STORAGE_BYTE_FEE
+		items as Balance * 100 * MILLIOSLO * SUPPLY_FACTOR + (bytes as Balance) * STORAGE_BYTE_FEE
 	}
 }
 
@@ -322,7 +322,7 @@ impl pallet_timestamp::Config for Runtime {
 }
 
 /// Existential deposit.
-pub const EXISTENTIAL_DEPOSIT: u128 = 1 * currency::MICROSTOR;
+pub const EXISTENTIAL_DEPOSIT: u128 = 1 * currency::MICROOSLO;
 
 impl pallet_balances::Config for Runtime {
 	/// The type for recording an account's balance.
@@ -588,7 +588,7 @@ parameter_types! {
 parameter_types! {
 
 	pub const ProposalBond: Permill = Permill::from_percent(5);
-	pub const ProposalBondMinimum: Balance = 1 * STOR;
+	pub const ProposalBondMinimum: Balance = 1 * OSLO;
 	pub const ImOnlineUnsignedPriority: TransactionPriority = TransactionPriority::max_value();
 	pub const SpendPeriod: BlockNumber = 1 * DAYS;
 	pub const Burn: Permill = Permill::from_percent(50);
@@ -642,7 +642,7 @@ parameter_types! {
 	pub const LaunchPeriod: BlockNumber = 28 * 24 * 60 * MINUTES;
 	pub const VotingPeriod: BlockNumber = 28 * 24 * 60 * MINUTES;
 	pub const FastTrackVotingPeriod: BlockNumber = 3 * 24 * 60 * MINUTES;
-	pub const MinimumDeposit: Balance = 100 * STOR;
+	pub const MinimumDeposit: Balance = 100 * OSLO;
 	pub const EnactmentPeriod: BlockNumber = 30 * 24 * 60 * MINUTES;
 	pub const CooloffPeriod: BlockNumber = 28 * 24 * 60 * MINUTES;
 	pub const MaxProposals: u32 = 100;
@@ -781,9 +781,9 @@ impl pallet_scheduler::Config for Runtime {
 
 parameter_types! {
 	pub const PreimageMaxSize: u32 = 4096 * 1024;
-	pub const PreimageBaseDeposit: Balance = 1 * STOR;
+	pub const PreimageBaseDeposit: Balance = 1 * OSLO;
 	// One cent: $10,000 / MB
-	pub const PreimageByteDeposit: Balance = 1 * MILLISTOR;
+	pub const PreimageByteDeposit: Balance = 1 * MILLIOSLO;
 }
 
 impl pallet_preimage::Config for Runtime {

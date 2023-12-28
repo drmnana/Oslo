@@ -5,7 +5,7 @@ use crate::{
 	service,
 };
 use frame_benchmarking_cli::{BenchmarkCmd, SUBSTRATE_REFERENCE_HARDWARE};
-use storage_chain_runtime::{Block};
+use oslo_network_runtime::{Block};
 use sc_cli::{ChainSpec, RuntimeVersion, SubstrateCli};
 use sc_service::PartialComponents;
 // use sp_keyring::Sr25519Keyring;
@@ -38,7 +38,7 @@ impl SubstrateCli for Cli {
 	fn load_spec(&self, id: &str) -> Result<Box<dyn sc_service::ChainSpec>, String> {
 		Ok(match id {
 			"dev" => Box::new(chain_spec::development_config()?),
-			"" | "local" => Box::new(chain_spec::local_testnet_config()?),
+			"" | "testnet" => Box::new(chain_spec::testnet_config()?),
 			"live" => Box::new(chain_spec::public_config()?),
 			path =>
 				Box::new(chain_spec::ChainSpec::from_json_file(std::path::PathBuf::from(path))?),
@@ -46,7 +46,7 @@ impl SubstrateCli for Cli {
 	}
 
 	fn native_runtime_version(_: &Box<dyn ChainSpec>) -> &'static RuntimeVersion {
-		&storage_chain_runtime::VERSION
+		&oslo_network_runtime::VERSION
 	}
 }
 
