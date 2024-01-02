@@ -224,10 +224,10 @@ pub fn testnet_config() -> Result<ChainSpec, String> {
 		},
 		// Bootnodes
 		vec![
-			"/ip4/35.173.188.46/tcp/30333/p2p/12D3KooWC9ptbtXAGv2omPsckQ9wgvqjEtc72BfCZWXXbkVQZ1y2".parse().unwrap(),
-			"/ip4/35.173.188.46/tcp/30334/p2p/12D3KooWAHYbFdT3kv8GrLgDoBPERzez8C6sjGfQf8qJZEWVeP4f".parse().unwrap(),
-			"/ip4/35.173.188.46/tcp/30335/p2p/12D3KooWFdG1KySNaeksJv76vZauDk51zLTHHkxAmmGogGUEjpcu".parse().unwrap(),
-			"/ip4/35.173.188.46/tcp/30336/p2p/12D3KooWEsNNh1Ldsc8nDD9A3Z2Ww15cp3zUKGuSYwawftoKoL3s".parse().unwrap(),
+			"/ip4/54.145.221.232/tcp/30333/p2p/12D3KooWC9ptbtXAGv2omPsckQ9wgvqjEtc72BfCZWXXbkVQZ1y2".parse().unwrap(),
+			"/ip4/54.145.221.232/tcp/30334/p2p/12D3KooWAHYbFdT3kv8GrLgDoBPERzez8C6sjGfQf8qJZEWVeP4f".parse().unwrap(),
+			"/ip4/54.145.221.232/tcp/30335/p2p/12D3KooWFdG1KySNaeksJv76vZauDk51zLTHHkxAmmGogGUEjpcu".parse().unwrap(),
+			"/ip4/54.145.221.232/tcp/30336/p2p/12D3KooWEsNNh1Ldsc8nDD9A3Z2Ww15cp3zUKGuSYwawftoKoL3s".parse().unwrap(),
 		],
 		// Telemetry
 		None,
