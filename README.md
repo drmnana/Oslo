@@ -19,6 +19,11 @@ lorri `lorri shell`.
 
 ### Rust Setup
 
+Use rustc 1.68.0-nightly (574b64a97 2022-12-31) version 
+```sh
+rustup toolchain install nightly-2022-12-31
+```
+
 First, complete the [basic Rust setup instructions](./docs/rust-setup.md).
 
 ### Run
