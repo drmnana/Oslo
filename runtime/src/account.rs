@@ -2,16 +2,11 @@
 //!
 //! It includes the Verify and IdentifyAccount traits for the AccountId20
 
-#![cfg_attr(not(feature = "std"), no_std)]
 use codec::{Decode, Encode, MaxEncodedLen};
 use scale_info::TypeInfo;
 use sha3::{Digest, Keccak256};
 use sp_core::{ecdsa, H160};
 use sp_runtime::traits::Convert;
-
-
-#[cfg(feature = "std")]
-pub use serde::{de::DeserializeOwned, Deserialize, Serialize};
 
 //TODO Maybe this should be upstreamed into Frontier (And renamed accordingly) so that it can
 // be used in palletEVM as well. It may also need more traits such as AsRef, AsMut, etc like
@@ -21,14 +16,9 @@ pub use serde::{de::DeserializeOwned, Deserialize, Serialize};
 /// a dedicated type to prevent using arbitrary 20 byte arrays were AccountIds are expected. With
 /// the introduction of the `scale-info` crate this benefit extends even to non-Rust tools like
 /// Polkadot JS.
-
-#[derive(
-	Eq, PartialEq, Copy, Clone, Encode, Decode, TypeInfo, MaxEncodedLen, Default, PartialOrd, Ord,
-)]
+use serde::{Deserialize, Serialize};
+#[derive(Eq, PartialEq, Copy, Clone, Encode, Decode, TypeInfo, MaxEncodedLen, Default, PartialOrd, Ord, Serialize, Deserialize)]
 pub struct AccountId20(pub [u8; 20]);
-
-#[cfg(feature = "std")]
-impl_serde::impl_fixed_hash_serde!(AccountId20, 20);
 
 #[cfg(feature = "std")]
 impl std::fmt::Display for AccountId20 {
@@ -176,9 +166,10 @@ impl<T: From<H160>> pallet_evm::AddressMapping<T> for IntoAddressMapping {
 }
 
 
-pub struct IdentityCollator;
+/* pub struct IdentityCollator;
 impl<T> Convert<T, Option<T>> for IdentityCollator {
 	fn convert(t: T) -> Option<T> {
 		Some(t)
 	}
 }
+*/

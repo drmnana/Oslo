@@ -1,4 +1,4 @@
-use pallet_evm::{Precompile, PrecompileHandle, PrecompileResult, PrecompileSet};
+use pallet_evm::{Precompile, PrecompileFailure, PrecompileOutput, PrecompileHandle, IsPrecompileResult, PrecompileSet};
 use sp_core::H160;
 use sp_std::marker::PhantomData;
 
@@ -26,7 +26,7 @@ impl<R> PrecompileSet for SubstratePrecompiles<R>
 where
 	R: pallet_evm::Config,
 {
-	fn execute(&self, handle: &mut impl PrecompileHandle) -> Option<PrecompileResult> {
+	fn execute(&self, handle: &mut impl PrecompileHandle) -> Option<Result<PrecompileOutput, PrecompileFailure>> {
 		match handle.code_address() {
 			// Ethereum precompiles :
 			a if a == hash(1) => Some(ECRecover::execute(handle)),
@@ -41,8 +41,11 @@ where
 		}
 	}
 
-	fn is_precompile(&self, address: H160) -> bool {
-		Self::used_addresses().contains(&address)
+	fn is_precompile(&self, address: H160, _gas: u64) -> IsPrecompileResult {
+		IsPrecompileResult::Answer {
+			is_precompile: Self::used_addresses().contains(&address),
+			extra_cost: 0,
+		}
 	}
 }
 
