@@ -6,7 +6,6 @@ use codec::{Decode, Encode, MaxEncodedLen};
 use scale_info::TypeInfo;
 use sha3::{Digest, Keccak256};
 use sp_core::{ecdsa, H160};
-use sp_runtime::traits::Convert;
 
 //TODO Maybe this should be upstreamed into Frontier (And renamed accordingly) so that it can
 // be used in palletEVM as well. It may also need more traits such as AsRef, AsMut, etc like
@@ -119,7 +118,7 @@ impl sp_runtime::traits::IdentifyAccount for EthereumSigner {
 		AccountId20(self.0)
 	}
 }
- 
+
 impl From<[u8; 20]> for EthereumSigner {
 	fn from(x: [u8; 20]) -> Self {
 		EthereumSigner(x)

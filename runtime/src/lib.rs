@@ -2,7 +2,7 @@
 // `construct_runtime!` does a lot of recursion and requires us to increase the limit to 256.
 #![recursion_limit = "256"]
 
-use crate::account::AccountId20;
+pub use crate::account::AccountId20;
 
 
 // Make the WASM binary available.
@@ -92,7 +92,7 @@ pub type Signature = account::EthereumSignature;
 
 /// Some way of identifying an account on the chain. We intentionally make it equivalent
 /// to the public key of our transaction signing scheme.
-// pub type AccountId = AccountId20;
+pub type AccountId = AccountId20;
 
 /// Balance of an account.
 pub type Balance = u128;
@@ -212,7 +212,7 @@ const NORMAL_DISPATCH_RATIO: Perbill = Perbill::from_percent(75);
 // const WEIGHT_PER_GAS: u64 = 20_000;
 
 mod precompiles;
-mod account;
+pub mod account;
 
 use precompiles::SubstratePrecompiles;
 
@@ -283,8 +283,6 @@ impl frame_system::Config for Runtime {
 	type OnSetCode = ();
 	type MaxConsumers = frame_support::traits::ConstU32<16>;
 }
-
-//impl pallet_randomness_collective_flip::Config for Runtime {}
 
 use sp_core::ConstBool;
 
@@ -578,7 +576,6 @@ impl pallet_im_online::Config for Runtime {
 	type MaxKeys = MaxKeys;
 	type MaxPeerInHeartbeats = MaxPeerInHeartbeats;
 	type RuntimeEvent = RuntimeEvent;
-
 }
 
 
@@ -726,7 +723,6 @@ impl pallet_collective::Config<CouncilCollective> for Runtime {
 
 type TechnicalCollective = pallet_collective::Instance2;
 
-
 impl pallet_collective::Config<TechnicalCollective> for Runtime {
 	type RuntimeOrigin = RuntimeOrigin;
 	type Proposal = RuntimeCall;
@@ -868,7 +864,6 @@ construct_runtime!(
 	pub struct Runtime
 	{
 		System: frame_system,
-		//RandomnessCollectiveFlip: pallet_randomness_collective_flip,
 		Timestamp: pallet_timestamp,
 
 		Balances: pallet_balances,
@@ -985,8 +980,6 @@ mod benches {
 		[pallet_collective, Council]
 		[pallet_scheduler, Scheduler]
 		[pallet_preimage, Preimage]
-
-		
 	);
 }
 

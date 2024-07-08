@@ -35,7 +35,7 @@ pallet-authorship = { workspace = true }
 pallet-balances = { workspace = true }
 frame-support = { workspace = true, features = ["experimental"] }
 pallet-grandpa = { workspace = true }
-sp-consensus-grandpa = { workspace = true, features = ["serde"] }
+sp-consensus-grandpa = { workspace = true, features = ["serde", "sp-keystore"] }
 pallet-babe = { workspace = true }
 pallet-sudo = { workspace = true }
 frame-system = { workspace = true }
@@ -54,6 +54,7 @@ sp-std = { workspace = true }
 sp-transaction-pool = { workspace = true }
 sp-version = { workspace = true, features = ["serde"] }
 sp-io = { workspace = true }
+sp-genesis-builder = { workspace = true }
 validator-set = { workspace = true }
 
 # Used for the node template's RPCs
@@ -82,8 +83,11 @@ std = [
 	"log/std",
 	"sha3/std",
 	"codec/std",
+	"getrandom/std",
+	"libsecp256k1/std",
 	"scale-info/std",
 	"serde/std",
+	"impl-serde/std",
 	"fp-evm/std",
 	"fp-rpc/std",
 	"fp-self-contained/std",
@@ -114,7 +118,6 @@ std = [
 	"pallet-treasury/std",
 	"pallet-scheduler/std",
 	"pallet-preimage/std",
-	"pallet-balances/std",
 	"pallet-authorship/std",
 	"sp-consensus-grandpa/std",
 	"sp-api/std",
@@ -128,7 +131,8 @@ std = [
 	"sp-std/std",
 	"sp-io/std",
 	"sp-transaction-pool/std",
-	"sp-version/std",	
+	"sp-version/std",
+	"sp-genesis-builder/std",
 	"validator-set/std",
 	"substrate-wasm-builder"
 ]

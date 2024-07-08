@@ -11,92 +11,84 @@ repository = "https://github.com/asadalisiyal/oslo-network"
 build = "build.rs"
 
 [package.metadata.docs.rs]
-targets = ["x86_64-unknown-linux-gnu"]
+targets = ["aarch64-unknown-linux-gnu"]
+#targets = ["x86_64-unknown-linux-gnu"]
 
 [[bin]]
 name = "oslo-network"
 
 [dependencies]
-clap = { workspace = true, features = ["derive"] }
-libsecp256k1 = { workspace = true, features = [ "hmac" ] }
-sha3 = { workspace = true }
-array-bytes = "6.0.0"
+serde_json = { version = "1.0.114", default-features = true, features = ["arbitrary_precision"] }
+jsonrpsee = { default-features = false, version = "0.22", features = ["server", "macros"] }
+clap = { workspace = true }
+hex-literal = { workspace = true }
+futures = { workspace = true }
+futures-util = { workspace = true }
+array-bytes = { workspace = true }
 
-sc-cli = { workspace = true }
+fp-rpc = { workspace = true }
+fp-storage = { workspace = true }
+fp-dynamic-fee = { workspace = true, default-features = true }
+
+fc-rpc = { workspace = true }
+fc-db = { workspace = true, features = ["rocksdb"] }
+fc-consensus = { workspace = true }
+fc-rpc-core = { workspace = true }
+fc-mapping-sync = { workspace = true }
+fc-api = { workspace = true }
+
+sp-io = { default-features = false, git = "https://github.com/paritytech/polkadot-sdk.git", branch = "release-polkadot-v1.9.0" }
+sp-consensus-aura = { workspace = true }
+sp-consensus-grandpa = { workspace = true, features = ["serde", "sp-keystore"] }
+sp-timestamp = { workspace = true }
 sp-core = { workspace = true }
-sc-executor = { workspace = true }
+sp-runtime = { workspace = true }
+sp-blockchain = { workspace = true }
+sp-block-builder = { workspace = true }
+sp-api = { workspace = true }
+sp-inherents = { workspace = true }
+
+sc-consensus = { workspace = true }
+sc-consensus-aura = { workspace = true }
+sc-consensus-grandpa = { workspace = true }
+sc-cli = { workspace = true }
+sc-client-api = { workspace = true }
+sc-rpc-api = { workspace = true }
 sc-service = { workspace = true }
 sc-telemetry = { workspace = true }
 sc-keystore = { workspace = true }
+sc-executor = { workspace = true }
 sc-transaction-pool = { workspace = true }
 sc-transaction-pool-api = { workspace = true }
-sc-consensus-aura = { workspace = true }
-sp-consensus-aura = { workspace = true }
-sp-consensus = { workspace = true }
-sc-consensus = { workspace = true }
-sc-finality-grandpa = { workspace = true }
-sp-finality-grandpa = { workspace = true }
-sc-client-api = { workspace = true }
-sp-runtime = { workspace = true }
-sp-timestamp = { workspace = true }
-sp-inherents = { workspace = true }
-sp-keyring = { workspace = true }
-frame-system = { workspace = true }
-pallet-transaction-payment = { workspace = true }
-hex-literal = "0.4.1"
-futures = "0.3.25"
-
-
-# These dependencies are used for the node template's RPCs
-jsonrpsee = { version = "0.16", features = [ "macros", "server" ] }
-sc-rpc = { workspace = true }
-sp-api = { workspace = true }
-sc-rpc-api = { workspace = true }
-sp-blockchain = { workspace = true }
-sp-block-builder = { workspace = true }
+sc-network = { workspace = true }
+sc-network-sync = { workspace = true }
 sc-basic-authorship = { workspace = true }
-substrate-frame-rpc-system = { workspace = true }
-pallet-transaction-payment-rpc = { workspace = true }
+sc-offchain = { workspace = true }
 
-# These dependencies are used for runtime benchmarking
+substrate-frame-rpc-system = { git = "https://github.com/paritytech/polkadot-sdk.git", branch = "release-polkadot-v1.9.0" }
+pallet-transaction-payment-rpc = { git = "https://github.com/paritytech/polkadot-sdk.git", branch = "release-polkadot-v1.9.0" }
+pallet-im-online = { workspace = true }
+pallet-collective = { workspace = true }
+
 frame-benchmarking = { workspace = true }
 frame-benchmarking-cli = { workspace = true }
 
 # Local Dependencies
 oslo-network-runtime = { path = "../runtime" }
 
-# CLI-specific dependencies
-try-runtime-cli = { optional = true, workspace = true }
-
-# Evm dependencies
-fp-evm = { workspace = true }
-fp-rpc = { workspace = true }
-fp-storage = { workspace = true }
-fp-dynamic-fee = { workspace = true }
-fc-rpc = { workspace = true}
-fc-consensus = { workspace = true }
-fp-consensus = { workspace = true }
-fc-rpc-core = { workspace = true }
-fc-mapping-sync = { workspace = true }
-fc-db = { workspace = true }
-sc-network = { workspace = true }
-
 [build-dependencies]
-substrate-build-script-utils = { git = "https://github.com/paritytech/substrate.git", branch = "polkadot-v0.9.37" }
+substrate-build-script-utils = { git = "https://github.com/paritytech/polkadot-sdk.git", branch = "release-polkadot-v1.9.0" }
 
 [features]
 default = []
-# Dependencies that are only required if runtime benchmarking should be build.
+# Dependencies that are only required if runtime benchmarking should be built.
 runtime-benchmarks = [
-	"oslo-network-runtime/runtime-benchmarks",
+#	"oslo-network-runtime/runtime-benchmarks",
 	"frame-benchmarking/runtime-benchmarks",
 	"frame-benchmarking-cli/runtime-benchmarks",
 ]
-# Enable features that allow the runtime to be tried and debugged. Name might be subject to change
-# in the near future.
-try-runtime = ["oslo-network-runtime/try-runtime", "try-runtime-cli"]
 
-[dependencies.pallet-im-online]
-default-features = false
-git = 'https://github.com/paritytech/substrate.git'
-branch = 'polkadot-v0.9.37'
+try-runtime = [
+#   "oslo-network-runtime/try-runtime",
+#    "try-runtime-cli"
+]

@@ -5,8 +5,8 @@ use crate::{
 	service,
 };
 use frame_benchmarking_cli::{BenchmarkCmd, SUBSTRATE_REFERENCE_HARDWARE};
-use oslo_network_runtime::{Block};
-use sc_cli::{ChainSpec, RuntimeVersion, SubstrateCli};
+use oslo_network_runtime::Block;
+use sc_cli::SubstrateCli;
 use sc_service::PartialComponents;
 // use sp_keyring::Sr25519Keyring;
 
@@ -37,16 +37,11 @@ impl SubstrateCli for Cli {
 
 	fn load_spec(&self, id: &str) -> Result<Box<dyn sc_service::ChainSpec>, String> {
 		Ok(match id {
-			"dev" => Box::new(chain_spec::development_config()?),
-			"" | "testnet" => Box::new(chain_spec::testnet_config()?),
-			"live" => Box::new(chain_spec::public_config()?),
+			"" | "testnet" => Box::new(chain_spec::testnet_config()),
+			"live" => Box::new(chain_spec::public_config()),
 			path =>
 				Box::new(chain_spec::ChainSpec::from_json_file(std::path::PathBuf::from(path))?),
 		})
-	}
-
-	fn native_runtime_version(_: &Box<dyn ChainSpec>) -> &'static RuntimeVersion {
-		&oslo_network_runtime::VERSION
 	}
 }
 
@@ -100,7 +95,7 @@ pub fn run() -> sc_cli::Result<()> {
 				let PartialComponents { client, task_manager, backend, .. } =
 					service::new_partial(&config)?;
 				let aux_revert = Box::new(|client, _, blocks| {
-					sc_finality_grandpa::revert(client, blocks)?;
+					sc_consensus_grandpa::revert(client, blocks)?;
 					Ok(())
 				});	
 				Ok((cmd.run(client, backend, Some(aux_revert)), task_manager))
@@ -113,7 +108,9 @@ pub fn run() -> sc_cli::Result<()> {
 				// This switch needs to be in the client, since the client decides
 				// which sub-commands it wants to support.
 				match cmd {
+					
 					BenchmarkCmd::Pallet(cmd) => {
+						
 						if !cfg!(feature = "runtime-benchmarks") {
 							return Err(
 								"Runtime benchmarking wasn't enabled when building the node. \
@@ -121,8 +118,7 @@ pub fn run() -> sc_cli::Result<()> {
 									.into(),
 							)
 						}
-
-						cmd.run::<Block, service::ExecutorDispatch>(config)
+						cmd.run::<sp_runtime::traits::BlakeTwo256, ()>(config)
 					},
 					BenchmarkCmd::Block(cmd) => {
 						let PartialComponents { client, .. } = service::new_partial(&config)?;
