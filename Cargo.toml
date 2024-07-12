@@ -6,7 +6,7 @@ members = [
 resolver = "2"
 [workspace.package]
 authors = ["Asad Ali (asad.sial.4142@gmail.com)", "Josey Medley"]
-repository = "https://github.com/drmnana/Oslo"
+#repository = "https://github.com/drmnana/Oslo"
 
 
 [workspace.dependencies]
