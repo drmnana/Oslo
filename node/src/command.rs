@@ -9,6 +9,7 @@ use oslo_network_runtime::Block;
 use sc_cli::SubstrateCli;
 use sc_service::PartialComponents;
 // use sp_keyring::Sr25519Keyring;
+use service::frontier_database_dir;
 
 impl SubstrateCli for Cli {
 	fn impl_name() -> String {
@@ -37,8 +38,9 @@ impl SubstrateCli for Cli {
 
 	fn load_spec(&self, id: &str) -> Result<Box<dyn sc_service::ChainSpec>, String> {
 		Ok(match id {
-			"" | "testnet" => Box::new(chain_spec::testnet_config()),
-			"live" => Box::new(chain_spec::public_config()),
+			"dev" => Box::new(chain_spec::development_config()?),
+			"" | "testnet" => Box::new(chain_spec::testnet_config()?),
+			"live" => Box::new(chain_spec::public_config()?),
 			path =>
 				Box::new(chain_spec::ChainSpec::from_json_file(std::path::PathBuf::from(path))?),
 		})
@@ -67,7 +69,10 @@ pub fn run() -> sc_cli::Result<()> {
 			let runner = cli.create_runner(cmd)?;
 			runner.async_run(|config| {
 				let PartialComponents { client, task_manager, .. } = service::new_partial(&config)?;
-				Ok((cmd.run(client, config.database), task_manager))
+				Ok((cmd.run(client, fc_db::kv::DatabaseSource::RocksDb {
+					path: frontier_database_dir(&config),
+					cache_size: 0
+				}), task_manager))
 			})
 		},
 		Some(Subcommand::ExportState(cmd)) => {
@@ -87,7 +92,10 @@ pub fn run() -> sc_cli::Result<()> {
 		},
 		Some(Subcommand::PurgeChain(cmd)) => {
 			let runner = cli.create_runner(cmd)?;
-			runner.sync_run(|config| cmd.run(config.database))
+			runner.sync_run(|config| cmd.run(fc_db::kv::DatabaseSource::RocksDb {
+				path: frontier_database_dir(&config),
+				cache_size: 0
+			}))
 		},
 		Some(Subcommand::Revert(cmd)) => {
 			let runner = cli.create_runner(cmd)?;

@@ -6,7 +6,7 @@ members = [
 resolver = "2"
 [workspace.package]
 authors = ["Asad Ali (asad.sial.4142@gmail.com)", "Josey Medley"]
-#repository = "https://github.com/drmnana/Oslo"
+repository = "https://github.com/drmnana/Oslo"
 
 
 [workspace.dependencies]
@@ -45,7 +45,6 @@ pallet-timestamp = { default-features = false, git = "https://github.com/parityt
 pallet-transaction-payment = { default-features = false, git = "https://github.com/paritytech/polkadot-sdk.git", branch = "release-polkadot-v1.9.0" }
 frame-executive = { default-features = false, git = "https://github.com/paritytech/polkadot-sdk.git", branch = "release-polkadot-v1.9.0" }
 sp-api = { default-features = false, git = "https://github.com/paritytech/polkadot-sdk.git", branch = "release-polkadot-v1.9.0" }
-sp-genesis-builder = { default-features = false, git = "https://github.com/paritytech/polkadot-sdk.git", tag = "polkadot-v1.9.0" }
 sp-block-builder = { default-features = false, git = "https://github.com/paritytech/polkadot-sdk.git", branch = "release-polkadot-v1.9.0" }
 sp-core = { default-features = false, git = "https://github.com/paritytech/polkadot-sdk.git", branch = "release-polkadot-v1.9.0" }
 sp-inherents = { default-features = false, git = "https://github.com/paritytech/polkadot-sdk.git", branch = "release-polkadot-v1.9.0" }
@@ -103,6 +102,7 @@ fp-self-contained = { default-features = false, git = "https://github.com/polkad
 fp-rpc = { default-features = false, git = "https://github.com/polkadot-evm/frontier", branch = "polkadot-v1.9.0" }
 fp-storage = { default-features = false, git = "https://github.com/polkadot-evm/frontier", branch = "polkadot-v1.9.0" }
 fp-dynamic-fee = { default-features = false, git = "https://github.com/polkadot-evm/frontier", branch = "polkadot-v1.9.0" }
+fc-storage = { default-features = false, git = "https://github.com/polkadot-evm/frontier", branch = "polkadot-v1.9.0" }
 fc-rpc = { default-features = false, git = "https://github.com/polkadot-evm/frontier", branch = "polkadot-v1.9.0"}
 fc-consensus = { default-features = false, git = "https://github.com/polkadot-evm/frontier", branch = "polkadot-v1.9.0" }
 fp-consensus = { default-features = false, git = "https://github.com/polkadot-evm/frontier", branch = "polkadot-v1.9.0" }
@@ -110,3 +110,4 @@ fc-rpc-core = { default-features = false, git = "https://github.com/polkadot-evm
 fc-mapping-sync = { default-features = false, git = "https://github.com/polkadot-evm/frontier", branch = "polkadot-v1.9.0" }
 fc-db = { default-features = false, git = "https://github.com/polkadot-evm/frontier", branch = "polkadot-v1.9.0" }
 fc-api = { default-features = false, git = "https://github.com/polkadot-evm/frontier", branch = "polkadot-v1.9.0" }
+fc-cli = { default-features = false, git = "https://github.com/polkadot-evm/frontier", branch = "polkadot-v1.9.0" }

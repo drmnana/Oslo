@@ -189,7 +189,7 @@ pub fn create_full<B, C, BE, P, A, CT, CIDP>(
 		forced_parent_hashes,
 		pending_create_inherent_data_providers,
 		Some(Box::new(AuraConsensusDataProvider::new(client.clone())))
-	).replace_config::<DefaultEthConfig<C, BE>>().into_rpc())?;
+	).into_rpc())?;
 
 	// Extend this RPC with a custom API by using the following syntax.
 	// `YourRpcStruct` should have a reference to a client, which is needed

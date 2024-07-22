@@ -2,9 +2,6 @@
 // `construct_runtime!` does a lot of recursion and requires us to increase the limit to 256.
 #![recursion_limit = "256"]
 
-pub use crate::account::AccountId20;
-
-
 // Make the WASM binary available.
 #[cfg(feature = "std")]
 include!(concat!(env!("OUT_DIR"), "/wasm_binary.rs"));
@@ -31,9 +28,8 @@ use sp_runtime::{
 		Dispatchable, PostDispatchInfoOf, DispatchInfoOf, UniqueSaturatedInto, OpaqueKeys, 
 		Verify 
 	},
-	transaction_validity::{
-		TransactionSource,TransactionPriority, TransactionValidity, TransactionValidityError}, ApplyExtrinsicResult, ConsensusEngineId,
-		SaturatedConversion,
+	transaction_validity::{TransactionSource,TransactionPriority, TransactionValidity, TransactionValidityError},
+	ApplyExtrinsicResult, ConsensusEngineId, SaturatedConversion
 };
 
 use sp_std::prelude::*;
@@ -56,11 +52,11 @@ use fp_rpc::TransactionStatus;
 #[cfg(feature = "std")]
 pub use fp_evm::GenesisAccount;
 
-
+use frame_support::genesis_builder_helper::{build_config, create_default_config};
 // A few exports that help ease life for downstream crates.
 pub use frame_support::{
 	construct_runtime, parameter_types, pallet_prelude::PhantomData,
-	PalletId,
+	PalletId, derive_impl,
 	traits::{
 		ConstU128, ConstU32, ConstU64, ConstU8, KeyOwnerProofSystem, Randomness, StorageInfo,
 		FindAuthor, OnUnbalanced, Currency, Imbalance, EitherOfDiverse, EqualPrivilegeOnly,
@@ -68,11 +64,9 @@ pub use frame_support::{
 	},
 	weights::{
 		constants::{BlockExecutionWeight, ExtrinsicBaseWeight, RocksDbWeight, WEIGHT_REF_TIME_PER_SECOND},
-		IdentityFee, Weight,
+		IdentityFee, Weight
 	},
-
-
-	StorageValue,
+	StorageValue
 };
 
 pub use frame_system::Call as SystemCall;
@@ -92,7 +86,7 @@ pub type Signature = account::EthereumSignature;
 
 /// Some way of identifying an account on the chain. We intentionally make it equivalent
 /// to the public key of our transaction signing scheme.
-pub type AccountId = AccountId20;
+pub type AccountId = <<Signature as sp_runtime::traits::Verify>::Signer as sp_runtime::traits::IdentifyAccount>::AccountId;
 
 /// Balance of an account.
 pub type Balance = u128;
@@ -157,7 +151,7 @@ parameter_types! {
 
 impl validator_set::Config for Runtime {
 	type RuntimeEvent = RuntimeEvent;
-	type AddRemoveOrigin = EnsureRoot<AccountId20>;
+	type AddRemoveOrigin = EnsureRoot<AccountId>;
 	type MinAuthorities = MinAuthorities;
 	type WeightInfo = validator_set::weights::SubstrateWeight<Runtime>;
 }
@@ -175,12 +169,11 @@ pub const VERSION: RuntimeVersion = RuntimeVersion {
 	//   `spec_version`, and `authoring_version` are the same between Wasm and native.
 	// This value is set to 100 to notify Polkadot-JS App (https://polkadot.js.org/apps) to use
 	//   the compatible custom types.
-	spec_version: 101	,
+	spec_version: 101,
 	impl_version: 1,
 	apis: RUNTIME_API_VERSIONS,
 	transaction_version: 1,
-	state_version: 1,
-	
+	state_version: 1
 };
 
 /// This determines the average expected block time that we are targeting.
@@ -209,7 +202,6 @@ pub fn native_version() -> NativeVersion {
 const NORMAL_DISPATCH_RATIO: Perbill = Perbill::from_percent(75);
 /// We allow for 2 seconds of compute with a 6 second average block time.
 // pub const MAXIMUM_BLOCK_WEIGHT: Weight = WEIGHT_PER_SECOND.saturating_mul(2);
-// const WEIGHT_PER_GAS: u64 = 20_000;
 
 mod precompiles;
 pub mod account;
@@ -230,8 +222,6 @@ parameter_types! {
 	pub const SS58Prefix: u8 = 42;
 }
 
-// Configure FRAME pallets to include in runtime.
-use frame_support::derive_impl;
 #[derive_impl(frame_system::config_preludes::SolochainDefaultConfig as frame_system::DefaultConfig)]
 impl frame_system::Config for Runtime {
 	/// The basic call filter to use in dispatchable.
@@ -255,10 +245,9 @@ impl frame_system::Config for Runtime {
 	type Block = Block;
 	type Hashing = BlakeTwo256;
 	/// The identifier used to distinguish between accounts.
-	type AccountId = AccountId20;
+	type AccountId = AccountId;
 	/// The lookup mechanism to get account ID from whatever is passed in dispatchers.
-	// type Lookup = AccountIdLookup<AccountId, ()>;
-	type Lookup = sp_runtime::traits::IdentityLookup<AccountId20>;
+	type Lookup = sp_runtime::traits::IdentityLookup<AccountId>;
 	/// Maximum number of block number to block hash mappings to keep (oldest pruned first).
 	type BlockHashCount = BlockHashCount;
 	/// The weight of database operations that the runtime can invoke.
@@ -337,7 +326,7 @@ parameter_types! {
 }
 
 pub struct DealWithFees;
-type NegativeImbalance = <Balances as Currency<AccountId20>>::NegativeImbalance;
+type NegativeImbalance = <Balances as Currency<AccountId>>::NegativeImbalance;
  
 impl OnUnbalanced<NegativeImbalance> for DealWithFees {
 	fn on_unbalanceds<B>(mut fees_then_tips: impl Iterator<Item=NegativeImbalance>) {
@@ -374,8 +363,6 @@ impl pallet_transaction_payment::Config for Runtime {
 	type LengthToFee = IdentityFee<Balance>;
 	type FeeMultiplierUpdate = ();
 }
-
- 
  
 impl pallet_sudo::Config for Runtime {
 	type RuntimeEvent = RuntimeEvent;
@@ -383,14 +370,12 @@ impl pallet_sudo::Config for Runtime {
 	type WeightInfo = pallet_sudo::weights::SubstrateWeight<Self>;
 }
 
-
 parameter_types! {
 	pub MaximumSchedulerWeight: Weight = Perbill::from_percent(80) *
 		BlockWeights::get().max_block;
 	// Retry a scheduled item every 10 blocks (1 minute) until the preimage exists.
 	pub const NoPreimagePostponement: Option<u32> = Some(10);
 }
-
 
 const BLOCK_GAS_LIMIT: u64 = 75_000_000;
 const MAX_POV_SIZE: u64 = 5 * 1024 * 1024;
@@ -415,9 +400,7 @@ impl<F: FindAuthor<u32>> FindAuthor<H160> for FindAuthorTruncated<F> {
 
 				if raw.len() >= 24 {
 					Some(H160::from_slice(&raw[4..24]))
-				} else {
-					None
-				}
+				} else {None}
 			})
 		})
 	}
@@ -426,7 +409,7 @@ impl<F: FindAuthor<u32>> FindAuthor<H160> for FindAuthorTruncated<F> {
 pub struct StorageFindAuthor<Inner>(PhantomData<Inner>);
 impl<Inner> FindAuthor<H160> for StorageFindAuthor<Inner>
 where
-	Inner: FindAuthor<AccountId20>,
+	Inner: FindAuthor<AccountId>,
 {
 	fn find_author<'a, I>(digests: I) -> Option<H160>
 	where
@@ -450,8 +433,8 @@ impl pallet_evm::Config for Runtime {
 	type GasLimitPovSizeRatio = GasLimitPovSizeRatio;
     type WeightPerGas = WeightPerGas;
 	type BlockHashMapping = EthereumBlockHashMapping<Self>;
-	type CallOrigin = EnsureAddressRoot<AccountId20>;
-	type WithdrawOrigin = EnsureAddressNever<AccountId20>;
+	type CallOrigin = EnsureAddressRoot<AccountId>;
+	type WithdrawOrigin = EnsureAddressNever<AccountId>;
 	type SuicideQuickClearLimit = SuicideQuickClearLimit;
 	type AddressMapping = account::IntoAddressMapping;
 	type Currency = Balances;
@@ -521,7 +504,7 @@ where
 	fn create_transaction<C: frame_system::offchain::AppCrypto<Self::Public, Self::Signature>>(
 		call: RuntimeCall,
 		public: <Signature as Verify>::Signer,
-		account: AccountId20,
+		account: AccountId,
 		nonce: Index,
 	) -> Option<(RuntimeCall, <UncheckedExtrinsic as sp_runtime::traits::Extrinsic>::SignaturePayload)> {
 		let tip = 0;
@@ -606,8 +589,8 @@ impl pallet_assets::Config for Runtime {
 	type AssetId = u32;
 	type AssetIdParameter = codec::Compact<u32>;
 	type Currency = Balances;
-	type CreateOrigin = AsEnsureOriginWithArg<EnsureSigned<AccountId20>>;
-	type ForceOrigin = EnsureRoot<AccountId20>;
+	type CreateOrigin = AsEnsureOriginWithArg<EnsureSigned<AccountId>>;
+	type ForceOrigin = EnsureRoot<AccountId>;
 	type AssetDeposit = AssetDeposit;
 	type AssetAccountDeposit = ConstU128<OSLO>;
 	type MetadataDepositBase = MetadataDepositBase;
@@ -635,7 +618,7 @@ parameter_types! {
 	pub const MaxPeerInHeartbeats: u32 = 10_000;
 	pub const MaxPeerDataEncodingSize: u32 = 1_000;
 	pub const SpendPayoutPeriod: BlockNumber = 30 * DAYS;
-	pub TreasuryAccount: AccountId20 = Treasury::account_id();
+	pub TreasuryAccount: AccountId = Treasury::account_id();
 }
 
 impl pallet_treasury::Config for Runtime {
@@ -643,12 +626,12 @@ impl pallet_treasury::Config for Runtime {
 	type PalletId = TreasuryPalletId;
 	type Currency = Balances;
 	type ApproveOrigin = EitherOfDiverse<
-		EnsureRoot<AccountId20>,
-		pallet_collective::EnsureProportionAtLeast<AccountId20, CouncilCollective, 3, 5>,
+		EnsureRoot<AccountId>,
+		pallet_collective::EnsureProportionAtLeast<AccountId, CouncilCollective, 3, 5>,
 	>;
 	type RejectOrigin = EitherOfDiverse<
-		EnsureRoot<AccountId20>,
-		pallet_collective::EnsureProportionMoreThan<AccountId20, CouncilCollective, 1, 2>,
+		EnsureRoot<AccountId>,
+		pallet_collective::EnsureProportionMoreThan<AccountId, CouncilCollective, 1, 2>,
 	>;
 	type RuntimeEvent = RuntimeEvent;
 	type OnSlash = ();
@@ -662,8 +645,8 @@ impl pallet_treasury::Config for Runtime {
 	type WeightInfo = pallet_treasury::weights::SubstrateWeight<Runtime>;
 	type MaxApprovals = MaxApprovals;
 	type AssetKind = u32;
-	type Beneficiary = AccountId20;
-	type BeneficiaryLookup = sp_runtime::traits::IdentityLookup<AccountId20>;
+	type Beneficiary = AccountId;
+	type BeneficiaryLookup = sp_runtime::traits::IdentityLookup<AccountId>;
 	type Paymaster = PayAssetFromAccount<Assets, TreasuryAccount>;
 	type BalanceConverter = AssetRate;
 	type PayoutPeriod = SpendPayoutPeriod;
@@ -676,9 +659,9 @@ parameter_types! {
 }
 
 impl pallet_asset_rate::Config for Runtime {
-	type CreateOrigin = EnsureRoot<AccountId20>;
-	type RemoveOrigin = EnsureRoot<AccountId20>;
-	type UpdateOrigin = EnsureRoot<AccountId20>;
+	type CreateOrigin = EnsureRoot<AccountId>;
+	type RemoveOrigin = EnsureRoot<AccountId>;
+	type UpdateOrigin = EnsureRoot<AccountId>;
 	type Currency = Balances;
 	type AssetKind = u32;
 	type RuntimeEvent = RuntimeEvent;
@@ -717,7 +700,7 @@ impl pallet_collective::Config<CouncilCollective> for Runtime {
 	type MaxMembers = CouncilMaxMembers;
 	type DefaultVote = pallet_collective::PrimeDefaultVote;
 	type WeightInfo = pallet_collective::weights::SubstrateWeight<Runtime>;
-	type SetMembersOrigin = frame_system::EnsureRoot<AccountId20>;
+	type SetMembersOrigin = frame_system::EnsureRoot<AccountId>;
 	type MaxProposalWeight = MaxProposalWeight;
 }
 
@@ -732,7 +715,7 @@ impl pallet_collective::Config<TechnicalCollective> for Runtime {
 	type MaxMembers = TechnicalMaxMembers;
 	type DefaultVote = pallet_collective::PrimeDefaultVote;
 	type WeightInfo = pallet_collective::weights::SubstrateWeight<Runtime>;
-	type SetMembersOrigin = frame_system::EnsureRoot<AccountId20>;
+	type SetMembersOrigin = frame_system::EnsureRoot<AccountId>;
 	type MaxProposalWeight = MaxProposalWeight;
 }
 
@@ -753,36 +736,36 @@ impl pallet_democracy::Config for Runtime {
 	type MinimumDeposit = MinimumDeposit;
 	/// A straight majority of the council can decide what their next motion is.
 	type ExternalOrigin =
-	pallet_collective::EnsureProportionAtLeast<AccountId20, CouncilCollective, 1, 2>;
+	pallet_collective::EnsureProportionAtLeast<AccountId, CouncilCollective, 1, 2>;
 	/// A super-majority can have the next scheduled referendum be a straight majority-carries vote.
 	type ExternalMajorityOrigin =
-	pallet_collective::EnsureProportionAtLeast<AccountId20, CouncilCollective, 3, 4>;
+	pallet_collective::EnsureProportionAtLeast<AccountId, CouncilCollective, 3, 4>;
 	/// A unanimous council can have the next scheduled referendum be a straight default-carries
 	/// (NTB) vote.
 	type ExternalDefaultOrigin =
-	pallet_collective::EnsureProportionAtLeast<AccountId20, CouncilCollective, 1, 1>;
+	pallet_collective::EnsureProportionAtLeast<AccountId, CouncilCollective, 1, 1>;
 	/// Two thirds of the technical committee can have an ExternalMajority/ExternalDefault vote
 	/// be tabled immediately and with a shorter voting/enactment period.
 	type FastTrackOrigin = 
-	pallet_collective::EnsureProportionAtLeast<AccountId20, TechnicalCollective, 2, 3>;
+	pallet_collective::EnsureProportionAtLeast<AccountId, TechnicalCollective, 2, 3>;
 	type InstantOrigin =
-	pallet_collective::EnsureProportionAtLeast<AccountId20, TechnicalCollective, 1, 1>;
+	pallet_collective::EnsureProportionAtLeast<AccountId, TechnicalCollective, 1, 1>;
 	type InstantAllowed = frame_support::traits::ConstBool<true>;
 	type FastTrackVotingPeriod = FastTrackVotingPeriod;
 	// To cancel a proposal which has been passed, 2/3 of the council must agree to it.
 	type CancellationOrigin =
-	pallet_collective::EnsureProportionAtLeast<AccountId20, CouncilCollective, 2, 3>;
-	type BlacklistOrigin = EnsureRoot<AccountId20>;
+	pallet_collective::EnsureProportionAtLeast<AccountId, CouncilCollective, 2, 3>;
+	type BlacklistOrigin = EnsureRoot<AccountId>;
 	// To cancel a proposal before it has been passed, the technical committee must be unanimous or
 	// Root must agree.
 	type CancelProposalOrigin = EitherOfDiverse<
-		EnsureRoot<AccountId20>,	
-		pallet_collective::EnsureProportionAtLeast<AccountId20, TechnicalCollective, 1, 1>,
+		EnsureRoot<AccountId>,	
+		pallet_collective::EnsureProportionAtLeast<AccountId, TechnicalCollective, 1, 1>,
 	>;
-	type SubmitOrigin = EnsureSigned<AccountId20>;
+	type SubmitOrigin = EnsureSigned<AccountId>;
 	// Any single technical committee member may veto a coming council proposal, however they can
 	// only do it once and it lasts only for the cool-off period.
-	type VetoOrigin = pallet_collective::EnsureMember<AccountId20, TechnicalCollective>;
+	type VetoOrigin = pallet_collective::EnsureMember<AccountId, TechnicalCollective>;
 	type CooloffPeriod = CooloffPeriod;
 	// type PreimageByteDeposit = PreimageByteDeposit;
 	// type OperationalPreimageOrigin = pallet_collective::EnsureMember<AccountId, CouncilCollective>;
@@ -800,8 +783,8 @@ impl pallet_democracy::Config for Runtime {
 
 /// Special `ValidatorIdOf` implementation that is just returning the input as result.
 pub struct ValidatorIdOf;
-impl sp_runtime::traits::Convert<AccountId20, Option<AccountId20>> for ValidatorIdOf {
-	fn convert(a: AccountId20) -> Option<AccountId20> {
+impl sp_runtime::traits::Convert<AccountId, Option<AccountId>> for ValidatorIdOf {
+	fn convert(a: AccountId) -> Option<AccountId> {
 		Some(a)
 	}
 }
@@ -809,7 +792,7 @@ impl sp_runtime::traits::Convert<AccountId20, Option<AccountId20>> for Validator
 
 impl pallet_session::Config for Runtime {
 	type RuntimeEvent = RuntimeEvent;
-	type ValidatorId = AccountId20;
+	type ValidatorId = <Self as frame_system::Config>::AccountId;
 	// type ValidatorIdOf = account::IdentityCollator;
 	type ValidatorIdOf = validator_set::ValidatorOf<Self>;
 	type ShouldEndSession = pallet_session::PeriodicSessions<Period, Offset>;
@@ -834,7 +817,7 @@ impl pallet_scheduler::Config for Runtime {
 	type PalletsOrigin = OriginCaller;
 	type RuntimeCall = RuntimeCall;
 	type MaximumWeight = MaximumSchedulerWeight;
-	type ScheduleOrigin = EnsureRoot<AccountId20>;
+	type ScheduleOrigin = EnsureRoot<AccountId>;
 	type MaxScheduledPerBlock = ConstU32<50>;
 	type WeightInfo = pallet_scheduler::weights::SubstrateWeight<Runtime>;
 	type OriginPrivilegeCmp = EqualPrivilegeOnly;
@@ -853,10 +836,9 @@ impl pallet_preimage::Config for Runtime {
 	type WeightInfo = pallet_preimage::weights::SubstrateWeight<Runtime>;
 	type RuntimeEvent = RuntimeEvent;
 	type Currency = Balances;
-	type ManagerOrigin = EnsureRoot<AccountId20>;
-	type Consideration = HoldConsideration<AccountId20, Balances, PreimageHoldReason, LinearStoragePrice<PreimageBaseDeposit, PreimageByteDeposit, Balance>>;
+	type ManagerOrigin = EnsureRoot<AccountId>;
+	type Consideration = HoldConsideration<AccountId, Balances, PreimageHoldReason, LinearStoragePrice<PreimageBaseDeposit, PreimageByteDeposit, Balance>>;
 }
-
 
 
 // Create the runtime by composing the FRAME pallets that were previously configured.
@@ -923,7 +905,7 @@ impl fp_rpc::ConvertTransaction<opaque::UncheckedExtrinsic> for TransactionConve
 
 /// The address format for describing accounts.
 // pub type Address = sp_runtime::MultiAddress<AccountId, ()>;
-pub type Address = AccountId20;
+pub type Address = AccountId;
 /// Block header type as expected by this runtime.
 pub type Header = generic::Header<BlockNumber, BlakeTwo256>;
 /// Block type as expected by this runtime.
@@ -945,7 +927,6 @@ pub type SignedExtra = (
 // 	type IdentificationTuple = pallet_session::historical::IdentificationTuple<Self>;
 // 	type OnOffenceHandler = Staking;
 // }
-
 
 
 /// Unchecked extrinsic type as expected by this runtime.
@@ -1033,9 +1014,7 @@ impl_runtime_apis! {
 
 		fn gas_limit_multiplier_support() {}
 
-		fn chain_id() -> u64 {
-			<Runtime as pallet_evm::Config>::ChainId::get()
-		}
+		fn chain_id() -> u64 {<Runtime as pallet_evm::Config>::ChainId::get()}
 
 		fn account_basic(address: H160) -> EVMAccount {
 			let (account, _) = pallet_evm::Pallet::<Runtime>::account_basic(&address);
@@ -1052,9 +1031,7 @@ impl_runtime_apis! {
 			pallet_evm::AccountCodes::<Runtime>::get(address)
 		}
 
-		fn author() -> H160 {
-			<pallet_evm::Pallet<Runtime>>::find_author()
-		}
+		fn author() -> H160 {<pallet_evm::Pallet<Runtime>>::find_author()}
 
 		fn storage_at(address: H160, index: U256) -> H256 {
 			let mut tmp = [0u8; 32];
@@ -1343,9 +1320,19 @@ impl_runtime_apis! {
 		}
 	}
 
-	impl frame_system_rpc_runtime_api::AccountNonceApi<Block, AccountId20, Index> for Runtime {
-		fn account_nonce(account: AccountId20) -> Index {
+	impl frame_system_rpc_runtime_api::AccountNonceApi<Block, AccountId, Index> for Runtime {
+		fn account_nonce(account: AccountId) -> Index {
 			System::account_nonce(account)
+		}
+	}
+
+	impl sp_genesis_builder::GenesisBuilder<Block> for Runtime {
+		fn create_default_config() -> Vec<u8> {
+			create_default_config::<RuntimeGenesisConfig>()
+		}
+
+		fn build_config(config: Vec<u8>) -> sp_genesis_builder::Result {
+			build_config::<RuntimeGenesisConfig>(config)
 		}
 	}
 

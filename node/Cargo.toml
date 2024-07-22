@@ -2,12 +2,12 @@
 name = "oslo-network"
 version = "4.0.0-dev"
 description = "A fresh FRAME-based Substrate node, ready for hacking."
-authors = ["Asad Ali (asad.sial.4142@gmail.com)"]
+authors = ["Asad Ali (asad.sial.4142@gmail.com)", "Josey Medley"]
 homepage = "https://substrate.io/"
 edition = "2021"
 license = "Unlicense"
 publish = false
-#repository = "https://github.com/asadalisiyal/oslo-network"
+repository = "http://github.com/drmnana/Oslo"
 build = "build.rs"
 
 [package.metadata.docs.rs]
@@ -29,6 +29,7 @@ array-bytes = { workspace = true }
 fp-rpc = { workspace = true }
 fp-storage = { workspace = true }
 fp-dynamic-fee = { workspace = true, default-features = true }
+fp-evm = { workspace = true }
 
 fc-rpc = { workspace = true }
 fc-db = { workspace = true, features = ["rocksdb"] }
@@ -36,6 +37,8 @@ fc-consensus = { workspace = true }
 fc-rpc-core = { workspace = true }
 fc-mapping-sync = { workspace = true }
 fc-api = { workspace = true }
+fc-storage = { workspace = true }
+fc-cli = { workspace = true }
 
 sp-io = { default-features = false, git = "https://github.com/paritytech/polkadot-sdk.git", branch = "release-polkadot-v1.9.0" }
 sp-consensus-aura = { workspace = true }
@@ -69,6 +72,7 @@ substrate-frame-rpc-system = { git = "https://github.com/paritytech/polkadot-sdk
 pallet-transaction-payment-rpc = { git = "https://github.com/paritytech/polkadot-sdk.git", branch = "release-polkadot-v1.9.0" }
 pallet-im-online = { workspace = true }
 pallet-collective = { workspace = true }
+pallet-sudo = { workspace = true }
 
 frame-benchmarking = { workspace = true }
 frame-benchmarking-cli = { workspace = true }
@@ -80,7 +84,16 @@ oslo-network-runtime = { path = "../runtime" }
 substrate-build-script-utils = { git = "https://github.com/paritytech/polkadot-sdk.git", branch = "release-polkadot-v1.9.0" }
 
 [features]
-default = []
+default = ["rocksdb"]
+rocksdb = [
+	"sc-cli/rocksdb",
+	"sc-service/rocksdb",
+	"fc-cli/rocksdb",
+	"fc-db/rocksdb",
+	"fc-mapping-sync/rocksdb",
+	"fc-rpc/rocksdb"
+]
+
 # Dependencies that are only required if runtime benchmarking should be built.
 runtime-benchmarks = [
 #	"oslo-network-runtime/runtime-benchmarks",

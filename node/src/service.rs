@@ -1,6 +1,6 @@
 //! Service and ServiceFactory implementation. Specialized wrapper over substrate service.
 
-use oslo_network_runtime::{self, opaque::Block, RuntimeApi};
+use oslo_network_runtime::{self, opaque::Block, RuntimeApi, TransactionConverter};
 use sc_client_api::{BlockBackend, BlockchainEvents, Backend};
 use sc_consensus_aura::{CompatibilityMode, ImportQueueParams, SlotProportion, StartAuraParams};
 pub use sc_executor::NativeElseWasmExecutor;
@@ -10,16 +10,14 @@ use sc_telemetry::{Telemetry, TelemetryWorker};
 use sp_consensus_aura::sr25519::AuthorityPair as AuraPair;
 use std::{future, sync::{Arc, Mutex}, time::Duration, collections::BTreeMap};
 use fc_mapping_sync::{kv::MappingSyncWorker, SyncStrategy};
-use fc_rpc_core::types::{FeeHistoryCache, FeeHistoryCacheLimit};
+use fc_rpc_core::types::{FeeHistoryCache, FeeHistoryCacheLimit, FilterPool};
+use fc_rpc::OverrideHandle;
 use fc_consensus::FrontierBlockImport;
 use sc_transaction_pool_api::OffchainTransactionPoolFactory;
 use futures_util::{StreamExt, FutureExt};
-use fc_db::kv::frontier_database_dir;
 use sp_core::U256;
-
 // Our native executor instance.
 pub struct ExecutorDispatch;
-
 
 const GRANDPA_JUSTIFICATION_PERIOD: u32 = 512;
 
@@ -44,6 +42,10 @@ pub(crate) type FullClient = sc_service::TFullClient<Block, RuntimeApi, NativeEl
 type FullBackend = sc_service::TFullBackend<Block>;
 type FullSelectChain = sc_consensus::LongestChain<FullBackend, Block>;
 
+pub fn frontier_database_dir(config: &Configuration) -> std::path::PathBuf {
+	let config_dir = config.base_path.path();
+	config_dir.join("frontier").join("db")
+}
 pub fn open_frontier_backend<C>(
 	client: Arc<C>,
 	config: &Configuration,
@@ -54,10 +56,10 @@ pub fn open_frontier_backend<C>(
 		client,
 		&fc_db::kv::DatabaseSettings {
 			source: fc_db::kv::DatabaseSource::RocksDb {
-				path: frontier_database_dir(&config.base_path.config_dir(config.chain_spec.id()), "db"),
-				cache_size: 0,
-			},
-		},
+				path: frontier_database_dir(&config),
+				cache_size: 0
+			}
+		}
 	)?))
 }
 
@@ -77,17 +79,18 @@ pub fn new_partial(
 					FullBackend,
 					Block,
 					FullClient,
-					FullSelectChain,
+					FullSelectChain
 				>,
-				FullClient,
+				FullClient
 			>,
 			sc_consensus_grandpa::LinkHalf<Block, FullClient, FullSelectChain>,
 			Arc<fc_db::kv::Backend<Block>>,
 			Option<Telemetry>,
-			(FeeHistoryCache, FeeHistoryCacheLimit),
-		),
+			Arc<OverrideHandle<Block>>,
+			(FeeHistoryCache, FeeHistoryCacheLimit)
+		)
 	>,
-	ServiceError,
+	ServiceError
 > {
 	let telemetry = config
 		.telemetry_endpoints
@@ -122,7 +125,7 @@ pub fn new_partial(
 		config.role.is_authority().into(),
 		config.prometheus_registry(),
 		task_manager.spawn_essential_handle(),
-		client.clone(),
+		client.clone()
 	);
 
 	let (grandpa_block_import, grandpa_link) = sc_consensus_grandpa::block_import(
@@ -134,11 +137,8 @@ pub fn new_partial(
 	)?;
 
 	let slot_duration = sc_consensus_aura::slot_duration(&*client)?;
-
-	let frontier_backend = open_frontier_backend(
-		client.clone(),
-		config,
-	)?;
+	let storage_override = crate::rpc::overrides_handle(client.clone());
+	let frontier_backend = open_frontier_backend(client.clone(), config)?;
 
 	let frontier_block_import = FrontierBlockImport::new(grandpa_block_import.clone(), client.clone());
 
@@ -168,7 +168,6 @@ pub fn new_partial(
 			telemetry: telemetry.as_ref().map(|x| x.handle()),
 			compatibility_mode: Default::default(),
 		})?;
-
 	Ok(sc_service::PartialComponents {
 		client,
 		backend,
@@ -177,7 +176,7 @@ pub fn new_partial(
 		select_chain,
 		import_queue,
 		transaction_pool,
-		other: (frontier_block_import, grandpa_link, frontier_backend, telemetry, fee_history)
+		other: (frontier_block_import, grandpa_link, frontier_backend, telemetry, storage_override, fee_history)
 	})
 }
 
@@ -194,11 +193,11 @@ pub fn new_full(config: Configuration) -> Result<TaskManager, ServiceError> {
 		client,
 		backend,
 		mut task_manager,
-		import_queue,
 		keystore_container,
-		select_chain,
+		select_chain, 
+		import_queue,
 		transaction_pool,
-		other: (block_import, grandpa_link, frontier_backend, mut telemetry, fee_history),
+		other: (frontier_block_import, grandpa_link, frontier_backend, mut telemetry, storage_override, fee_history)
 	} = new_partial(&config)?;
 
 	let mut net_config = sc_network::config::FullNetworkConfiguration::new(&config.network);
@@ -226,13 +225,13 @@ pub fn new_full(config: Configuration) -> Result<TaskManager, ServiceError> {
 				"offchain-worker",
 				sc_offchain::OffchainWorkers::new(sc_offchain::OffchainWorkerOptions {
 					runtime_api_provider: client.clone(),
-					is_validator: config.role.is_authority(),
 					keystore: Some(keystore_container.keystore()),
 					offchain_db: backend.offchain_storage(),
 					transaction_pool: Some(OffchainTransactionPoolFactory::new(
 						transaction_pool.clone(),
 					)),
 					network_provider: Arc::new(network.clone()),
+					is_validator: config.role.is_authority(),
 					enable_http_requests: true,
 					custom_extensions: |_| vec![],
 				})
@@ -247,75 +246,8 @@ pub fn new_full(config: Configuration) -> Result<TaskManager, ServiceError> {
 	let name = config.network.node_name.clone();
 	let enable_grandpa = !config.disable_grandpa;
 	let prometheus_registry = config.prometheus_registry().cloned();
-	let is_authority = config.role.is_authority();
+
 	let (fee_history_cache, fee_history_cache_limit) = fee_history;
-	let overrides = crate::rpc::overrides_handle(client.clone());
-	let rpc_extensions_builder = {
-		let client = client.clone();
-		let pool = transaction_pool.clone();
-		let network = network.clone();
-		let frontier_backend = frontier_backend.clone();
-		let fee_history_cache = fee_history_cache.clone();
-		let sync_service = sync_service.clone();
-		let block_data_cache = Arc::new(fc_rpc::EthBlockDataCacheTask::new(
-			task_manager.spawn_handle(),
-			overrides.clone(),
-			50,
-			50,
-			prometheus_registry.clone(),
-		));
-
-		let slot_duration = sc_consensus_aura::slot_duration(&*client)?;
-		//let target_gas_price = eth_config.target_gas_price;
-		let pending_create_inherent_data_providers = move |_, ()| async move {
-			let current = sp_timestamp::InherentDataProvider::from_system_time();
-			let next_slot = current.timestamp().as_millis() + slot_duration.as_millis();
-			let timestamp = sp_timestamp::InherentDataProvider::new(next_slot.into());
-			let slot = sp_consensus_aura::inherents::InherentDataProvider::from_timestamp_and_slot_duration(
-				*timestamp,
-				slot_duration,
-			);
-			let dynamic_fee = fp_dynamic_fee::InherentDataProvider(U256::from(1));
-			Ok((slot, timestamp, dynamic_fee))
-		};
-
-		Box::new(move |deny_unsafe, _| {
-			let deps =
-				crate::rpc::FullDeps {
-					client: client.clone(),
-					pool: pool.clone(),
-					graph: pool.pool().clone(),
-					converter: Some(oslo_network_runtime::TransactionConverter),
-					deny_unsafe,
-					is_authority,
-					network: network.clone(),
-					sync: sync_service.clone(),
-					frontier_backend: frontier_backend.clone(),
-					block_data_cache: block_data_cache.clone(),
-					fee_history_cache: fee_history_cache.clone(),
-					fee_history_cache_limit,
-					execute_gas_limit_multiplier: 10,
-					forced_parent_hashes: None,
-					pending_create_inherent_data_providers
-				};
-			crate::rpc::create_full(deps).map_err(Into::into)
-		})
-	};
-
-	let _rpc_handlers = sc_service::spawn_tasks(sc_service::SpawnTasksParams {
-		network: network.clone(),
-		client: client.clone(),
-		keystore: keystore_container.keystore(),
-		task_manager: &mut task_manager,
-		transaction_pool: transaction_pool.clone(),
-		rpc_builder: rpc_extensions_builder,
-		backend: backend.clone(),
-		sync_service: sync_service.clone(),
-		system_rpc_tx,
-		tx_handler_controller,
-		config,
-		telemetry: telemetry.as_mut(),
-	})?;
 
 	// Sinks for pubsub notifications.
 	// Everytime a new subscription is created, a new mpsc channel is added to the sink pool.
@@ -324,7 +256,7 @@ pub fn new_full(config: Configuration) -> Result<TaskManager, ServiceError> {
 	let pubsub_notification_sinks: fc_mapping_sync::EthereumBlockNotificationSinks<
 		fc_mapping_sync::EthereumBlockNotification<Block>,
 	> = Default::default();
-
+	let filter_pool: Option<FilterPool> = Some(Arc::new(Mutex::new(BTreeMap::new())));
 	let pubsub_notification_sinks = Arc::new(pubsub_notification_sinks);
 	task_manager.spawn_essential_handle().spawn(
 		"frontier-mapping-sync-worker", None,
@@ -332,17 +264,89 @@ pub fn new_full(config: Configuration) -> Result<TaskManager, ServiceError> {
 			client.import_notification_stream(),
 			Duration::new(6, 0),    // kick off the sync worker every 6 seconds
 			client.clone(),
-			backend,
-			overrides.clone(),
+			backend.clone(),
+			storage_override.clone(),
 			frontier_backend.clone(),
 			3,
 			0,
 			SyncStrategy::Normal,
 			sync_service.clone(),
-			pubsub_notification_sinks
+			pubsub_notification_sinks.clone()
 		)
 			.for_each(|()| future::ready(())),
 	);
+	
+	let rpc_builder = {
+		let client = client.clone();
+		let pool = transaction_pool.clone();
+		let network = network.clone();
+		let sync_service = sync_service.clone();
+		let is_authority = role.is_authority();
+		let _enable_dev_signer = true;
+		let _max_past_logs: u32 = 1024;
+		let execute_gas_limit_multiplier: u64 = 10;
+		let _ = filter_pool.clone();
+		let frontier_backend = frontier_backend.clone();
+		let _pubsub_notification_sinks = pubsub_notification_sinks.clone();
+		let storage_override = storage_override.clone();
+		let fee_history_cache = fee_history_cache.clone();
+		let block_data_cache = Arc::new(fc_rpc::EthBlockDataCacheTask::new(
+			task_manager.spawn_handle(),
+			storage_override.clone(),
+			10,
+			50,
+			prometheus_registry.clone(),
+		));
+		let slot_duration = sc_consensus_aura::slot_duration(&*client)?;
+		let target_gas_price: u64 = 1;
+		let pending_create_inherent_data_providers = move |_, ()| async move {
+			let current = sp_timestamp::InherentDataProvider::from_system_time();
+			let next_slot = current.timestamp().as_millis() + slot_duration.as_millis();
+			let timestamp = sp_timestamp::InherentDataProvider::new(next_slot.into());
+			let slot = sp_consensus_aura::inherents::InherentDataProvider::from_timestamp_and_slot_duration(
+				*timestamp,
+				slot_duration,
+			);
+			let dynamic_fee = fp_dynamic_fee::InherentDataProvider(U256::from(target_gas_price));
+			Ok((slot, timestamp, dynamic_fee))
+		};
+
+		Box::new(move |deny_unsafe, _subscription_task_executor| {
+			let deps = crate::rpc::FullDeps {
+				client: client.clone(),
+				pool: pool.clone(),
+				graph: pool.pool().clone(),
+				converter: Some(TransactionConverter),
+				deny_unsafe,
+				is_authority,
+				network: network.clone(),
+				sync: sync_service.clone(),
+				frontier_backend: frontier_backend.clone(),
+				block_data_cache: block_data_cache.clone(),
+				fee_history_cache: fee_history_cache.clone(),
+				fee_history_cache_limit,
+				execute_gas_limit_multiplier,
+				forced_parent_hashes: None,
+				pending_create_inherent_data_providers
+			};
+			crate::rpc::create_full(deps).map_err(Into::into)
+		})
+	};
+
+	let _rpc_handlers = sc_service::spawn_tasks(sc_service::SpawnTasksParams {
+		config,
+		client: client.clone(),
+		backend: backend.clone(),
+		task_manager: &mut task_manager,
+		keystore: keystore_container.keystore(),
+		transaction_pool: transaction_pool.clone(),
+		rpc_builder,
+		network: network.clone(),
+		system_rpc_tx,
+		tx_handler_controller,
+		sync_service: sync_service.clone(),
+		telemetry: telemetry.as_mut()
+	})?;
 
 	if role.is_authority() {
 		let proposer_factory = sc_basic_authorship::ProposerFactory::new(
@@ -360,7 +364,7 @@ pub fn new_full(config: Configuration) -> Result<TaskManager, ServiceError> {
 				slot_duration,
 				client,
 				select_chain,
-				block_import,
+				block_import: frontier_block_import,
 				proposer_factory,
 				sync_oracle: sync_service.clone(),
 				justification_sync_link: sync_service.clone(),
@@ -382,7 +386,7 @@ pub fn new_full(config: Configuration) -> Result<TaskManager, ServiceError> {
 				max_block_proposal_slot_portion: None,
 				telemetry: telemetry.as_ref().map(|x| x.handle()),
 				compatibility_mode: CompatibilityMode::None,
-			},
+			}
 		)?;
 
 		// the AURA authoring task is considered essential, i.e. if it
