@@ -9,20 +9,18 @@ use std::sync::Arc;
 use std::collections::BTreeMap;
 use jsonrpsee::RpcModule;
 use oslo_network_runtime::{AccountId, Balance, Index, Hash};
-use sc_client_api::{backend::{Backend, StorageProvider, StateBackend},
-					client::BlockchainEvents, AuxStore, UsageProvider};
+use sc_client_api::{backend::{Backend, StorageProvider, StateBackend}, client::BlockchainEvents, AuxStore, UsageProvider};
 use sc_network::NetworkService;
 use sc_network_sync::SyncingService;
 use sc_transaction_pool::{ChainApi, Pool};
 use sc_transaction_pool_api::TransactionPool;
-use sp_consensus_aura::{sr25519::AuthorityId as AuraId, AuraApi};
+use sp_consensus_aura::{AuraApi, sr25519::AuthorityId as AuraId};
 use sp_inherents::CreateInherentDataProviders;
 use sp_api::{ProvideRuntimeApi, CallApiAt};
 use sp_block_builder::BlockBuilder;
 use sp_blockchain::{Error as BlockChainError, HeaderBackend, HeaderMetadata};
 use fc_rpc::{EthBlockDataCacheTask, OverrideHandle, RuntimeApiStorageOverride, SchemaV1Override,
-	SchemaV2Override, SchemaV3Override, StorageOverride, pending::AuraConsensusDataProvider,
-	EthApiServer};
+	SchemaV2Override, SchemaV3Override, StorageOverride, pending::AuraConsensusDataProvider, EthApiServer};
 use fc_rpc_core::types::{FeeHistoryCache, FeeHistoryCacheLimit};
 use fp_storage::EthereumStorageSchema;
 use fp_rpc::{ConvertTransaction, ConvertTransactionRuntimeApi, EthereumRuntimeRPCApi};
@@ -36,27 +34,23 @@ pub fn overrides_handle<B, C, BE>(client: Arc<C>) -> Arc<OverrideHandle<B>>
 		C: ProvideRuntimeApi<B> + StorageProvider<B, BE> + AuxStore,
 		C: HeaderBackend<B> + HeaderMetadata<B, Error=BlockChainError>,
 		C: Send + Sync + 'static,
-		C::Api: sp_api::ApiExt<B>
-		+ fp_rpc::EthereumRuntimeRPCApi<B>
-		+ fp_rpc::ConvertTransactionRuntimeApi<B>,
+		C::Api: sp_api::ApiExt<B> + fp_rpc::EthereumRuntimeRPCApi<B> + fp_rpc::ConvertTransactionRuntimeApi<B>,
 		BE: Backend<B> + 'static,
-		BE::State: StateBackend<BlakeTwo256>, B: BlockT
+		BE::State: StateBackend<BlakeTwo256>,
+		B: BlockT
 {
 	let mut overrides_map = BTreeMap::new();
 	overrides_map.insert(
 		EthereumStorageSchema::V1,
-		Box::new(SchemaV1Override::new(client.clone()))
-			as Box<(dyn StorageOverride<B> + 'static)>
+		Box::new(SchemaV1Override::new(client.clone())) as Box<(dyn StorageOverride<B> + 'static)>
 	);
 	overrides_map.insert(
 		EthereumStorageSchema::V2,
-		Box::new(SchemaV2Override::new(client.clone()))
-			as Box<(dyn StorageOverride<B> + 'static)>
+		Box::new(SchemaV2Override::new(client.clone())) as Box<(dyn StorageOverride<B> + 'static)>
 	);
 	overrides_map.insert(
 		EthereumStorageSchema::V3,
-		Box::new(SchemaV3Override::new(client.clone()))
-			as Box<(dyn StorageOverride<B> + 'static)>
+		Box::new(SchemaV3Override::new(client.clone())) as Box<(dyn StorageOverride<B> + 'static)>
 	);
 
 	Arc::new(OverrideHandle {
@@ -101,6 +95,7 @@ pub struct FullDeps<B: BlockT, C, P, A: ChainApi, CT, CIDP> {
 	/// Something that can create the inherent data providers for pending state
 	pub pending_create_inherent_data_providers: CIDP
 }
+
 ///I have no clue
 pub struct DefaultEthConfig<C, BE>(std::marker::PhantomData<(C, BE)>);
 
@@ -113,8 +108,7 @@ where
 	///Why this is necessary
 	type EstimateGasAdapter = ();
 	///For Eth::new() to work
-	type RuntimeStorageOverride =
-		fc_rpc::frontier_backend_client::SystemAccountId20StorageOverride<B, C, BE>;
+	type RuntimeStorageOverride = fc_rpc::frontier_backend_client::SystemAccountId20StorageOverride<B, C, BE>;
 }
 /// Instantiate all full RPC extensions.
 pub fn create_full<B, C, BE, P, A, CT, CIDP>(

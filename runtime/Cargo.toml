@@ -51,6 +51,7 @@ sp-offchain = { workspace = true }
 sp-runtime = { workspace = true, features = ["serde"] }
 sp-session = { workspace = true }
 sp-std = { workspace = true }
+sp-storage = { workspace = true }
 sp-transaction-pool = { workspace = true }
 sp-version = { workspace = true, features = ["serde"] }
 sp-io = { workspace = true }
@@ -62,8 +63,10 @@ frame-system-rpc-runtime-api = { git = "https://github.com/paritytech/polkadot-s
 pallet-transaction-payment-rpc-runtime-api = { git = "https://github.com/paritytech/polkadot-sdk.git", branch = "release-polkadot-v1.9.0", default-features = false }
 
 # Used for runtime benchmarking
-#frame-benchmarking = { workspace = true }
-#frame-system-benchmarking = { workspace = true }
+frame-benchmarking = { workspace = true }
+frame-system-benchmarking = { workspace = true }
+
+frame-try-runtime = { workspace = true }
 
 # evm dependencies
 pallet-evm = { workspace = true }
@@ -138,23 +141,48 @@ std = [
 ]
 
 runtime-benchmarks = [
-#	"frame-benchmarking/runtime-benchmarks",
-#	"frame-support/runtime-benchmarks",
-#	"frame-system-benchmarking/runtime-benchmarks",
-#	"frame-system/runtime-benchmarks",
-#	"pallet-balances/runtime-benchmarks",
-#	"pallet-grandpa/runtime-benchmarks",
-#	"pallet-timestamp/runtime-benchmarks",
-#	"pallet-treasury/runtime-benchmarks",
-#	"sp-runtime/runtime-benchmarks",
-#	"pallet-im-online/runtime-benchmarks",
-#	"pallet-collective/runtime-benchmarks",
-#	"pallet-democracy/runtime-benchmarks",
-#	"pallet-scheduler/runtime-benchmarks",
+	"frame-benchmarking/runtime-benchmarks",
+	"frame-support/runtime-benchmarks",
+	"frame-system-benchmarking/runtime-benchmarks",
+	"frame-system/runtime-benchmarks",
+	"pallet-balances/runtime-benchmarks",
+	"pallet-grandpa/runtime-benchmarks",
+	"pallet-sudo/runtime-benchmarks",
+	"pallet-timestamp/runtime-benchmarks",
+	"pallet-ethereum/runtime-benchmarks",
+	"pallet-democracy/runtime-benchmarks",
+	"pallet-collective/runtime-benchmarks",
+	"pallet-assets/runtime-benchmarks",
+	"pallet-asset-rate/runtime-benchmarks",
+	"pallet-preimage/runtime-benchmarks",
+	"sp-runtime/runtime-benchmarks"
 ]
 
 try-runtime = [
-	#
+	"fp-self-contained/try-runtime",
+	"frame-executive/try-runtime",
+	"frame-support/try-runtime",
+	"frame-system/try-runtime",
+	"frame-try-runtime/try-runtime",
+	"pallet-aura/try-runtime",
+	"pallet-preimage/try-runtime",
+	"pallet-balances/try-runtime",
+	"pallet-grandpa/try-runtime",
+	"pallet-sudo/try-runtime",
+	"pallet-timestamp/try-runtime",
+	"pallet-transaction-payment/try-runtime",
+	"pallet-ethereum/try-runtime",
+	"pallet-democracy/try-runtime",
+	"pallet-collective/try-runtime",
+	"pallet-asset-rate/try-runtime",
+	"pallet-assets/try-runtime",
+	"pallet-base-fee/try-runtime",
+	"pallet-im-online/try-runtime",
+	"pallet-treasury/try-runtime",
+	"pallet-session/try-runtime",
+	"pallet-scheduler/try-runtime",
+	"sp-runtime/try-runtime",
+	"validator-set/try-runtime"
 ]
 
 [build-dependencies]

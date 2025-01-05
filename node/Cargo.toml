@@ -18,6 +18,7 @@ targets = ["aarch64-unknown-linux-gnu"]
 name = "oslo-network"
 
 [dependencies]
+rustc-hex = { version = "2.1.0" }
 serde_json = { version = "1.0.114", default-features = true, features = ["arbitrary_precision"] }
 jsonrpsee = { default-features = false, version = "0.22", features = ["server", "macros"] }
 clap = { workspace = true }
@@ -68,17 +69,22 @@ sc-network-sync = { workspace = true }
 sc-basic-authorship = { workspace = true }
 sc-offchain = { workspace = true }
 
-substrate-frame-rpc-system = { git = "https://github.com/paritytech/polkadot-sdk.git", branch = "release-polkadot-v1.9.0" }
 pallet-transaction-payment-rpc = { git = "https://github.com/paritytech/polkadot-sdk.git", branch = "release-polkadot-v1.9.0" }
 pallet-im-online = { workspace = true }
 pallet-collective = { workspace = true }
 pallet-sudo = { workspace = true }
+pallet-transaction-payment = { workspace = true }
 
+frame-system = { workspace = true }
 frame-benchmarking = { workspace = true }
 frame-benchmarking-cli = { workspace = true }
+substrate-frame-rpc-system = { git = "https://github.com/paritytech/polkadot-sdk.git", branch = "release-polkadot-v1.9.0" }
 
 # Local Dependencies
 oslo-network-runtime = { path = "../runtime" }
+
+# CLI-specific dependencies
+try-runtime-cli = { workspace = true, optional = true }
 
 [build-dependencies]
 substrate-build-script-utils = { git = "https://github.com/paritytech/polkadot-sdk.git", branch = "release-polkadot-v1.9.0" }
@@ -96,12 +102,17 @@ rocksdb = [
 
 # Dependencies that are only required if runtime benchmarking should be built.
 runtime-benchmarks = [
-#	"oslo-network-runtime/runtime-benchmarks",
-	"frame-benchmarking/runtime-benchmarks",
+	"oslo-network-runtime/runtime-benchmarks",
 	"frame-benchmarking-cli/runtime-benchmarks",
+	"frame-system/runtime-benchmarks",
+	"sc-service/runtime-benchmarks",
+	"sp-runtime/runtime-benchmarks"
 ]
 
 try-runtime = [
-#   "oslo-network-runtime/try-runtime",
-#    "try-runtime-cli"
+	"frame-system/try-runtime",
+	"pallet-transaction-payment/try-runtime",
+	"oslo-network-runtime/try-runtime",
+	"sp-runtime/try-runtime",
+	"try-runtime-cli/try-runtime",
 ]
