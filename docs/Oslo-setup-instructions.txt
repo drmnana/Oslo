@@ -1,0 +1,119 @@
+For reference, this guide assumes the node is being set up on a Raspberry Pi 5 with 64 bit Pi OS, though this should work for Debian and Ubuntu as well.
+Due to how Pi OS handles memory, this *will not* work with vanilla Pi OS on a Pi 4.
+
+
+From another pc, download the Raspberry Pi Imager from here https://www.raspberrypi.com/software/
+Connect an sd card with at least 128GB of storage to the pc, then select it as the storage device in imager. For the OS use Raspberry Pi OS 64 bit and for the device select Raspberry Pi 5.
+Click next then go to edit settings. Set a strong password and make sure you have it saved somewhere. You can change the username if you want but it's not necessary. 
+Make sure keyboard layout is set to US then click save, then yes, then yes again and it will start flashing the OS. This will take several minutes.
+If it errors out just restart it, this is usually harmless and happens randomly when the drive is accessed by the user or another program during the flash. When it says it was 
+successful you can remove the sd card from the computer(the imager ejects it automatically).
+
+Insert the sd card into the pi, connect it to the router with ethernet, and connect it to a display. Then plug both the pi and the router into the backup battery.
+This should make sure the system and the network stays online even during a power outage. You will need a keyboard and mouse for setup but they're not necessary afterwards.
+In the past raspberry pi os had a guided setup, but this time it did not. If you're given a guided setup just follow along but make sure the locale is set to en_US.UTF-8 UTF-8.
+Open the terminal with ctrl+alt+t or the terminal icon in the top left. Run the command "sudo raspi-config" then go to localisation options if you did not have a setup screen.
+Select en_us.UTF-8 UTF-8 with the spacebar then press enter, then select en_us.UTF-8 UTF-8 again and press enter again. Afterwards you'll be sent back to the raspi-config screen.
+Select interface options and enable both ssh and vnc. These let you access the pi from other devices, but they require the username and password set earlier. Now go to back to 
+the raspi-config screen and under advanced options select expand filesystem. This will make sure that the pi has access to all of the sd card's storage. After that command
+finishes, exit out of raspi-config, and when asked if you want to reboot now select yes and hit enter.
+
+If there's no issues with the ethernet cable, the pi should already have internet. Run the command "sudo apt update;sudo apt upgrade -y;" to update the pi. This usually takes a while the first time.
+After it completes, run "sudo crontab -e" to open crontab, which lets us run commands automatically at certain times. It will ask which text editor you want to use, I prefer nano and
+will be using it in this guide. When it opens the file, move down to the first line without a # before it. The # means that line is a comment and will not be run. Add this line to
+automatically update and restart the pi daily 
+0 22 * * * sudo apt update && sudo apt upgrade -y && sudo reboot
+
+but replace 22 with the number of an hour(utc time) where you expect the network to not have much traffic. It should only be down for a minute at a time. Save this file with ctrl+o and exit nano with
+ctrl+x. By default a Pi will not run automatic filesystem repairs on boot, but we can greatly improve the reliability of the pi by enabling them. You can open the config file for this with 
+sudo nano /boot/firmware/cmdline.txt
+
+You should see one line of text, in that line find where it says fsck.repair=yes. Right after that, add "fsck.mode=force" without the quotes but keeping a space between it and the other parameters.
+Once again, save the file with ctrl+o and exit with ctrl+x. Now the file system should automatically attempt to repair small corruptions when the Pi boots and help prevent larger corruptions from 
+happening at all. Now run 
+sudo reboot
+
+to reboot the Pi since many updates and configurations don't apply until the Pi restarts. 
+
+To remotely access the Pi(within the local network at least), download RealVNC Viewer on another device from here https://www.realvnc.com/en/connect/download/viewer/. Make sure both devices are on the same network,
+then get the IP of the Pi from the network dropdown in the top right corner under advanced options then connection information. Open RealVNC Viewer then enter the IP of the Pi.
+Enter the username and password for the pi then you should have remote access to the desktop. If this does not work(I had this issue), run the command "sudo passwd" and enter
+a strong password. Now try RealVNC again with the username "root" and the password you just entered. 
+
+Now we're ready to start setting up substrate. First we need to install prerequisites starting with the command on the next line
+sudo apt install -y build-essential clang curl git make libssl-dev llvm libudev-dev protobuf-compiler
+
+------NOTE------
+The version of Substrate that Oslo is currently based on does not seem to work with rust version 1.87
+Now run these commands to install rust
+
+curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+
+and when prompted press enter to keep the standard installation options, then 
+source $HOME/.cargo/env
+
+to finish installing the stable version of rust. We'll also need the nightly version of rust which can be installed with 
+rustup update nightly
+
+then
+rustup target add wasm32-unknown-unknown --toolchain nightly; rustup component add rust-src --toolchain nightly-aarch64-unknown-linux-gnu
+
+and we're done installing the prerequisites for substrate.
+
+Download the Oslo source with
+git clone https://github.com/drmnana/Oslo.git; cd Oslo;
+
+Compile the node(this will take a while) with 
+cargo build --release -j4
+
+When it's done, if you haven't already generate the Sr25519 key with 
+./target/release/oslo-network key generate --scheme Sr25519
+
+Keep the entire output of the above command somewhere safe. You only need to send me the hex public key and the SS58 public key though.
+
+Now you also need to derive the Ed25519 sudo key using 
+./target/release/oslo-network key inspect --scheme Ed25519 "pig giraffe ceiling enter weird liar orange decline behind total despair fly"
+
+but replacing the secret phrase with the one generated above.
+Save these keys as well, but again sending me the public hex key and public SS58 key.
+
+Now we need to add these keys to the nodes keystore
+target/release/oslo-network key insert --base-path ~/.local/share/oslo-network --chain=OsloMainnetChainSpec.json --scheme Ed25519 --suri "bottom drive obey lake curtain smoke basket hold race lonely fit walk" --key-type gran
+target/release/oslo-network key insert --base-path ~/.local/share/oslo-network --chain=OsloMainnetChainSpec.json --scheme Sr25519 --suri "bottom drive obey lake curtain smoke basket hold race lonely fit walk" --key-type aura
+target/release/oslo-network key insert --base-path ~/.local/share/oslo-network --chain=OsloMainnetChainSpec.json --scheme Sr25519 --suri "bottom drive obey lake curtain smoke basket hold race lonely fit walk" --key-type imon
+but again replacing the secret phrase for all three commands with the secret phrase you generated earlier.
+
+There's no substrate command to save the node-key, but we can do it manually. Make the directory for the node-key with
+mkdir ~/.local/share/oslo-network/chains/Oslo-Network_Mainnet/network
+
+Now open the node-key file with
+nano ~/.local/share/oslo-network/chains/Oslo-Network_Mainnet/network/secret_ed25519_hex
+
+Paste the ed25519 secret seed from earlier into this file(without the 0x at the beggining)
+Save the file with ctrl+o, then exit the file with ctrl+x
+
+For substrate to decode the node-key, we need to convert the file from hex to binary. We can install the converter with
+sudo apt install xxd
+
+And convert the file with 
+xxd -r -p -c 0 ~/.local/share/oslo-network/chains/Oslo-Network_Mainnet/network/secret_ed25519_hex ~/.local/share/oslo-network/chains/Oslo-Network_Mainnet/network/secret_ed25519
+
+The information in this paragraph is not necessary to run the node but will definitely help with understanding the technical aspects of how the network works. The "gran" key-type represents the private key for the grandpa 
+method of block finalization(which is the method used by the Oslo network to finalize a block before it is permanently appended to the chain). The "aura" key-type represents the private key for the aura method of block 
+authoring(also used by the Oslo network to generate new blocks, which are then finalized by the nodes with a valid "gran" key.). The "imon" key-type represents the key-type used by the im-online pallet(which removes inactive 
+validator nodes from the Oslo network, and also returns old validator nodes to the network once they come online again).   
+
+
+If all that worked out then we're ready to start the node for the first time with the command below.
+RUST_BACKTRACE=full target/release/oslo-network --chain=OsloMainnetChainSpec.json --pruning=archive --validator --base-path ~/.local/share/oslo-network
+If it starts showing blocks being validated, or at least showing the genesis block hash, then everything is probably working as intended. 
+Now, press ctrl+C then ctrl+Z to close out of the node.
+
+Open the crontab again with
+crontab -e
+
+and at the end of the file add this line
+@reboot screen -S node -dm bash -c "cd ~/Oslo && RUST_BACKTRACE=full target/release/oslo-network --chain=OsloMainnetChainSpec.json --pruning=archive --validator --base-path ~/.local/share/oslo-network --port 37954 --no-mdns --no-prometheus"
+
+Finally, to allow inbound connections from other validators and to allow regular nodes to download the chain, the TCP port 37954 will need to be opened on the router and forwarded to the validator node. This process varies wildly from router to router, so it 
+is nearly impossible to give good instructions without knowing the router model/networking setup. 
