@@ -391,9 +391,7 @@ pub fn new_full(config: Configuration) -> Result<TaskManager, ServiceError> {
 
 		// the AURA authoring task is considered essential, i.e. if it
 		// fails we take down the service with it.
-		task_manager
-			.spawn_essential_handle()
-			.spawn_blocking("aura", Some("block-authoring"), aura);
+		task_manager.spawn_essential_handle().spawn_blocking("aura", Some("block-authoring"), aura);
 	}
 
 	if enable_grandpa {
@@ -411,7 +409,7 @@ pub fn new_full(config: Configuration) -> Result<TaskManager, ServiceError> {
 			keystore,
 			local_role: role,
 			telemetry: telemetry.as_ref().map(|x| x.handle()),
-			protocol_name: grandpa_protocol_name,
+			protocol_name: grandpa_protocol_name
 		};
 
 		// start the full GRANDPA voter

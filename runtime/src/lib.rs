@@ -41,8 +41,7 @@ use pallet_im_online::sr25519::AuthorityId as ImOnlineId;
 
 
 use pallet_evm::{
-	EnsureAddressRoot, EnsureAddressNever, Account as EVMAccount, Runner,
-	FeeCalculator,
+	EnsureAddressRoot, EnsureAddressNever, Account as EVMAccount, Runner, FeeCalculator
 };
 
 use pallet_ethereum::{Call::transact, PostLogContent, EthereumBlockHashMapping, Transaction as EthereumTransaction,
@@ -103,17 +102,13 @@ pub mod currency {
 	pub const SUPPLY_FACTOR: Balance = 100;
 
 	pub const WEI: Balance = 1;
-	pub const KILOWEI: Balance = 1_000;
-	pub const MEGAWEI: Balance = 1_000_000;
-	pub const GIGAWEI: Balance = 1_000_000_000;
-	pub const MICROOSLO: Balance = 1_000_000_000_000;
-	pub const MILLIOSLO: Balance = 1_000_000_000_000_000;
-	pub const OSLO: Balance = 1_000_000_000_000_000_000;
-	pub const KILOOSLO: Balance = 1_000_000_000_000_000_000_000;
+	pub const MILLIOSLO: Balance = 1_000;
+	pub const OSLO: Balance = 1_000_000;
+	pub const KILOOSLO: Balance = 1_000_000_000;
 
-	pub const TRANSACTION_BYTE_FEE: Balance = 1 * GIGAWEI * SUPPLY_FACTOR;
-	pub const STORAGE_BYTE_FEE: Balance = 100 * MICROOSLO * SUPPLY_FACTOR;
-	pub const WEIGHT_FEE: Balance = 50 * KILOWEI * SUPPLY_FACTOR;
+	pub const TRANSACTION_BYTE_FEE: Balance = 1 * WEI * SUPPLY_FACTOR;
+	pub const STORAGE_BYTE_FEE: Balance = 10 * WEI * SUPPLY_FACTOR;
+	pub const WEIGHT_FEE: Balance = 10 * WEI * SUPPLY_FACTOR;
 
 	pub const fn deposit(items: u32, bytes: u32) -> Balance {
 		items as Balance * 100 * MILLIOSLO * SUPPLY_FACTOR + (bytes as Balance) * STORAGE_BYTE_FEE
@@ -182,7 +177,7 @@ pub const VERSION: RuntimeVersion = RuntimeVersion {
 /// up by `pallet_aura` to implement `fn slot_duration()`.
 ///
 /// Change this to adjust the block time.
-pub const MILLISECS_PER_BLOCK: u64 = 6000;
+pub const MILLISECS_PER_BLOCK: u64 = 15000;
 
 // NOTE: Currently it is not possible to change the slot duration after the chain has started.
 //       Attempting to do so will brick block production.
@@ -215,7 +210,7 @@ parameter_types! {
 	pub BlockWeights: frame_system::limits::BlockWeights =
 		frame_system::limits::BlockWeights::with_sensible_defaults(
 			Weight::from_parts(2u64 * WEIGHT_REF_TIME_PER_SECOND, u64::MAX),
-			NORMAL_DISPATCH_RATIO,
+			NORMAL_DISPATCH_RATIO
 		);
 	pub BlockLength: frame_system::limits::BlockLength = frame_system::limits::BlockLength
 		::max_with_normal_ratio(5 * 1024 * 1024, NORMAL_DISPATCH_RATIO);
@@ -301,7 +296,7 @@ impl pallet_timestamp::Config for Runtime {
 }
 
 /// Existential deposit.
-pub const EXISTENTIAL_DEPOSIT: u128 = 1 * currency::MICROOSLO;
+pub const EXISTENTIAL_DEPOSIT: u128 = 1 * currency::MILLIOSLO;
 
 impl pallet_balances::Config for Runtime {
 	/// The type for recording an account's balance.
@@ -505,7 +500,7 @@ where
 		call: RuntimeCall,
 		public: <Signature as Verify>::Signer,
 		account: AccountId,
-		nonce: Index,
+		nonce: Index
 	) -> Option<(RuntimeCall, <UncheckedExtrinsic as sp_runtime::traits::Extrinsic>::SignaturePayload)> {
 		let tip = 0;
 		let period =
@@ -627,11 +622,11 @@ impl pallet_treasury::Config for Runtime {
 	type Currency = Balances;
 	type ApproveOrigin = EitherOfDiverse<
 		EnsureRoot<AccountId>,
-		pallet_collective::EnsureProportionAtLeast<AccountId, CouncilCollective, 3, 5>,
+		pallet_collective::EnsureProportionAtLeast<AccountId, CouncilCollective, 3, 5>
 	>;
 	type RejectOrigin = EitherOfDiverse<
 		EnsureRoot<AccountId>,
-		pallet_collective::EnsureProportionMoreThan<AccountId, CouncilCollective, 1, 2>,
+		pallet_collective::EnsureProportionMoreThan<AccountId, CouncilCollective, 1, 2>
 	>;
 	type RuntimeEvent = RuntimeEvent;
 	type OnSlash = ();
@@ -653,7 +648,7 @@ impl pallet_treasury::Config for Runtime {
 }
 
 parameter_types! {
-	pub const CouncilMotionDuration: BlockNumber = 5 * DAYS;
+	pub const CouncilMotionDuration: BlockNumber = 7 * DAYS;
 	pub const CouncilMaxProposals: u32 = 100;
 	pub const CouncilMaxMembers: u32 = 100;
 }
@@ -671,7 +666,7 @@ impl pallet_asset_rate::Config for Runtime {
 }
 
 parameter_types! {
-	pub const TechnicalMotionDuration: BlockNumber = 5 * DAYS;
+	pub const TechnicalMotionDuration: BlockNumber = 7 * DAYS;
 	pub const TechnicalMaxProposals: u32 = 100;
 	pub const TechnicalMaxMembers: u32 = 100;
 }
@@ -753,14 +748,14 @@ impl pallet_democracy::Config for Runtime {
 	type InstantAllowed = frame_support::traits::ConstBool<true>;
 	type FastTrackVotingPeriod = FastTrackVotingPeriod;
 	// To cancel a proposal which has been passed, 2/3 of the council must agree to it.
-	type CancellationOrigin =
+	type CancellationOrigin = 
 	pallet_collective::EnsureProportionAtLeast<AccountId, CouncilCollective, 2, 3>;
 	type BlacklistOrigin = EnsureRoot<AccountId>;
 	// To cancel a proposal before it has been passed, the technical committee must be unanimous or
 	// Root must agree.
 	type CancelProposalOrigin = EitherOfDiverse<
 		EnsureRoot<AccountId>,	
-		pallet_collective::EnsureProportionAtLeast<AccountId, TechnicalCollective, 1, 1>,
+		pallet_collective::EnsureProportionAtLeast<AccountId, TechnicalCollective, 1, 1>
 	>;
 	type SubmitOrigin = EnsureSigned<AccountId>;
 	// Any single technical committee member may veto a coming council proposal, however they can
@@ -802,13 +797,6 @@ impl pallet_session::Config for Runtime {
 	type Keys = opaque::SessionKeys;
 	type WeightInfo = ();
 }
-
-
-
-// impl pallet_session::historical::Config for Runtime {
-// 	type FullIdentification = pallet_staking::Exposure<AccountId, Balance>;
-// 	type FullIdentificationOf = pallet_staking::ExposureOf<Runtime>;
-// }
 
 impl pallet_scheduler::Config for Runtime {
 	type RuntimeOrigin = RuntimeOrigin;
@@ -873,7 +861,7 @@ construct_runtime!(
 		Scheduler: pallet_scheduler,
 		Council: pallet_collective::<Instance1>,
 		TechnicalCommittee: pallet_collective::<Instance2>,
-		Preimage: pallet_preimage,
+		Preimage: pallet_preimage
 	}
 );
 
@@ -890,14 +878,13 @@ impl fp_rpc::ConvertTransaction<UncheckedExtrinsic> for TransactionConverter {
 impl fp_rpc::ConvertTransaction<opaque::UncheckedExtrinsic> for TransactionConverter {
 	fn convert_transaction(
 		&self,
-		transaction: pallet_ethereum::Transaction,
+		transaction: pallet_ethereum::Transaction
 	) -> opaque::UncheckedExtrinsic {
 		let extrinsic = UncheckedExtrinsic::new_unsigned(
-			pallet_ethereum::Call::<Runtime>::transact { transaction }.into(),
+			pallet_ethereum::Call::<Runtime>::transact { transaction }.into()
 		);
 		let encoded = extrinsic.encode();
-		opaque::UncheckedExtrinsic::decode(&mut &encoded[..])
-			.expect("Encoded extrinsic is always valid")
+		opaque::UncheckedExtrinsic::decode(&mut &encoded[..]).expect("Encoded extrinsic is always valid")
 	}
 }
 
@@ -917,7 +904,7 @@ pub type SignedExtra = (
 	frame_system::CheckEra<Runtime>,
 	frame_system::CheckNonce<Runtime>,
 	frame_system::CheckWeight<Runtime>,
-	pallet_transaction_payment::ChargeTransactionPayment<Runtime>,
+	pallet_transaction_payment::ChargeTransactionPayment<Runtime>
 );
 
 /// Unchecked extrinsic type as expected by this runtime.
@@ -965,23 +952,23 @@ impl fp_self_contained::SelfContainedCall for RuntimeCall {
 		&self,
 		info: &Self::SignedInfo,
 		dispatch_info: &DispatchInfoOf<RuntimeCall>,
-		len: usize,
+		len: usize
 	) -> Option<TransactionValidity> {
 		match self {
 			RuntimeCall::Ethereum(call) => call.validate_self_contained(info, dispatch_info, len),
-			_ => None,
+			_ => None
 		}
 	}
 
 	fn apply_self_contained(
 		self,
-		info: Self::SignedInfo,
+		info: Self::SignedInfo
 	) -> Option<sp_runtime::DispatchResultWithInfo<PostDispatchInfoOf<Self>>> {
 		match self {
 			call @ RuntimeCall::Ethereum(pallet_ethereum::Call::transact { .. }) => Some(call.dispatch(
-				RuntimeOrigin::from(pallet_ethereum::RawOrigin::EthereumTransaction(info)),
+				RuntimeOrigin::from(pallet_ethereum::RawOrigin::EthereumTransaction(info))
 			)),
-			_ => None,
+			_ => None
 		}
 	}
 }
@@ -1029,15 +1016,13 @@ impl_runtime_apis! {
 			max_priority_fee_per_gas: Option<U256>,
 			nonce: Option<U256>,
 			estimate: bool,
-			access_list: Option<Vec<(H160, Vec<H256>)>>,
+			access_list: Option<Vec<(H160, Vec<H256>)>>
 		) -> Result<pallet_evm::CallInfo, sp_runtime::DispatchError> {
 			let config = if estimate {
 				let mut config = <Runtime as pallet_evm::Config>::config().clone();
 				config.estimate = true;
 				Some(config)
-			} else {
-				None
-			};
+			} else { None };
 
 			let gas_limit = gas_limit.min(u64::MAX.into());
 			let transaction_data = TransactionData::new(
@@ -1050,7 +1035,7 @@ impl_runtime_apis! {
 				max_priority_fee_per_gas,
 				value,
 				Some(<Runtime as pallet_evm::Config>::ChainId::get()),
-				access_list.clone().unwrap_or_default(),
+				access_list.clone().unwrap_or_default()
 			);
 			let (weight_limit, proof_size_base_cost) = pallet_ethereum::Pallet::<Runtime>::transaction_weight(&transaction_data);
 
@@ -1068,7 +1053,7 @@ impl_runtime_apis! {
 				true,
 				weight_limit,
 				proof_size_base_cost,
-				config.as_ref().unwrap_or(<Runtime as pallet_evm::Config>::config()),
+				config.as_ref().unwrap_or(<Runtime as pallet_evm::Config>::config())
 			).map_err(|err| err.error.into())
 		}
 		fn elasticity() -> Option<Permill> {
@@ -1160,7 +1145,7 @@ impl_runtime_apis! {
 		}
 
 		fn pending_block(
-			xts: Vec<<Block as BlockT>::Extrinsic>,
+			xts: Vec<<Block as BlockT>::Extrinsic>
 		) -> (Option<pallet_ethereum::Block>, Option<Vec<TransactionStatus>>) {
 			for ext in xts.into_iter() {
 				let _ = Executive::apply_extrinsic(ext);
@@ -1178,15 +1163,13 @@ impl_runtime_apis! {
 	impl fp_rpc::ConvertTransactionRuntimeApi<Block> for Runtime {
 		fn convert_transaction(transaction: EthereumTransaction) -> <Block as BlockT>::Extrinsic {
 			UncheckedExtrinsic::new_unsigned(
-				pallet_ethereum::Call::<Runtime>::transact { transaction }.into(),
+				pallet_ethereum::Call::<Runtime>::transact { transaction }.into()
 			)
 		}
 	}
 
 	impl sp_api::Core<Block> for Runtime {
-		fn version() -> RuntimeVersion {
-			VERSION
-		}
+		fn version() -> RuntimeVersion { VERSION }
 
 		fn execute_block(block: Block) {
 			Executive::execute_block(block);
@@ -1282,7 +1265,7 @@ impl_runtime_apis! {
 		fn submit_report_equivocation_unsigned_extrinsic(
 			_equivocation_proof: fg_primitives::EquivocationProof<
 				<Block as BlockT>::Hash,
-				NumberFor<Block>,
+				NumberFor<Block>
 			>,
 			_key_owner_proof: fg_primitives::OpaqueKeyOwnershipProof,
 		) -> Option<()> {

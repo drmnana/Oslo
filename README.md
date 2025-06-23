@@ -1,28 +1,6 @@
-# Substrate Node Template
-
-[![Try on playground](https://img.shields.io/badge/Playground-Node_Template-brightgreen?logo=Parity%20Substrate)](https://docs.substrate.io/playground/) [![Matrix](https://img.shields.io/matrix/substrate-technical:matrix.org)](https://matrix.to/#/#substrate-technical:matrix.org)
-
-A fresh FRAME-based [Substrate](https://www.substrate.io/) node, ready for hacking :rocket:
-
-## Getting Started
-
-Follow the steps below to get started with the Node Template, or get it up and running right from
-your browser in just a few clicks using
-the [Substrate Playground](https://docs.substrate.io/playground/) :hammer_and_wrench:
-
-### Using Nix
-
-Install [nix](https://nixos.org/) and optionally [direnv](https://github.com/direnv/direnv) and
-[lorri](https://github.com/nix-community/lorri) for a fully plug and play experience for setting up
-the development environment. To get all the correct dependencies activate direnv `direnv allow` and
-lorri `lorri shell`.
+# oslo-network node
 
 ### Rust Setup
-
-Use rustc 1.68.0-nightly (574b64a97 2022-12-31) version 
-```sh
-rustup toolchain install nightly-2022-12-31
-```
 
 First, complete the [basic Rust setup instructions](./docs/rust-setup.md).
 
@@ -41,6 +19,13 @@ without launching it:
 
 ```sh
 cargo build --release
+```
+This will usually take quite a while.
+If you're using a system with some spare cpu threads, you can speed up the process by adding
+`-j number_of_spare_threads` to the end of the command like this:
+
+```sh
+cargo build --release -j 4
 ```
 
 ### Embedded Docs

@@ -7,23 +7,13 @@ use scale_info::TypeInfo;
 use sha3::{Digest, Keccak256};
 use sp_core::{ecdsa, H160};
 
-//TODO Maybe this should be upstreamed into Frontier (And renamed accordingly) so that it can
-// be used in palletEVM as well. It may also need more traits such as AsRef, AsMut, etc like
-// AccountId32 has.
 
-/// The account type to be used in Moonbeam. It is a wrapper for 20 fixed bytes. We prefer to use
-/// a dedicated type to prevent using arbitrary 20 byte arrays were AccountIds are expected. With
-/// the introduction of the `scale-info` crate this benefit extends even to non-Rust tools like
-/// Polkadot JS.
 use serde::{Deserialize, Serialize};
 #[derive(Eq, PartialEq, Copy, Clone, Encode, Decode, TypeInfo, MaxEncodedLen, Default, PartialOrd, Ord, Serialize, Deserialize)]
 pub struct AccountId20(pub [u8; 20]);
 
 #[cfg(feature = "std")]
 impl std::fmt::Display for AccountId20 {
-	//TODO This is a pretty quck-n-dirty implementation. Perhaps we should add
-	// checksum casing here? I bet there is a crate for that.
-	// Maybe this one https://github.com/miguelmota/rust-eth-checksum
 	fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
 		write!(f, "{:?}", self.0)
 	}
@@ -63,9 +53,7 @@ impl Into<H160> for AccountId20 {
 impl std::str::FromStr for AccountId20 {
 	type Err = &'static str;
 	fn from_str(input: &str) -> Result<Self, Self::Err> {
-		H160::from_str(input)
-			.map(Into::into)
-			.map_err(|_| "invalid hex address.")
+		H160::from_str(input).map(Into::into).map_err(|_| "invalid hex address.")
 	}
 }
 
@@ -74,9 +62,7 @@ impl std::str::FromStr for AccountId20 {
 pub struct EthereumSignature(ecdsa::Signature);
 
 impl From<ecdsa::Signature> for EthereumSignature {
-	fn from(x: ecdsa::Signature) -> Self {
-		EthereumSignature(x)
-	}
+	fn from(x: ecdsa::Signature) -> Self { EthereumSignature(x) }
 }
 
 impl sp_runtime::traits::Verify for EthereumSignature {
@@ -86,8 +72,7 @@ impl sp_runtime::traits::Verify for EthereumSignature {
 		m.copy_from_slice(Keccak256::digest(msg.get()).as_slice());
 		match sp_io::crypto::secp256k1_ecdsa_recover(self.0.as_ref(), &m) {
 			Ok(pubkey) => {
-				AccountId20(H160::from_slice(&Keccak256::digest(&pubkey).as_slice()[12..32]).0)
-					== *signer
+				AccountId20(H160::from_slice(&Keccak256::digest(&pubkey).as_slice()[12..32]).0) == *signer
 			}
 			Err(sp_io::EcdsaVerifyError::BadRS) => {
 				log::error!(target: "evm", "Error recovering: Incorrect value of R or S");
@@ -106,9 +91,7 @@ impl sp_runtime::traits::Verify for EthereumSignature {
 }
 
 /// Public key for an Ethereum / Moonbeam compatible account
-#[derive(
-	Eq, PartialEq, Ord, PartialOrd, Clone, Encode, Decode, sp_core::RuntimeDebug, TypeInfo,
-)]
+#[derive(Eq, PartialEq, Ord, PartialOrd, Clone, Encode, Decode, sp_core::RuntimeDebug, TypeInfo)]
 #[cfg_attr(feature = "std", derive(serde::Serialize, serde::Deserialize))]
 pub struct EthereumSigner([u8; 20]);
 
@@ -129,7 +112,7 @@ impl From<ecdsa::Public> for EthereumSigner {
 	fn from(x: ecdsa::Public) -> Self {
 		let decompressed = libsecp256k1::PublicKey::parse_slice(
 			&x.0,
-			Some(libsecp256k1::PublicKeyFormat::Compressed),
+			Some(libsecp256k1::PublicKeyFormat::Compressed)
 		)
 		.expect("Wrong compressed public key provided")
 		.serialize();
@@ -163,12 +146,3 @@ impl<T: From<H160>> pallet_evm::AddressMapping<T> for IntoAddressMapping {
 		address.into()
 	}
 }
-
-
-/* pub struct IdentityCollator;
-impl<T> Convert<T, Option<T>> for IdentityCollator {
-	fn convert(t: T) -> Option<T> {
-		Some(t)
-	}
-}
-*/

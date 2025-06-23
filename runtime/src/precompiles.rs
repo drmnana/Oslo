@@ -12,14 +12,9 @@ impl<R> SubstratePrecompiles<R>
 where
 	R: pallet_evm::Config,
 {
-	pub fn new() -> Self {
-		Self(Default::default())
-	}
+	pub fn new() -> Self { Self(Default::default()) }
 	pub fn used_addresses() -> sp_std::vec::Vec<H160> {
-		sp_std::vec![1, 2, 3, 4, 5, 1024, 1025]
-			.into_iter()
-			.map(hash)
-			.collect()
+		sp_std::vec![1, 2, 3, 4, 5, 1024, 1025].into_iter().map(hash).collect()
 	}
 }
 impl<R> PrecompileSet for SubstratePrecompiles<R>
@@ -37,14 +32,14 @@ where
 			// Non-Frontier specific nor Ethereum precompiles :
 			a if a == hash(1024) => Some(Sha3FIPS256::execute(handle)),
 			a if a == hash(1025) => Some(ECRecoverPublicKey::execute(handle)),
-			_ => None,
+			_ => None
 		}
 	}
 
 	fn is_precompile(&self, address: H160, _gas: u64) -> IsPrecompileResult {
 		IsPrecompileResult::Answer {
 			is_precompile: Self::used_addresses().contains(&address),
-			extra_cost: 0,
+			extra_cost: 0
 		}
 	}
 }
