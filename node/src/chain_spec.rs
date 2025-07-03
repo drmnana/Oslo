@@ -3,15 +3,15 @@ use sp_consensus_aura::sr25519::AuthorityId as AuraId;
 use sp_consensus_grandpa::AuthorityId as GrandpaId;
 use pallet_im_online::sr25519::AuthorityId as ImOnlineId;
 use sp_core::{Pair, Public, H256, sr25519, ed25519, crypto::{Ss58Codec, AccountId32}};
-use sc_network::{config::MultiaddrWithPeerId, PeerId, PublicKey};
+use sc_network::{config::MultiaddrWithPeerId, PeerId};
 use oslo_network_runtime::{currency::*, opaque::SessionKeys, WASM_BINARY,
-	CouncilConfig, DemocracyConfig, RuntimeGenesisConfig, ValidatorSetConfig,
+	CouncilConfig, DemocracyConfig, ValidatorSetConfig,
 	TechnicalCommitteeConfig, TreasuryConfig, TransactionPaymentConfig,
 	EVMConfig, EthereumConfig, BaseFeeConfig, ImOnlineConfig, BalancesConfig,
 	GrandpaConfig, AuraConfig, SudoConfig, SystemConfig, SessionConfig, AccountId}; 
 use std::{default::Default};
 /// Specialized `ChainSpec`. This is a specialization of the general Substrate ChainSpec type.
-pub type ChainSpec = sc_service::GenericChainSpec<RuntimeGenesisConfig>;
+pub type ChainSpec = sc_service::GenericChainSpec;
 
 /// Helper function to generate a crypto pair from seed
 fn get_from_secret<TPublic: Public>(seed: &str) -> <TPublic::Pair as Pair>::Public {
@@ -43,20 +43,18 @@ const DOROTHY: &str = "0x8cBcD18e730eFD8c9C26e6791455CD100477DAEe";
 /// Begin Testnet Addresses
 const JOSEY: &str = "0xd1fd49da79e79af0Ac5A0C4c1658E9fE1cb076E6";
 
-const TESTNETNODE1AURA: &str = "5FxfxpKVcydFo3UdGyGxVPHLF8CdCZ7KMYvaeYrakKe8RPHw";
-const TESTNETNODE1AURAHEX: &str = "0xac5715ea68463a03cf360fcfc79b95435897f9c7252efc5315c3c3c4eab7013c";
-const TESTNETNODE1GRANDPA: &str = "5GoDFkeEL5sYubk7XmWk1a148yS3nrZasWgCPR3sXVNYgMjf";
-const TESTNETNODE1GRANDPAHEX: &str = "0xd15c340c69a3a09f1472b8c9eb3a3e8bf9e3abe50f3ef36cb96908e480c5c9fb";
-const TESTNETNODE1H160: &str = "0xd15c340c69a3a09f1472b8c9eb3a3e8bf9e3abe5";
+const TESTNETNODE1AURA: &str = "5EP15U8PitEa8N2qrKaCrafZzyp3RsU59owdv5mWhWtSM1Mc";
+const TESTNETNODE1AURAHEX: &str = "0x666cdaab93a8fb6ffba8457fe9d6a5ff9704d3c359403cbad7c9f633a714c74f";
+const TESTNETNODE1GRANDPA: &str = "5DDAPHxEebdeaKUysxudLHteRkUXdmi14koJANS2DsanZyoi";
+const TESTNETNODE1GRANDPAHEX: &str = "0x32af7f7772b33a64c0382ddeae52c0f33bae7df2c7f2d91a3246ca3e49cdcbd2";
+const TESTNETNODE1H160: &str = "0x32af7f7772b33a64c0382ddeae52c0f33bae7df2";
 
-
-const TESTNETNODE2AURA: &str = "5EP15U8PitEa8N2qrKaCrafZzyp3RsU59owdv5mWhWtSM1Mc";
-const TESTNETNODE2AURAHEX: &str = "0x666cdaab93a8fb6ffba8457fe9d6a5ff9704d3c359403cbad7c9f633a714c74f";
-const TESTNETNODE2GRANDPA: &str = "5DDAPHxEebdeaKUysxudLHteRkUXdmi14koJANS2DsanZyoi";
-const TESTNETNODE2GRANDPAHEX: &str = "0x32af7f7772b33a64c0382ddeae52c0f33bae7df2c7f2d91a3246ca3e49cdcbd2";
-const TESTNETNODE2H160: &str = "0x32af7f7772b33a64c0382ddeae52c0f33bae7df2";
-///End Testnet Addresses
-
+//PeerId 12D3KooWCreP3P122JcyiczGqt4pBZqyNX7w6YcNhtRVMD7mzB74
+const TESTNETNODE2AURA: &str = "5DUNUSVj3fN9iWxaqSbM7bmdecnRUu9Jxs4Uq5BwqFQbENbo";
+const TESTNETNODE2AURAHEX: &str = "0x3e48df9289ff7f5fc1d7c3b61db8a61fd77d75a5b02c0b1d68fa4a5fc9ec5002";
+const TESTNETNODE2GRANDPA: &str = "5D5v4ND8soXKD241Szoswcv6aBY9XbemgxJSE3DB8jVsAdxZ";
+const TESTNETNODE2GRANDPAHEX: &str = "0x2d288dab0ab0edbbca2bdb741ec430b4cc6e8ba14683051e7acf16721d44bd2f";
+const TESTNETNODE2H160: &str = "0x2d288dab0ab0edbbca2bdb741ec430b4cc6e8ba1";
 
 ///Begin Mainnet Addresses
 const MAINNETSUDONODEAURA: &str = "5HTJDxz8GCjFtaYj5HWffMYBFxhK5Sk7H9LicEATkcznYEEr";
@@ -86,27 +84,35 @@ const MAINNETNODE3GRANDPA: &str = "5Gkt96oLmHWKeK7cAvq9gfegQpcDpDs63yX8csEw9BcFc
 const MAINNETNODE3GRANDPAHEX: &str = "0xcf955ddfe3874a306fc9fa4be2983e3157e24be9da722ba3477d6413ed39ab4f";
 const MAINNETNODE3H160: &str = "0xcf955ddfe3874a306fc9fa4be2983e3157e24be9";
 
-//reused testnet node 2
-const MAINNETNODE4AURA: &str = "5EP15U8PitEa8N2qrKaCrafZzyp3RsU59owdv5mWhWtSM1Mc";
-const MAINNETNODE4AURAHEX: &str = "0x666cdaab93a8fb6ffba8457fe9d6a5ff9704d3c359403cbad7c9f633a714c74f";
-const MAINNETNODE4GRANDPA: &str = "5DDAPHxEebdeaKUysxudLHteRkUXdmi14koJANS2DsanZyoi";
-const MAINNETNODE4GRANDPAHEX: &str = "0x32af7f7772b33a64c0382ddeae52c0f33bae7df2c7f2d91a3246ca3e49cdcbd2";
-const MAINNETNODE4H160: &str = "0x32af7f7772b33a64c0382ddeae52c0f33bae7df2";
-///End Mainnet Addresses
+//PeerId 12D3KooWCreP3P122JcyiczGqt4pBZqyNX7w6YcNhtRVMD7mzB74
+const MAINNETNODE4AURA: &str = "5DUNUSVj3fN9iWxaqSbM7bmdecnRUu9Jxs4Uq5BwqFQbENbo";
+const MAINNETNODE4AURAHEX: &str = "0x3e48df9289ff7f5fc1d7c3b61db8a61fd77d75a5b02c0b1d68fa4a5fc9ec5002";
+const MAINNETNODE4GRANDPA: &str = "5D5v4ND8soXKD241Szoswcv6aBY9XbemgxJSE3DB8jVsAdxZ";
+const MAINNETNODE4GRANDPAHEX: &str = "0x2d288dab0ab0edbbca2bdb741ec430b4cc6e8ba14683051e7acf16721d44bd2f";
+const MAINNETNODE4H160: &str = "0x2d288dab0ab0edbbca2bdb741ec430b4cc6e8ba1";
 
+
+//PeerId 12D3KooWDcXdEcTyqePJYCKvduX6vt3qLhjQWieg5FUkPJmkJML2
+const MAINNETNODE5AURA: &str = "5GuoZBbAjUQxJyjAXHiQ4yXDHFSJY6Z9fQAYuwhrvbX5NcWi";
+const MAINNETNODE5AURAHEX: &str = "0xd663243eb04c28df055ff070abebcc7c4705b5a798b032521bc4ce0a91388b68";
+const MAINNETNODE5GRANDPA: &str = "5DLeyjCzSB7o1DfbhZmy5hNpG2FJPyMqd4XSz5w1A8276YKA";
+const MAINNETNODE5GRANDPAHEX: &str = "0x38667884513ea7b233411b2d5b3e9fef3bdce8b052ee595492af9abae441f337";
+const MAINNETNODE5H160: &str = "0x38667884513ea7b233411b2d5b3e9fef3bdce8b0";
 
 pub fn public_config() -> Result<ChainSpec, String> {
-	let mainnetsudonodepeerid: PeerId = PublicKey::from(sc_network::config::ed25519::PublicKey::try_from_bytes(AccountId32::from_ss58check_with_version(MAINNETSUDONODEGRANDPA).unwrap().0.as_ref()).unwrap()).to_peer_id();
-	let mainnetnode1peerid: PeerId = PublicKey::from(sc_network::config::ed25519::PublicKey::try_from_bytes(AccountId32::from_ss58check_with_version(MAINNETNODE1GRANDPA).unwrap().0.as_ref()).unwrap()).to_peer_id();
-	let mainnetnode2peerid: PeerId = PublicKey::from(sc_network::config::ed25519::PublicKey::try_from_bytes(AccountId32::from_ss58check_with_version(MAINNETNODE2GRANDPA).unwrap().0.as_ref()).unwrap()).to_peer_id();
-	let mainnetnode3peerid: PeerId = PublicKey::from(sc_network::config::ed25519::PublicKey::try_from_bytes(AccountId32::from_ss58check_with_version(MAINNETNODE3GRANDPA).unwrap().0.as_ref()).unwrap()).to_peer_id();
-	let mainnetnode4peerid: PeerId = PublicKey::from(sc_network::config::ed25519::PublicKey::try_from_bytes(AccountId32::from_ss58check_with_version(MAINNETNODE4GRANDPA).unwrap().0.as_ref()).unwrap()).to_peer_id();
+	let mainnetsudonodepeerid: PeerId = sc_network::config::ed25519::PublicKey::try_from_bytes(AccountId32::from_ss58check_with_version(MAINNETSUDONODEGRANDPA).unwrap().0.as_ref()).unwrap().to_peer_id().into();
+	let mainnetnode1peerid: PeerId = sc_network::config::ed25519::PublicKey::try_from_bytes(AccountId32::from_ss58check_with_version(MAINNETNODE1GRANDPA).unwrap().0.as_ref()).unwrap().to_peer_id().into();
+	let mainnetnode2peerid: PeerId = sc_network::config::ed25519::PublicKey::try_from_bytes(AccountId32::from_ss58check_with_version(MAINNETNODE2GRANDPA).unwrap().0.as_ref()).unwrap().to_peer_id().into();
+	let mainnetnode3peerid: PeerId = sc_network::config::ed25519::PublicKey::try_from_bytes(AccountId32::from_ss58check_with_version(MAINNETNODE3GRANDPA).unwrap().0.as_ref()).unwrap().to_peer_id().into();
+	let mainnetnode4peerid: PeerId = sc_network::config::ed25519::PublicKey::try_from_bytes(AccountId32::from_ss58check_with_version(MAINNETNODE4GRANDPA).unwrap().0.as_ref()).unwrap().to_peer_id().into();
+	let mainnetnode5peerid: PeerId = sc_network::config::ed25519::PublicKey::try_from_bytes(AccountId32::from_ss58check_with_version(MAINNETNODE5GRANDPA).unwrap().0.as_ref()).unwrap().to_peer_id().into();
 	let mainnet_sudo_node: MultiaddrWithPeerId = ("/dns/sudonode.oslocrypto.com/tcp/37954/p2p/".to_owned() + &mainnetsudonodepeerid.to_string()).parse().unwrap();
 	let mainnet_boot_node_1: MultiaddrWithPeerId = ("/dns/node1.oslocrypto.com/tcp/37954/p2p/".to_owned() + &mainnetnode1peerid.to_string()).parse().unwrap();
 	let mainnet_boot_node_2: MultiaddrWithPeerId = ("/dns/node2.oslocrypto.com/tcp/37954/p2p/".to_owned() + &mainnetnode2peerid.to_string()).parse().unwrap();
 	let mainnet_boot_node_3: MultiaddrWithPeerId = ("/dns/node3.oslocrypto.com/tcp/37954/p2p/".to_owned() + &mainnetnode3peerid.to_string()).parse().unwrap();
 	let mainnet_boot_node_4: MultiaddrWithPeerId = ("/dns/node4.oslocrypto.com/tcp/37954/p2p/".to_owned() + &mainnetnode4peerid.to_string()).parse().unwrap();
-	let mainnet_boot_nodes_vec: Vec<MultiaddrWithPeerId> = vec![mainnet_sudo_node, mainnet_boot_node_1, mainnet_boot_node_2, mainnet_boot_node_3, mainnet_boot_node_4];
+	let mainnet_boot_node_5: MultiaddrWithPeerId = ("/dns/node5.oslocrypto.com/tcp/37954/p2p/".to_owned() + &mainnetnode5peerid.to_string()).parse().unwrap();
+	let mainnet_boot_nodes_vec: Vec<MultiaddrWithPeerId> = vec![mainnet_sudo_node, mainnet_boot_node_1, mainnet_boot_node_2, mainnet_boot_node_3, mainnet_boot_node_4, mainnet_boot_node_5];
 	Ok(ChainSpec::builder(WASM_BINARY.expect("WASM not available"), Default::default()).with_boot_nodes(mainnet_boot_nodes_vec).with_name("Oslo-Network-Mainnet")
 		.with_protocol_id("Oslo-Network-Mainnet").with_id("Oslo-Network_Mainnet").with_chain_type(ChainType::Live).with_properties(chainspec_properties())
 		.with_genesis_config_patch(mainnet_genesis(
@@ -140,6 +146,12 @@ pub fn public_config() -> Result<ChainSpec, String> {
 					sr25519::Public::from_h256(MAINNETNODE4AURAHEX.parse::<H256>().unwrap()).into(),
 					ed25519::Public::from_h256(MAINNETNODE4GRANDPAHEX.parse::<H256>().unwrap()).into(),
 					sr25519::Public::from_raw(<[u8; 32]>::try_from(AccountId32::from_ss58check_with_version(MAINNETNODE4AURA).unwrap().0.as_ref()).unwrap()).into()
+				),
+				(
+					array_bytes::hex_n_into_unchecked(MAINNETNODE5H160),
+					sr25519::Public::from_h256(MAINNETNODE5AURAHEX.parse::<H256>().unwrap()).into(),
+					ed25519::Public::from_h256(MAINNETNODE5GRANDPAHEX.parse::<H256>().unwrap()).into(),
+					sr25519::Public::from_raw(<[u8; 32]>::try_from(AccountId32::from_ss58check_with_version(MAINNETNODE5AURA).unwrap().0.as_ref()).unwrap()).into()
 				)
 			],
 			// Sudo account
@@ -150,13 +162,13 @@ pub fn public_config() -> Result<ChainSpec, String> {
 				array_bytes::hex_n_into_unchecked(MAINNETNODE1H160)
 			],
 			true
-		)).build())
+	)).build())
 }
 
 pub fn testnet_config() -> Result<ChainSpec, String> {
-	let testnetnode1peerid: PeerId = PublicKey::from(sc_network::config::ed25519::PublicKey::try_from_bytes(AccountId32::from_ss58check_with_version(TESTNETNODE1GRANDPA).unwrap().0.as_ref()).unwrap()).to_peer_id();
-	let testnetnode2peerid: PeerId = PublicKey::from(sc_network::config::ed25519::PublicKey::try_from_bytes(AccountId32::from_ss58check_with_version(TESTNETNODE2GRANDPA).unwrap().0.as_ref()).unwrap()).to_peer_id();
-	let boot_node_1: MultiaddrWithPeerId = ("/dns/testnetnode1.oslocrypto.com/tcp/30334/p2p/".to_owned() + &testnetnode1peerid.to_string()).parse().unwrap();
+	let testnetnode1peerid: PeerId = sc_network::config::ed25519::PublicKey::try_from_bytes(AccountId32::from_ss58check_with_version(TESTNETNODE1GRANDPA).unwrap().0.as_ref()).unwrap().to_peer_id().into();
+	let testnetnode2peerid: PeerId = sc_network::config::ed25519::PublicKey::try_from_bytes(AccountId32::from_ss58check_with_version(TESTNETNODE2GRANDPA).unwrap().0.as_ref()).unwrap().to_peer_id().into();
+	let boot_node_1: MultiaddrWithPeerId = ("/dns/testnetnode1.oslocrypto.com/tcp/30333/p2p/".to_owned() + &testnetnode1peerid.to_string()).parse().unwrap();
 	let boot_node_2: MultiaddrWithPeerId = ("/dns/testnetnode2.oslocrypto.com/tcp/30333/p2p/".to_owned() + &testnetnode2peerid.to_string()).parse().unwrap();
 	let boot_nodes_vec: Vec<MultiaddrWithPeerId> = vec![boot_node_1, boot_node_2];
 	Ok(ChainSpec::builder(WASM_BINARY.expect("WASM not available"), Default::default()).with_boot_nodes(boot_nodes_vec)

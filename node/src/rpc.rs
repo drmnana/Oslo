@@ -8,10 +8,10 @@
 use std::sync::Arc;
 use std::collections::BTreeMap;
 use jsonrpsee::RpcModule;
-use oslo_network_runtime::{AccountId, Balance, Index, Hash};
+use oslo_network_runtime::{AccountId, Balance, Index};
 use sc_client_api::{backend::{Backend, StorageProvider, StateBackend}, client::BlockchainEvents, AuxStore, UsageProvider};
-use sc_network::NetworkService;
 use sc_network_sync::SyncingService;
+use sc_network::service::traits::NetworkService;
 use sc_transaction_pool::{ChainApi, Pool};
 use sc_transaction_pool_api::TransactionPool;
 use sp_consensus_aura::{AuraApi, sr25519::AuthorityId as AuraId};
@@ -19,17 +19,15 @@ use sp_inherents::CreateInherentDataProviders;
 use sp_api::{ProvideRuntimeApi, CallApiAt};
 use sp_block_builder::BlockBuilder;
 use sp_blockchain::{Error as BlockChainError, HeaderBackend, HeaderMetadata};
-use fc_rpc::{EthBlockDataCacheTask, OverrideHandle, RuntimeApiStorageOverride, SchemaV1Override,
-	SchemaV2Override, SchemaV3Override, StorageOverride, pending::AuraConsensusDataProvider, EthApiServer};
+use fc_rpc::{EthBlockDataCacheTask, StorageOverrideHandler, pending::AuraConsensusDataProvider, EthApiServer};
 use fc_rpc_core::types::{FeeHistoryCache, FeeHistoryCacheLimit};
-use fp_storage::EthereumStorageSchema;
 use fp_rpc::{ConvertTransaction, ConvertTransactionRuntimeApi, EthereumRuntimeRPCApi};
 use sp_core::H256;
 pub use sc_rpc_api::DenyUnsafe;
 use sp_runtime::traits::{BlakeTwo256, Block as BlockT};
 
 /// EVM overrides
-pub fn overrides_handle<B, C, BE>(client: Arc<C>) -> Arc<OverrideHandle<B>>
+pub fn overrides_handle<B, C, BE>(client: Arc<C>) -> Arc<StorageOverrideHandler<B, C, BE>>
 	where
 		C: ProvideRuntimeApi<B> + StorageProvider<B, BE> + AuxStore,
 		C: HeaderBackend<B> + HeaderMetadata<B, Error=BlockChainError>,
@@ -39,24 +37,8 @@ pub fn overrides_handle<B, C, BE>(client: Arc<C>) -> Arc<OverrideHandle<B>>
 		BE::State: StateBackend<BlakeTwo256>,
 		B: BlockT
 {
-	let mut overrides_map = BTreeMap::new();
-	overrides_map.insert(
-		EthereumStorageSchema::V1,
-		Box::new(SchemaV1Override::new(client.clone())) as Box<(dyn StorageOverride<B> + 'static)>
-	);
-	overrides_map.insert(
-		EthereumStorageSchema::V2,
-		Box::new(SchemaV2Override::new(client.clone())) as Box<(dyn StorageOverride<B> + 'static)>
-	);
-	overrides_map.insert(
-		EthereumStorageSchema::V3,
-		Box::new(SchemaV3Override::new(client.clone())) as Box<(dyn StorageOverride<B> + 'static)>
-	);
 
-	Arc::new(OverrideHandle {
-		schemas: overrides_map,
-		fallback: Box::new(RuntimeApiStorageOverride::new(client))
-	})
+	Arc::new(StorageOverrideHandler::new(client.clone()))
 }
 
 
@@ -76,7 +58,7 @@ pub struct FullDeps<B: BlockT, C, P, A: ChainApi, CT, CIDP> {
 	/// The Node authority flag
 	pub is_authority: bool,
 	/// Network service
-	pub network: Arc<NetworkService<B, Hash>>,
+	pub network: Arc<dyn NetworkService>,
 	/// Chain syncing service
 	pub sync: Arc<SyncingService<B>>,
 	/// Frontier Backend.
@@ -103,7 +85,7 @@ impl<B, C, BE> fc_rpc::EthConfig<B, C> for DefaultEthConfig<C, BE>
 where
 	B: BlockT,
 	C: StorageProvider<B, BE> + Sync + Send + 'static,
-	BE: Backend<B> + 'static,
+	BE: Backend<B> + 'static
 {
 	///Why this is necessary
 	type EstimateGasAdapter = ();
@@ -152,16 +134,10 @@ pub fn create_full<B, C, BE, P, A, CT, CIDP>(
 		pending_create_inherent_data_providers
 	} = deps;
 	// We won't use the override feature
-	let overrides = Arc::new(OverrideHandle {
-		schemas: BTreeMap::new(),
-		fallback: Box::new(RuntimeApiStorageOverride::new(client.clone())),
-	});
+	let overrides = Arc::new(StorageOverrideHandler::new(client.clone()));
 
 	// Nor any signers
 	let signers = Vec::new();
-
-	// Limit the number of queryable logs.
-	// let max_past_logs: u32 = 1024;
 	
 	module.merge(System::new(client.clone(), pool.clone(), deny_unsafe).into_rpc())?;
 	module.merge(TransactionPayment::new(client.clone()).into_rpc())?;

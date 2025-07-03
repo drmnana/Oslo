@@ -1,19 +1,16 @@
 use crate::{
 	// benchmarking::{inherent_benchmark_data, RemarkBuilder, TransferKeepAliveBuilder},
-	chain_spec,
-	cli::{Cli, Subcommand},
-	service,
+	chain_spec, cli::{Cli, Subcommand}, service
 };
 use frame_benchmarking_cli::{BenchmarkCmd, SUBSTRATE_REFERENCE_HARDWARE};
-use oslo_network_runtime::Block;
 use sc_cli::SubstrateCli;
 use sc_service::PartialComponents;
-// use sp_keyring::Sr25519Keyring;
 use service::frontier_database_dir;
+use oslo_network_runtime::{Block};
 
 impl SubstrateCli for Cli {
 	fn impl_name() -> String {
-		"Substrate Node".into()
+		"oslo-network".into()
 	}
 
 	fn impl_version() -> String {
@@ -29,20 +26,19 @@ impl SubstrateCli for Cli {
 	}
 
 	fn support_url() -> String {
-		"support.anonymous.an".into()
+		"oslocrypto.com".into()
 	}
 
 	fn copyright_start_year() -> i32 {
 		2017
 	}
 
-	fn load_spec(&self, id: &str) -> Result<Box<dyn sc_service::ChainSpec>, String> {
+	fn load_spec(&self, id: &str) -> Result<Box<dyn sc_cli::ChainSpec>, String> {
 		Ok(match id {
 			"dev" => Box::new(chain_spec::development_config()?),
 			"" | "testnet" => Box::new(chain_spec::testnet_config()?),
 			"live" => Box::new(chain_spec::public_config()?),
-			path =>
-				Box::new(chain_spec::ChainSpec::from_json_file(std::path::PathBuf::from(path))?),
+			path => Box::new(chain_spec::ChainSpec::from_json_file(std::path::PathBuf::from(path))?)
 		})
 	}
 }
@@ -52,20 +48,20 @@ pub fn run() -> sc_cli::Result<()> {
 	let cli = Cli::from_args();
 
 	match &cli.subcommand {
-		Some(Subcommand::Key(cmd)) => cmd.run(&cli),
-		Some(Subcommand::BuildSpec(cmd)) => {
+	Some(Subcommand::Key(cmd)) => cmd.run(&cli),
+    Some(Subcommand::BuildSpec(cmd)) => {
 			let runner = cli.create_runner(cmd)?;
 			runner.sync_run(|config| cmd.run(config.chain_spec, config.network))
 		},
-		Some(Subcommand::CheckBlock(cmd)) => {
+    Some(Subcommand::CheckBlock(cmd)) => {
 			let runner = cli.create_runner(cmd)?;
 			runner.async_run(|config| {
-				let PartialComponents { client, task_manager, import_queue, .. } =
-					service::new_partial(&config)?;
+				let PartialComponents { client, task_manager, import_queue, .. } = 
+				    service::new_partial(&config)?;
 				Ok((cmd.run(client, import_queue), task_manager))
 			})
 		},
-		Some(Subcommand::ExportBlocks(cmd)) => {
+    Some(Subcommand::ExportBlocks(cmd)) => {
 			let runner = cli.create_runner(cmd)?;
 			runner.async_run(|config| {
 				let PartialComponents { client, task_manager, .. } = service::new_partial(&config)?;
@@ -75,33 +71,31 @@ pub fn run() -> sc_cli::Result<()> {
 				}), task_manager))
 			})
 		},
-		Some(Subcommand::ExportState(cmd)) => {
+    Some(Subcommand::ExportState(cmd)) => {
 			let runner = cli.create_runner(cmd)?;
 			runner.async_run(|config| {
 				let PartialComponents { client, task_manager, .. } = service::new_partial(&config)?;
 				Ok((cmd.run(client, config.chain_spec), task_manager))
 			})
 		},
-		Some(Subcommand::ImportBlocks(cmd)) => {
+    Some(Subcommand::ImportBlocks(cmd)) => {
 			let runner = cli.create_runner(cmd)?;
 			runner.async_run(|config| {
-				let PartialComponents { client, task_manager, import_queue, .. } =
-					service::new_partial(&config)?;
+				let PartialComponents { client, task_manager, import_queue, .. } = service::new_partial(&config)?;
 				Ok((cmd.run(client, import_queue), task_manager))
 			})
 		},
-		Some(Subcommand::PurgeChain(cmd)) => {
+    Some(Subcommand::PurgeChain(cmd)) => {
 			let runner = cli.create_runner(cmd)?;
 			runner.sync_run(|config| cmd.run(fc_db::kv::DatabaseSource::RocksDb {
 				path: frontier_database_dir(&config),
 				cache_size: 0
 			}))
 		},
-		Some(Subcommand::Revert(cmd)) => {
+    Some(Subcommand::Revert(cmd)) => {
 			let runner = cli.create_runner(cmd)?;
 			runner.async_run(|config| {
-				let PartialComponents { client, task_manager, backend, .. } =
-					service::new_partial(&config)?;
+				let PartialComponents { client, task_manager, backend, .. } = service::new_partial(&config)?;
 				let aux_revert = Box::new(|client, _, blocks| {
 					sc_consensus_grandpa::revert(client, blocks)?;
 					Ok(())
@@ -109,7 +103,7 @@ pub fn run() -> sc_cli::Result<()> {
 				Ok((cmd.run(client, backend, Some(aux_revert)), task_manager))
 			})
 		},
-		Some(Subcommand::Benchmark(cmd)) => {
+    Some(Subcommand::Benchmark(cmd)) => {
 			let runner = cli.create_runner(cmd)?;
 
 			runner.sync_run(|config| {
@@ -118,15 +112,11 @@ pub fn run() -> sc_cli::Result<()> {
 				match cmd {
 					
 					BenchmarkCmd::Pallet(cmd) => {
-						
 						if !cfg!(feature = "runtime-benchmarks") {
-							return Err(
-								"Runtime benchmarking wasn't enabled when building the node. \
-							You can enable it with `--features runtime-benchmarks`."
-									.into(),
-							)
+							return Err("Runtime benchmarking wasn't enabled when building the node. \
+							You can enable it with `--features runtime-benchmarks`.".into())
 						}
-						cmd.run::<sp_runtime::traits::BlakeTwo256, ()>(config)
+						cmd.run_with_spec::<sp_runtime::traits::BlakeTwo256, ()>(Some(config.chain_spec))
 					},
 					BenchmarkCmd::Block(cmd) => {
 						let PartialComponents { client, .. } = service::new_partial(&config)?;
@@ -134,8 +124,7 @@ pub fn run() -> sc_cli::Result<()> {
 					},
 					#[cfg(not(feature = "runtime-benchmarks"))]
 					BenchmarkCmd::Storage(_) => Err(
-						"Storage benchmarking can be enabled with `--features runtime-benchmarks`."
-							.into(),
+						"Storage benchmarking can be enabled with `--features runtime-benchmarks`.".into()
 					),
 					#[cfg(feature = "runtime-benchmarks")]
 					BenchmarkCmd::Storage(cmd) => {
@@ -177,17 +166,12 @@ pub fn run() -> sc_cli::Result<()> {
 					BenchmarkCmd::Machine(cmd) => cmd.run(&config, SUBSTRATE_REFERENCE_HARDWARE.clone())
 				}
 			})
-		},
-		#[cfg(feature = "try-runtime")]
-		Some(Subcommand::TryRuntime(_)) => Err(try_runtime_cli::DEPRECATION_NOTICE.into()),
-		#[cfg(not(feature = "try-runtime"))]
-		Some(Subcommand::TryRuntime) => Err("TryRuntime wasn't enabled when building the node. \
-				You can enable it with `--features try-runtime`.".into()),
-		Some(Subcommand::ChainInfo(cmd)) => {
+		}
+    Some(Subcommand::ChainInfo(cmd)) => {
 			let runner = cli.create_runner(cmd)?;
 			runner.sync_run(|config| cmd.run::<Block>(&config))
 		},
-		None => {
+	None => {
 			let runner = cli.create_runner(&cli.run)?;
 			runner.run_node_until_exit(|config| async move {
 				service::new_full(config).map_err(sc_cli::Error::Service)

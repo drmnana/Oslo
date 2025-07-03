@@ -25,12 +25,15 @@ automatically update and restart the pi daily
 0 22 * * * sudo apt update && sudo apt upgrade -y && sudo reboot
 
 but replace 22 with the number of an hour(utc time) where you expect the network to not have much traffic. It should only be down for a minute at a time. Save this file with ctrl+o and exit nano with
-ctrl+x. By default a Pi will not run automatic filesystem repairs on boot, but we can greatly improve the reliability of the pi by enabling them. You can open the config file for this with 
+ctrl+x. 
+By default a Pi will not run automatic filesystem repairs on boot, but we can greatly improve the reliability of the pi by enabling them. You can open the config file for this with 
 sudo nano /boot/firmware/cmdline.txt
 
 You should see one line of text, in that line find where it says fsck.repair=yes. Right after that, add "fsck.mode=force" without the quotes but keeping a space between it and the other parameters.
 Once again, save the file with ctrl+o and exit with ctrl+x. Now the file system should automatically attempt to repair small corruptions when the Pi boots and help prevent larger corruptions from 
-happening at all. Now run 
+happening at all.
+
+Now run 
 sudo reboot
 
 to reboot the Pi since many updates and configurations don't apply until the Pi restarts. 
