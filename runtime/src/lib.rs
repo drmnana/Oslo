@@ -87,10 +87,10 @@ pub type DigestItem = generic::DigestItem;
 pub mod currency {
 	use super::Balance;
 
-	pub const WEI: Balance = 1;
-	pub const MILLIOSLO: Balance = 1_000;
-	pub const OSLO: Balance = 1_000_000;
-	pub const KILOOSLO: Balance = 1_000_000_000;
+	pub const WEI: Balance = 1_000;
+	pub const MILLIOSLO: Balance = 1_000_000;
+	pub const OSLO: Balance = 1_000_000_000;
+	pub const KILOOSLO: Balance = 1_000_000_000_000;
 
 	pub const TRANSACTION_BYTE_FEE: Balance = 1 * WEI;
 	pub const STORAGE_BYTE_FEE: Balance = 10 * WEI;
