@@ -44,27 +44,31 @@ Enter the username and password for the pi then you should have remote access to
 a strong password. Now try RealVNC again with the username "root" and the password you just entered. 
 
 Now we're ready to start setting up substrate. First we need to install prerequisites starting with the command on the next line
-sudo apt install -y build-essential clang curl git make libssl-dev llvm libudev-dev protobuf-compiler
+sudo apt install -y build-essential clang curl git make libssl-dev llvm libudev-dev protobuf-compiler xxd jq
 
 ------NOTE------
 The version of Substrate that Oslo is currently based on does not seem to work with rust version 1.87
-Now run these commands to install rust
+I was able to compile it successfully with rust 1.81.0, so that will be used here.
 
+Now run this command to install rust
 curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
 
 and when prompted press enter to keep the standard installation options, then 
 source $HOME/.cargo/env
 
-to finish installing the stable version of rust. We'll also need the nightly version of rust which can be installed with 
-rustup update nightly
+Install rust 1.81.0 with
+rustup toolchain install 1.81.0
 
-then
-rustup target add wasm32-unknown-unknown --toolchain nightly; rustup component add rust-src --toolchain nightly-aarch64-unknown-linux-gnu
+Switch to this version using 
+rustup default 1.81.0
+
+Add the necessary platform specific libraries with
+rustup target add wasm32-unknown-unknown && rustup component add rust-src --toolchain 1.81.0-aarch64-unknown-linux-gnu
 
 and we're done installing the prerequisites for substrate.
 
 Download the Oslo source with
-git clone https://github.com/drmnana/Oslo.git; cd Oslo;
+git clone https://github.com/drmnana/Oslo.git && cd Oslo
 
 Compile the node(this will take a while) with 
 cargo build --release -j4
@@ -80,35 +84,25 @@ Now you also need to derive the Ed25519 sudo key using
 but replacing the secret phrase with the one generated above.
 Save these keys as well, but again sending me the public hex key and public SS58 key.
 
-Now we need to add these keys to the nodes keystore
-target/release/oslo-network key insert --base-path ~/.local/share/oslo-network --chain=OsloMainnetChainSpec.json --scheme Ed25519 --suri "bottom drive obey lake curtain smoke basket hold race lonely fit walk" --key-type gran
-target/release/oslo-network key insert --base-path ~/.local/share/oslo-network --chain=OsloMainnetChainSpec.json --scheme Sr25519 --suri "bottom drive obey lake curtain smoke basket hold race lonely fit walk" --key-type aura
-target/release/oslo-network key insert --base-path ~/.local/share/oslo-network --chain=OsloMainnetChainSpec.json --scheme Sr25519 --suri "bottom drive obey lake curtain smoke basket hold race lonely fit walk" --key-type imon
-but again replacing the secret phrase for all three commands with the secret phrase you generated earlier.
+Now we need to add these keys to the nodes keystore. In my experience this is tedious and error prone, so I made a script to automate it.
+Mark the files in the scripts directory as executable with
+chmod +x ./scripts/* 
 
-There's no substrate command to save the node-key, but we can do it manually. Make the directory for the node-key with
-mkdir ~/.local/share/oslo-network/chains/Oslo-Network_Mainnet/network
+Now insert the key with
+./scripts/insert-universal-node-key.sh "pig giraffe ceiling enter weird liar orange decline behind total despair fly" ./OsloMainnetChainSpec.json
 
-Now open the node-key file with
-nano ~/.local/share/oslo-network/chains/Oslo-Network_Mainnet/network/secret_ed25519_hex
+but again replacing the secret phrase with the one you generated earlier.
 
-Paste the ed25519 secret seed from earlier into this file(without the 0x at the beggining)
-Save the file with ctrl+o, then exit the file with ctrl+x
 
-For substrate to decode the node-key, we need to convert the file from hex to binary. We can install the converter with
-sudo apt install xxd
-
-And convert the file with 
-xxd -r -p -c 0 ~/.local/share/oslo-network/chains/Oslo-Network_Mainnet/network/secret_ed25519_hex ~/.local/share/oslo-network/chains/Oslo-Network_Mainnet/network/secret_ed25519
-
-The information in this paragraph is not necessary to run the node but will definitely help with understanding the technical aspects of how the network works. The "gran" key-type represents the private key for the grandpa 
-method of block finalization(which is the method used by the Oslo network to finalize a block before it is permanently appended to the chain). The "aura" key-type represents the private key for the aura method of block 
+The information in this paragraph is not necessary to run the node but will definitely help with understanding the technical aspects of how the network works. The "gran" key-type represents the private key for the Grandpa 
+method of block finalization(which is the method used by the Oslo network to finalize a block before it is permanently appended to the chain). The "aura" key-type represents the private key for the Aura method of block 
 authoring(also used by the Oslo network to generate new blocks, which are then finalized by the nodes with a valid "gran" key.). The "imon" key-type represents the key-type used by the im-online pallet(which removes inactive 
 validator nodes from the Oslo network, and also returns old validator nodes to the network once they come online again).   
 
 
 If all that worked out then we're ready to start the node for the first time with the command below.
-RUST_BACKTRACE=full target/release/oslo-network --chain=OsloMainnetChainSpec.json --pruning=archive --validator --base-path ~/.local/share/oslo-network
+RUST_BACKTRACE=full target/release/oslo-network --chain ./OsloMainnetChainSpec.json --pruning archive --validator --base-path ./node-storage --rpc-cors all --rpc-methods safe --port 37954
+
 If it starts showing blocks being validated, or at least showing the genesis block hash, then everything is probably working as intended. 
 Now, press ctrl+C then ctrl+Z to close out of the node.
 
@@ -116,7 +110,7 @@ Open the crontab again with
 crontab -e
 
 and at the end of the file add this line
-@reboot screen -S node -dm bash -c "cd ~/Oslo && RUST_BACKTRACE=full target/release/oslo-network --chain=OsloMainnetChainSpec.json --pruning=archive --validator --base-path ~/.local/share/oslo-network --port 37954 --no-mdns --no-prometheus"
+@reboot screen -S node -dm bash -c "cd ~/Oslo && RUST_BACKTRACE=full target/release/oslo-network --chain ./OsloMainnetChainSpec.json --pruning archive --validator --base-path ./node-storage --rpc-cors all --rpc-methods safe --port 37954"
 
 Finally, to allow inbound connections from other validators and to allow regular nodes to download the chain, the TCP port 37954 will need to be opened on the router and forwarded to the validator node. This process varies wildly from router to router, so it 
 is nearly impossible to give good instructions without knowing the router model/networking setup. 

@@ -1,8 +1,5 @@
 [workspace]
-members = [
-    "runtime",
-    "node"
-]
+members = ["runtime", "node"]
 resolver = "2"
 [workspace.package]
 authors = ["Asad Ali (asad.sial.4142@gmail.com)", "Josey Medley"]
@@ -39,7 +36,6 @@ pallet-balances = { default-features = false, git = "https://github.com/parityte
 pallet-im-online = { default-features = false, git = 'https://github.com/paritytech/polkadot-sdk.git', branch = "release-crates-io-v1.13.0" }
 frame-support = { default-features = false, git = "https://github.com/paritytech/polkadot-sdk.git", branch = "release-crates-io-v1.13.0" }
 pallet-grandpa = { default-features = false, git = "https://github.com/paritytech/polkadot-sdk.git", branch = "release-crates-io-v1.13.0" }
-pallet-babe = { default-features = false, git = "https://github.com/paritytech/polkadot-sdk.git", branch = "release-crates-io-v1.13.0" }
 pallet-sudo = { default-features = false, git = "https://github.com/paritytech/polkadot-sdk.git", branch = "release-crates-io-v1.13.0" }
 frame-system = { default-features = false, git = "https://github.com/paritytech/polkadot-sdk.git", branch = "release-crates-io-v1.13.0" }
 pallet-timestamp = { default-features = false, git = "https://github.com/paritytech/polkadot-sdk.git", branch = "release-crates-io-v1.13.0" }
@@ -103,6 +99,7 @@ try-runtime-cli = { default-features = false, git = "https://github.com/parityte
 
 # Evm dependencies
 fp-evm = { default-features = false, git = "https://github.com/JoseyMedley/frontier", branch = "v1.13.0-patch" }
+fp-account = { default-features = false, git = "https://github.com/JoseyMedley/frontier", branch = "v1.13.0-patch" }
 fp-self-contained = { default-features = false, git = "https://github.com/JoseyMedley/frontier", branch = "v1.13.0-patch" }
 fp-rpc = { default-features = false, git = "https://github.com/JoseyMedley/frontier", branch = "v1.13.0-patch" }
 fp-storage = { default-features = false, git = "https://github.com/JoseyMedley/frontier", branch = "v1.13.0-patch" }

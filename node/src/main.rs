@@ -1,4 +1,4 @@
-//! Substrate Node Template CLI library.
+//! Oslo network node CLI library.
 #![warn(missing_docs)]
 
 mod chain_spec;
@@ -8,6 +8,4 @@ mod cli;
 mod command;
 mod rpc;
 
-fn main() -> sc_cli::Result<()> {
-	command::run()
-}
+fn main() -> sc_cli::Result<()> { command::run()}

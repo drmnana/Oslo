@@ -1,9 +1,9 @@
 //! Service and ServiceFactory implementation. Specialized wrapper over substrate service.
-
 use oslo_network_runtime::{self, opaque::Block, RuntimeApi, TransactionConverter};
 use sc_client_api::{BlockBackend, BlockchainEvents, Backend};
 use sc_consensus_aura::{ImportQueueParams, SlotProportion, StartAuraParams};
 use sc_consensus_grandpa::SharedVoterState;
+use sc_network::{config::FullNetworkConfiguration, NetworkBackend};
 use sc_service::{error::Error as ServiceError, Configuration, TaskManager, new_wasm_executor, WarpSyncParams};
 use sc_telemetry::{Telemetry, TelemetryWorker};
 use sp_consensus_aura::sr25519::AuthorityPair as AuraPair;
@@ -17,8 +17,7 @@ use fc_consensus::FrontierBlockImport;
 use sc_transaction_pool_api::OffchainTransactionPoolFactory;
 use futures_util::{StreamExt, FutureExt};
 use sp_core::{U256};
-use sc_network::NetworkBackend;
-use sc_network::config::FullNetworkConfiguration;
+
 
 #[cfg(feature = "runtime-benchmarks")]
 pub type HostFunctions = (
@@ -33,21 +32,14 @@ pub(crate) type FullClient = sc_service::TFullClient<Block, RuntimeApi, WasmExec
 type FullBackend = sc_service::TFullBackend<Block>;
 type FullSelectChain = sc_consensus::LongestChain<FullBackend, Block>;
 
-
 const GRANDPA_JUSTIFICATION_PERIOD: u32 = 512;
-
-
-
-
 
 pub fn frontier_database_dir(config: &Configuration) -> std::path::PathBuf {
 	let config_dir = config.base_path.path();
 	config_dir.join("frontier").join("db")
 }
-pub fn open_frontier_backend<C>(
-	client: Arc<C>,
-	config: &Configuration
-) -> Result<Arc<fc_db::kv::Backend<Block, C>>, String>
+pub fn open_frontier_backend<C>(client: Arc<C>, config: &Configuration) 
+-> Result<Arc<fc_db::kv::Backend<Block, C>>, String>
 	where C: sp_blockchain::HeaderBackend<Block>
 {
 	Ok(Arc::new(fc_db::kv::Backend::<Block, C>::new(
@@ -60,9 +52,7 @@ pub fn open_frontier_backend<C>(
 	)?))
 }
 
-pub fn new_partial(
-	config: &Configuration
-) -> Result<
+pub fn new_partial(config: &Configuration) -> Result<
 	sc_service::PartialComponents<
 		FullClient,
 		FullBackend,
@@ -72,9 +62,7 @@ pub fn new_partial(
 		(
 			FrontierBlockImport<
 				Block,
-				sc_consensus_grandpa::GrandpaBlockImport<
-					FullBackend, Block, FullClient, FullSelectChain
-				>,
+				sc_consensus_grandpa::GrandpaBlockImport<FullBackend, Block, FullClient, FullSelectChain>,
 				FullClient
 			>,
 			sc_consensus_grandpa::LinkHalf<Block, FullClient, FullSelectChain>,
@@ -83,25 +71,18 @@ pub fn new_partial(
 			Arc<StorageOverrideHandler<Block, FullClient, FullBackend>>,
 			(FeeHistoryCache, FeeHistoryCacheLimit)
 		)
-	>,
-	ServiceError
-> 
+	>, ServiceError> 
 {
 	let telemetry = config.telemetry_endpoints.clone().filter(|x| !x.is_empty())
 		.map(|endpoints| -> Result<_, sc_telemetry::Error> {
 			let worker = TelemetryWorker::new(16)?;
 			let telemetry = worker.handle().new_telemetry(endpoints);
-			Ok((worker, telemetry))
-		}).transpose()?;
+			Ok((worker, telemetry))}).transpose()?;
 
 	let executor = new_wasm_executor(config);
 
 	let (client, backend, keystore_container, task_manager) =
-		sc_service::new_full_parts::<Block, RuntimeApi, _>(
-			config,
-			telemetry.as_ref().map(|(_, telemetry)| telemetry.handle()),
-			executor
-		)?;
+		sc_service::new_full_parts::<Block, RuntimeApi, _>(config, telemetry.as_ref().map(|(_, telemetry)| telemetry.handle()), executor)?;
 	let client = Arc::new(client);
 
 	let telemetry = telemetry.map(|(worker, telemetry)| {
@@ -145,7 +126,6 @@ pub fn new_partial(
 			client: client.clone(),
 			create_inherent_data_providers: move |_, ()| async move {
 				let timestamp = sp_timestamp::InherentDataProvider::from_system_time();
-
 				let slot =
 					sp_consensus_aura::inherents::InherentDataProvider::from_timestamp_and_slot_duration(
 						*timestamp,
@@ -175,8 +155,7 @@ pub fn new_full(config: Configuration)
 	} = new_partial(&config)?;
     let maybe_registry = config.prometheus_config.as_ref().map(|cfg| &cfg.registry);
 	let mut net_config = FullNetworkConfiguration::<Block, <Block as sp_runtime::traits::Block>::Hash,
-	    sc_network::NetworkWorker<oslo_network_runtime::opaque::Block,
-			<oslo_network_runtime::opaque::Block as sp_runtime::traits::Block>::Hash>>::new(&config.network);
+	    sc_network::NetworkWorker<oslo_network_runtime::opaque::Block, <oslo_network_runtime::opaque::Block as sp_runtime::traits::Block>::Hash>>::new(&config.network);
 
 	let peer_store_handle = net_config.peer_store_handle();
 	let metrics =  sc_network::NetworkWorker::<Block, <Block as sp_runtime::traits::Block>::Hash>::register_notification_metrics(maybe_registry);
@@ -230,9 +209,7 @@ pub fn new_full(config: Configuration)
 	// Everytime a new subscription is created, a new mpsc channel is added to the sink pool.
 	// The MappingSyncWorker sends through the channel on block import and the subscription emits a notification to the subscriber on receiving a message through this channel.
 	// This way we avoid race conditions when using native substrate block import notification stream.
-	let pubsub_notification_sinks: fc_mapping_sync::EthereumBlockNotificationSinks<
-		fc_mapping_sync::EthereumBlockNotification<Block>
-	> = Default::default();
+	let pubsub_notification_sinks: fc_mapping_sync::EthereumBlockNotificationSinks<fc_mapping_sync::EthereumBlockNotification<Block>> = Default::default();
 	let filter_pool: Option<FilterPool> = Some(Arc::new(Mutex::new(BTreeMap::new())));
 	let pubsub_notification_sinks = Arc::new(pubsub_notification_sinks);
 	task_manager.spawn_essential_handle().spawn(
@@ -275,9 +252,7 @@ pub fn new_full(config: Configuration)
 			let current = sp_timestamp::InherentDataProvider::from_system_time();
 			let next_slot = current.timestamp().as_millis() + slot_duration.as_millis();
 			let timestamp = sp_timestamp::InherentDataProvider::new(next_slot.into());
-			let slot = sp_consensus_aura::inherents::InherentDataProvider::from_timestamp_and_slot_duration(
-				*timestamp, slot_duration
-			);
+			let slot = sp_consensus_aura::inherents::InherentDataProvider::from_timestamp_and_slot_duration(*timestamp, slot_duration);
 			let dynamic_fee = fp_dynamic_fee::InherentDataProvider(U256::from(target_gas_price));
 			Ok((slot, timestamp, dynamic_fee))
 		};
@@ -341,10 +316,7 @@ pub fn new_full(config: Configuration)
 				justification_sync_link: sync_service.clone(),
 				create_inherent_data_providers: move |_, ()| async move {
 					let timestamp = sp_timestamp::InherentDataProvider::from_system_time();
-					let slot =
-						sp_consensus_aura::inherents::InherentDataProvider::from_timestamp_and_slot_duration(
-							*timestamp, slot_duration
-						);
+					let slot = sp_consensus_aura::inherents::InherentDataProvider::from_timestamp_and_slot_duration(*timestamp, slot_duration);
 					Ok((slot, timestamp))
 				},
 				force_authoring,
@@ -368,7 +340,6 @@ pub fn new_full(config: Configuration)
 		let keystore = if role.is_authority() { Some(keystore_container.keystore()) } else { None };
 
 		let grandpa_config = sc_consensus_grandpa::Config {
-			// FIXME #1578 make this available through chainspec
 			gossip_duration: Duration::from_millis(1000),
 			justification_generation_period: GRANDPA_JUSTIFICATION_PERIOD,
 			name: Some(name),

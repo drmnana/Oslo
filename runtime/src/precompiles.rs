@@ -10,7 +10,7 @@ pub struct SubstratePrecompiles<R>(PhantomData<R>);
 
 impl<R> SubstratePrecompiles<R>
 where
-	R: pallet_evm::Config,
+	R: pallet_evm::Config
 {
 	pub fn new() -> Self { Self(Default::default()) }
 	pub fn used_addresses() -> sp_std::vec::Vec<H160> {
@@ -19,7 +19,7 @@ where
 }
 impl<R> PrecompileSet for SubstratePrecompiles<R>
 where
-	R: pallet_evm::Config,
+	R: pallet_evm::Config
 {
 	fn execute(&self, handle: &mut impl PrecompileHandle) -> Option<Result<PrecompileOutput, PrecompileFailure>> {
 		match handle.code_address() {
@@ -37,13 +37,8 @@ where
 	}
 
 	fn is_precompile(&self, address: H160, _gas: u64) -> IsPrecompileResult {
-		IsPrecompileResult::Answer {
-			is_precompile: Self::used_addresses().contains(&address),
-			extra_cost: 0
-		}
+		IsPrecompileResult::Answer { is_precompile: Self::used_addresses().contains(&address), extra_cost: 0 }
 	}
 }
 
-fn hash(a: u64) -> H160 {
-	H160::from_low_u64_be(a)
-}
+fn hash(a: u64) -> H160 { H160::from_low_u64_be(a) }

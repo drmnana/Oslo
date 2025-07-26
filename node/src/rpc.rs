@@ -36,10 +36,7 @@ pub fn overrides_handle<B, C, BE>(client: Arc<C>) -> Arc<StorageOverrideHandler<
 		BE: Backend<B> + 'static,
 		BE::State: StateBackend<BlakeTwo256>,
 		B: BlockT
-{
-
-	Arc::new(StorageOverrideHandler::new(client.clone()))
-}
+{ Arc::new(StorageOverrideHandler::new(client.clone())) }
 
 
 /// Full client dependencies.
@@ -93,9 +90,8 @@ where
 	type RuntimeStorageOverride = fc_rpc::frontier_backend_client::SystemAccountId20StorageOverride<B, C, BE>;
 }
 /// Instantiate all full RPC extensions.
-pub fn create_full<B, C, BE, P, A, CT, CIDP>(
-	deps: FullDeps<B, C, P, A, CT, CIDP>
-) -> Result<RpcModule<()>, Box<dyn std::error::Error + Send + Sync>>
+pub fn create_full<B, C, BE, P, A, CT, CIDP>(deps: FullDeps<B, C, P, A, CT, CIDP>)
+	-> Result<RpcModule<()>, Box<dyn std::error::Error + Send + Sync>>
 	where
 		B: BlockT,
 		C: CallApiAt<B> + ProvideRuntimeApi<B> + AuxStore + UsageProvider<B>,

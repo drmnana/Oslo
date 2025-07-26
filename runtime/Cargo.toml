@@ -1,11 +1,12 @@
 [package]
 name = "oslo-network-runtime"
-version = "4.0.0-dev"
-description = "A fresh FRAME-based Substrate node, ready for hacking."
+version = "5.0.0-dev"
+description = "The reference runtime for the Oslo network."
 authors = { workspace = true }
-homepage = "https://substrate.io/"
+homepage = "https://oslocrypto.com"
 edition = "2021"
 license = "Unlicense"
+repository = "http://github.com/drmnana/Oslo"
 publish = false
 
 [package.metadata.docs.rs]
@@ -36,7 +37,6 @@ pallet-balances = { workspace = true }
 frame-support = { workspace = true, features = ["experimental"] }
 pallet-grandpa = { workspace = true }
 sp-consensus-grandpa = { workspace = true, features = ["serde", "sp-keystore"] }
-pallet-babe = { workspace = true }
 pallet-sudo = { workspace = true }
 frame-system = { workspace = true }
 pallet-timestamp = { workspace = true }
@@ -77,6 +77,7 @@ pallet-ethereum = { workspace = true }
 pallet-im-online = { workspace = true }
 fp-evm = { workspace = true, features = ["serde"] }
 fp-rpc = { workspace = true }
+fp-account = { workspace = true, features = ["serde"] }
 pallet-base-fee = { workspace = true }
 fp-self-contained = { workspace = true, features = ["serde"] }
 
@@ -94,6 +95,7 @@ std = [
 	"fp-evm/std",
 	"fp-rpc/std",
 	"fp-self-contained/std",
+	"fp-account/std",
 	"frame-executive/std",
 	"frame-support/std",
 	"frame-system-rpc-runtime-api/std",
@@ -101,7 +103,6 @@ std = [
 	"pallet-assets/std",
 	"pallet-asset-rate/std",
 	"pallet-aura/std",
-	"pallet-babe/std",
 	"pallet-balances/std",
 	"pallet-base-fee/std",
 	"pallet-evm/std",

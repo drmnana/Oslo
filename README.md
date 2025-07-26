@@ -2,7 +2,7 @@
 
 ### Rust Setup
 
-First, complete the [basic Rust setup instructions](./docs/rust-setup.md).
+First, complete the [Oslo setup instructions](./docs/Oslo-setup-instructions.txt).
 
 ### Run
 
@@ -34,7 +34,7 @@ Once the project has been built, the following command can be used to explore al
 subcommands:
 
 ```sh
-./target/release/node-template -h
+./target/release/oslo-network -h
 ```
 
 ## Run
@@ -48,24 +48,24 @@ node.
 This command will start the single-node development chain with non-persistent state:
 
 ```bash
-./target/release/node-template --dev
+./target/release/oslo-network --dev
 ```
 
 Purge the development chain's state:
 
 ```bash
-./target/release/node-template purge-chain --dev
+./target/release/oslo-network purge-chain --dev
 ```
 
 Start the development chain with detailed logging:
 
 ```bash
-RUST_BACKTRACE=1 ./target/release/node-template -ldebug --dev
+RUST_BACKTRACE=1 ./target/release/oslo-network -ldebug --dev
 ```
 
 > Development chain means that the state of our chain will be in a tmp folder while the nodes are
 > running. Also, **alice** account will be authority and sudo account as declared in the
-> [genesis state](https://github.com/substrate-developer-hub/substrate-node-template/blob/main/node/src/chain_spec.rs#L49).
+> [genesis state](https://github.com/drmnana/Oslo/blob/main/node/src/chain_spec.rs#L49).
 > At the same time the following accounts will be pre-funded:
 > - Alice
 > - Bob
@@ -78,15 +78,13 @@ to store different chain databases, as a different folder will be created per di
 is ran. The following commands shows how to use a newly created folder as our db base path.
 
 ```bash
-// Create a folder to use as the db base path
-$ mkdir my-chain-state
 
-// Use of that folder to store the chain state
-$ ./target/release/node-template --dev --base-path ./my-chain-state/
+// Use the included node-storage folder to store the chain state
+$ ./target/release/oslo-network --dev --base-path ./node-storage
 
 // Check the folder structure created inside the base path after running the chain
-$ ls ./my-chain-state
-chains
+$ ls ./node-storage
+chains frontier
 $ ls ./my-chain-state/chains/
 dev
 $ ls ./my-chain-state/chains/dev
@@ -98,13 +96,12 @@ db keystore network
 
 Once the node template is running locally, you can connect it with **Polkadot-JS Apps** front-end
 to interact with your chain. [Click
-here](https://polkadot.js.org/apps/#/explorer?rpc=ws://localhost:9944) connecting the Apps to your
+here](https://explorer.oslocrypto.com/apps/#/explorer?rpc=ws://localhost:9944) connecting the Apps to your
 local node template.
 
-### Multi-Node Local Testnet
+### Multi-Node Testnet
 
-If you want to see the multi-node consensus algorithm in action, refer to our
-[Simulate a network tutorial](https://docs.substrate.io/tutorials/get-started/simulate-network/).
+If you want to try out the multi-node testnet, use --chain ./OsloTestnetChainSpec.json
 
 ## Template Structure
 
@@ -116,10 +113,10 @@ directories.
 A blockchain node is an application that allows users to participate in a blockchain network.
 Substrate-based blockchain nodes expose a number of capabilities:
 
-- Networking: Substrate nodes use the [`libp2p`](https://libp2p.io/) networking stack to allow the
-  nodes in the network to communicate with one another.
+- Networking: Oslo nodes use the [`libp2p`](https://libp2p.io/) networking stack to allow the
+  nodes in the network to communicate with one another. 
 - Consensus: Blockchains must have a way to come to
-  [consensus](https://docs.substrate.io/main-docs/fundamentals/consensus/) on the state of the
+  [consensus](https://wiki.polkadot.network/learn/learn-consensus/#resources) on the state of the
   network. Substrate makes it possible to supply custom consensus engines and also ships with
   several consensus mechanisms that have been built on top of
   [Web3 Foundation research](https://research.web3.foundation/en/latest/polkadot/NPoS/index.html).
@@ -147,7 +144,7 @@ After the node has been [built](#build), refer to the embedded documentation to 
 capabilities and configuration parameters that it exposes:
 
 ```shell
-./target/release/node-template --help
+./target/release/oslo-network --help
 ```
 
 ### Runtime
@@ -156,7 +153,7 @@ In Substrate, the terms
 "runtime" and "state transition function"
 are analogous - they refer to the core logic of the blockchain that is responsible for validating
 blocks and executing the state changes they define. The Substrate project in this repository uses
-[FRAME](https://docs.substrate.io/main-docs/fundamentals/runtime-intro/#frame) to construct a
+[FRAME](https://polkadot.js.org/docs/substrate/runtime) to construct a
 blockchain runtime. FRAME allows runtime developers to declare domain-specific logic in modules
 called "pallets". At the heart of FRAME is a helpful
 [macro language](https://docs.substrate.io/reference/frame-macros/) that makes it easy to
@@ -176,46 +173,36 @@ the following:
 ### Pallets
 
 The runtime in this project is constructed using many FRAME pallets that ship with the
-[core Substrate repository](https://github.com/paritytech/substrate/tree/master/frame) and a
-template pallet that is [defined in the `pallets`](./pallets/template/src/lib.rs) directory.
+[polkadot-sdk repository](https://github.com/paritytech/polkadot-sdk) and a
+template pallet that is [defined in the `pallets`](./templates/solochain/pallets/template/src/lib.rs) directory.
 
 A FRAME pallet is compromised of a number of blockchain primitives:
 
 - Storage: FRAME defines a rich set of powerful
-  [storage abstractions](https://docs.substrate.io/main-docs/build/runtime-storage/) that makes
+  [storage abstractions](https://polkadot.js.org/docs/substrate/storage) that makes
   it easy to use Substrate's efficient key-value database to manage the evolving state of a
   blockchain.
 - Dispatchables: FRAME pallets define special types of functions that can be invoked (dispatched)
   from outside of the runtime in order to update its state.
-- Events: Substrate uses [events and errors](https://docs.substrate.io/main-docs/build/events-errors/)
-  to notify users of important changes in the runtime.
+- Events: Substrate uses [events](https://polkadot.js.org/docs/substrate/events) and
+ [errors](https://polkadot.js.org/docs/substrate/errors) to notify users of important changes in the runtime.
 - Errors: When a dispatchable fails, it returns an error.
 - Config: The `Config` configuration interface is used to define the types and parameters upon
   which a FRAME pallet depends.
 
-### Run in Docker
 
-First, install [Docker](https://docs.docker.com/get-docker/) and
-[Docker Compose](https://docs.docker.com/compose/install/).
-
-Then run the following command to start a single node development chain.
-
-```bash
-./scripts/docker_run.sh
-```
-
-This command will firstly compile your code, and then start a local development network. You can
+This command will firstly compile the node, and then start a local development network. You can
 also replace the default command
-(`cargo build --release && ./target/release/node-template --dev --ws-external`)
+(`cargo build --release && ./target/release/oslo-network --dev --rpc-external`)
 by appending your own. A few useful ones are as follow.
 
 ```bash
 # Run Substrate node without re-compiling
-./scripts/docker_run.sh ./target/release/node-template --dev --ws-external
+./target/release/oslo-network --dev --rpc-external
 
 # Purge the local dev chain
-./scripts/docker_run.sh ./target/release/node-template purge-chain --dev
+./target/release/oslo-network purge-chain --dev
 
 # Check whether the code is compilable
-./scripts/docker_run.sh cargo check
+cargo check
 ```

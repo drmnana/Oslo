@@ -5,23 +5,35 @@ use pallet_im_online::sr25519::AuthorityId as ImOnlineId;
 use sp_core::{Pair, Public, H256, sr25519, ed25519, crypto::{Ss58Codec, AccountId32}};
 use sc_network::{config::MultiaddrWithPeerId, PeerId};
 use oslo_network_runtime::{currency::*, opaque::SessionKeys, WASM_BINARY,
-	CouncilConfig, DemocracyConfig, ValidatorSetConfig,
+	CouncilConfig, DemocracyConfig, ValidatorSetConfig, SS58Prefix, Signature,
 	TechnicalCommitteeConfig, TreasuryConfig, TransactionPaymentConfig,
 	EVMConfig, EthereumConfig, BaseFeeConfig, ImOnlineConfig, BalancesConfig,
 	GrandpaConfig, AuraConfig, SudoConfig, SystemConfig, SessionConfig, AccountId}; 
 use std::{default::Default};
 /// Specialized `ChainSpec`. This is a specialization of the general Substrate ChainSpec type.
 pub type ChainSpec = sc_service::GenericChainSpec;
-
+use sp_runtime::traits::{IdentifyAccount, Verify};
 /// Helper function to generate a crypto pair from seed
 fn get_from_secret<TPublic: Public>(seed: &str) -> <TPublic::Pair as Pair>::Public {
 	TPublic::Pair::from_string(seed, None).unwrap_or_else(|_| panic!("Invalid string '{}'", seed)).public()
 }
 
+type AccountPublic = <Signature as Verify>::Signer;
+
+
+pub fn get_account_id_from_seed<TPublic: Public>(seed: &str) -> AccountId
+where
+	AccountPublic: From<<TPublic::Pair as Pair>::Public>,
+{
+	AccountPublic::from(get_from_secret::<TPublic>(seed)).into_account()
+}
+
+
 pub fn chainspec_properties() -> Properties {
 	let mut properties = Properties::new();
 	properties.insert("tokenDecimals".into(), 6.into());
 	properties.insert("tokenSymbol".into(), "OSLO".into());
+	properties.insert("ss58Format".into(), SS58Prefix::get().into());
 	properties
 }
 
@@ -32,16 +44,7 @@ const NODE4SUPPLY: u128 = 200_000;
 
 /// The H160 addresses below are all actually shortened Grandpa hex addresses
 
-/// Begin Development Addresses
-const ALITH: &str = "0x83451391e196556A66ebfCe472165d37E6575F5e";
-const BALTATHAR: &str = "0xB78ef962F15Fb30d70fE7f5e00aA042869a2293A";
-const CHARLETH: &str = "0x8ff34400aAb1Ee14Ee26BE799e107BDAAD88df8d";
-const DOROTHY: &str = "0x8cBcD18e730eFD8c9C26e6791455CD100477DAEe";
-/// End Development Addresses
-
-
 /// Begin Testnet Addresses
-const JOSEY: &str = "0xd1fd49da79e79af0Ac5A0C4c1658E9fE1cb076E6";
 
 const TESTNETNODE1AURA: &str = "5EP15U8PitEa8N2qrKaCrafZzyp3RsU59owdv5mWhWtSM1Mc";
 const TESTNETNODE1AURAHEX: &str = "0x666cdaab93a8fb6ffba8457fe9d6a5ff9704d3c359403cbad7c9f633a714c74f";
@@ -118,48 +121,48 @@ pub fn public_config() -> Result<ChainSpec, String> {
 		.with_genesis_config_patch(mainnet_genesis(
 			vec![ // Initial PoA authorities
 				(
-					array_bytes::hex_n_into_unchecked(MAINNETSUDONODEH160),
+					array_bytes::hex_n_into_unchecked::<&str, sp_runtime::AccountId32, 32>(MAINNETSUDONODEGRANDPAHEX),
 					sr25519::Public::from_h256(MAINNETSUDONODEAURAHEX.parse::<H256>().unwrap()).into(),
 					ed25519::Public::from_h256(MAINNETSUDONODEGRANDPAHEX.parse::<H256>().unwrap()).into(),
 					sr25519::Public::from_raw(<[u8; 32]>::try_from(AccountId32::from_ss58check_with_version(MAINNETSUDONODEAURA).unwrap().0.as_ref()).unwrap()).into()
 				),
 				(
-					array_bytes::hex_n_into_unchecked(MAINNETNODE1H160),
+					array_bytes::hex_n_into_unchecked::<&str, sp_runtime::AccountId32, 32>(MAINNETNODE1GRANDPAHEX),
 					sr25519::Public::from_h256(MAINNETNODE1AURAHEX.parse::<H256>().unwrap()).into(),
 					ed25519::Public::from_h256(MAINNETNODE1GRANDPAHEX.parse::<H256>().unwrap()).into(),
 					sr25519::Public::from_raw(<[u8; 32]>::try_from(AccountId32::from_ss58check_with_version(MAINNETNODE1AURA).unwrap().0.as_ref()).unwrap()).into()
 				),
 				(
-					array_bytes::hex_n_into_unchecked(MAINNETNODE2H160),
+					array_bytes::hex_n_into_unchecked::<&str, sp_runtime::AccountId32, 32>(MAINNETNODE2GRANDPAHEX),
 					sr25519::Public::from_h256(MAINNETNODE2AURAHEX.parse::<H256>().unwrap()).into(),
 					ed25519::Public::from_h256(MAINNETNODE2GRANDPAHEX.parse::<H256>().unwrap()).into(),
 					sr25519::Public::from_raw(<[u8; 32]>::try_from(AccountId32::from_ss58check_with_version(MAINNETNODE2AURA).unwrap().0.as_ref()).unwrap()).into()
 				),
 				(
-					array_bytes::hex_n_into_unchecked(MAINNETNODE3H160),
+					array_bytes::hex_n_into_unchecked::<&str, sp_runtime::AccountId32, 32>(MAINNETNODE3GRANDPAHEX),
 					sr25519::Public::from_h256(MAINNETNODE3AURAHEX.parse::<H256>().unwrap()).into(),
 					ed25519::Public::from_h256(MAINNETNODE3GRANDPAHEX.parse::<H256>().unwrap()).into(),
 					sr25519::Public::from_raw(<[u8; 32]>::try_from(AccountId32::from_ss58check_with_version(MAINNETNODE3AURA).unwrap().0.as_ref()).unwrap()).into()
 				),
 				(
-					array_bytes::hex_n_into_unchecked(MAINNETNODE4H160),
+					array_bytes::hex_n_into_unchecked::<&str, sp_runtime::AccountId32, 32>(MAINNETNODE4GRANDPAHEX),
 					sr25519::Public::from_h256(MAINNETNODE4AURAHEX.parse::<H256>().unwrap()).into(),
 					ed25519::Public::from_h256(MAINNETNODE4GRANDPAHEX.parse::<H256>().unwrap()).into(),
 					sr25519::Public::from_raw(<[u8; 32]>::try_from(AccountId32::from_ss58check_with_version(MAINNETNODE4AURA).unwrap().0.as_ref()).unwrap()).into()
 				),
 				(
-					array_bytes::hex_n_into_unchecked(MAINNETNODE5H160),
+					array_bytes::hex_n_into_unchecked::<&str, sp_runtime::AccountId32, 32>(MAINNETNODE5GRANDPAHEX),
 					sr25519::Public::from_h256(MAINNETNODE5AURAHEX.parse::<H256>().unwrap()).into(),
 					ed25519::Public::from_h256(MAINNETNODE5GRANDPAHEX.parse::<H256>().unwrap()).into(),
 					sr25519::Public::from_raw(<[u8; 32]>::try_from(AccountId32::from_ss58check_with_version(MAINNETNODE5AURA).unwrap().0.as_ref()).unwrap()).into()
 				)
 			],
 			// Sudo account
-			array_bytes::hex_n_into_unchecked(MAINNETSUDONODEH160),
+			array_bytes::hex_n_into_unchecked::<&str, sp_runtime::AccountId32, 32>(MAINNETSUDONODEGRANDPAHEX),
 			// Pre-funded accounts
 			vec![
-				array_bytes::hex_n_into_unchecked(MAINNETSUDONODEH160),
-				array_bytes::hex_n_into_unchecked(MAINNETNODE1H160)
+				array_bytes::hex_n_into_unchecked::<&str, sp_runtime::AccountId32, 32>(MAINNETSUDONODEGRANDPAHEX),
+				array_bytes::hex_n_into_unchecked::<&str, sp_runtime::AccountId32, 32>(MAINNETNODE1GRANDPAHEX)
 			],
 			true
 	)).build())
@@ -177,25 +180,24 @@ pub fn testnet_config() -> Result<ChainSpec, String> {
 		// Initial PoA authorities
 		vec![
 			(
-				array_bytes::hex_n_into_unchecked(TESTNETNODE1H160),
+				array_bytes::hex_n_into_unchecked::<&str, sp_runtime::AccountId32, 32>(TESTNETNODE1GRANDPAHEX),
 				sr25519::Public::from_h256(TESTNETNODE1AURAHEX.parse::<H256>().unwrap()).into(),
 				ed25519::Public::from_h256(TESTNETNODE1GRANDPAHEX.parse::<H256>().unwrap()).into(),
 				sr25519::Public::from_raw(<[u8; 32]>::try_from(AccountId32::from_ss58check_with_version(TESTNETNODE1AURA).unwrap().0.as_ref()).unwrap()).into()
 			),
 			(
-				array_bytes::hex_n_into_unchecked(TESTNETNODE2H160),
+				array_bytes::hex_n_into_unchecked::<&str, sp_runtime::AccountId32, 32>(TESTNETNODE2GRANDPAHEX),
 				sr25519::Public::from_h256(TESTNETNODE2AURAHEX.parse::<H256>().unwrap()).into(),
 				ed25519::Public::from_h256(TESTNETNODE2GRANDPAHEX.parse::<H256>().unwrap()).into(),
 				sr25519::Public::from_raw(<[u8; 32]>::try_from(AccountId32::from_ss58check_with_version(TESTNETNODE2AURA).unwrap().0.as_ref()).unwrap()).into()
 			)
 		],
 		// Sudo account
-		array_bytes::hex_n_into_unchecked(TESTNETNODE1H160),
+		array_bytes::hex_n_into_unchecked::<&str, sp_runtime::AccountId32, 32>(TESTNETNODE1GRANDPAHEX),
 		// Pre-funded accounts
 		vec![
-			array_bytes::hex_n_into_unchecked(JOSEY),
-			array_bytes::hex_n_into_unchecked(TESTNETNODE1H160),
-			array_bytes::hex_n_into_unchecked(TESTNETNODE2H160)
+			array_bytes::hex_n_into_unchecked::<&str, sp_runtime::AccountId32, 32>(TESTNETNODE1GRANDPAHEX),
+			array_bytes::hex_n_into_unchecked::<&str, sp_runtime::AccountId32, 32>(TESTNETNODE2GRANDPAHEX)
 		],
 		true
 	)).build())
@@ -205,25 +207,24 @@ pub fn development_config() -> Result<ChainSpec, String> {
 	Ok(ChainSpec::builder(WASM_BINARY.expect("WASM not available"), Default::default()).with_name("Oslo-Network-Dev")
 	.with_id("dev").with_chain_type(ChainType::Development).with_properties(chainspec_properties())
 	.with_genesis_config_patch(testnet_genesis(
-			// Initial PoA authorities
-			vec![(
-				array_bytes::hex_n_into_unchecked(JOSEY),
-				get_from_secret::<AuraId>("//Alice"),
-				get_from_secret::<GrandpaId>("//Alice"),
-				get_from_secret::<ImOnlineId>("//Alice")
-			)],
-			// Sudo account
-			array_bytes::hex_n_into_unchecked(JOSEY),
-			// Pre-funded accounts
-			vec![
-				array_bytes::hex_n_into_unchecked(ALITH),
-				array_bytes::hex_n_into_unchecked(BALTATHAR),
-				array_bytes::hex_n_into_unchecked(CHARLETH),
-				array_bytes::hex_n_into_unchecked(DOROTHY),
-				array_bytes::hex_n_into_unchecked(JOSEY)
-			],
-			true
-		)).build())
+		// Initial PoA authorities
+		vec![(
+			get_account_id_from_seed::<sr25519::Public>("Alice"),
+			get_from_secret::<AuraId>("//Alice"),
+			get_from_secret::<GrandpaId>("//Alice"),
+			get_from_secret::<ImOnlineId>("//Alice")
+		)],
+		// Sudo account
+		get_account_id_from_seed::<sr25519::Public>("Alice"),
+		// Pre-funded accounts
+		vec![
+			get_account_id_from_seed::<sr25519::Public>("Alice"),
+			get_account_id_from_seed::<sr25519::Public>("Bob"),
+			get_account_id_from_seed::<sr25519::Public>("Charlie"),
+			get_account_id_from_seed::<sr25519::Public>("Dave"),
+		],
+		true
+	)).build())
 }
 
 fn session_keys(aura: AuraId, grandpa: GrandpaId, im_online: ImOnlineId) -> SessionKeys { SessionKeys { aura, grandpa, im_online } }
@@ -272,7 +273,7 @@ fn mainnet_genesis(
 		"balances": BalancesConfig{ 
 			balances: {
 				let mut balances_vec = endowed_accounts.iter().cloned().map(|k| (k, INITIALSUPPLY * OSLO)).collect::<Vec<_>>();
-		        balances_vec.push((array_bytes::hex_n_into_unchecked(MAINNETNODE4H160), NODE4SUPPLY * OSLO));
+		        balances_vec.push((array_bytes::hex_n_into_unchecked::<&str, sp_runtime::AccountId32, 32>(MAINNETNODE4GRANDPAHEX), NODE4SUPPLY * OSLO));
 		        balances_vec
 			}
 		},

@@ -5193,7 +5193,7 @@ checksum = "04744f49eae99ab78e0d5c0b603ab218f515ea8cfe5a456d7629ad883a3b6e7d"
 
 [[package]]
 name = "oslo-network"
-version = "4.0.0-dev"
+version = "5.0.0-dev"
 dependencies = [
  "array-bytes",
  "clap",
@@ -5205,6 +5205,7 @@ dependencies = [
  "fc-rpc",
  "fc-rpc-core",
  "fc-storage",
+ "fp-account",
  "fp-dynamic-fee",
  "fp-evm",
  "fp-rpc",
@@ -5257,8 +5258,9 @@ dependencies = [
 
 [[package]]
 name = "oslo-network-runtime"
-version = "4.0.0-dev"
+version = "5.0.0-dev"
 dependencies = [
+ "fp-account",
  "fp-evm",
  "fp-rpc",
  "fp-self-contained",
@@ -5277,7 +5279,6 @@ dependencies = [
  "pallet-assets",
  "pallet-aura",
  "pallet-authorship",
- "pallet-babe",
  "pallet-balances",
  "pallet-base-fee",
  "pallet-collective",
@@ -5385,30 +5386,6 @@ dependencies = [
  "parity-scale-codec",
  "scale-info",
  "sp-runtime",
- "sp-std",
-]
-
-[[package]]
-name = "pallet-babe"
-version = "35.0.0"
-source = "git+https://github.com/paritytech/polkadot-sdk.git?branch=release-crates-io-v1.13.0#d3e98d95dcc0659e5af3f0f7334fb2a665c18131"
-dependencies = [
- "frame-benchmarking",
- "frame-support",
- "frame-system",
- "log",
- "pallet-authorship",
- "pallet-session",
- "pallet-timestamp",
- "parity-scale-codec",
- "scale-info",
- "sp-application-crypto",
- "sp-consensus-babe",
- "sp-core",
- "sp-io",
- "sp-runtime",
- "sp-session",
- "sp-staking",
  "sp-std",
 ]
 
@@ -8718,24 +8695,6 @@ dependencies = [
  "sp-api",
  "sp-application-crypto",
  "sp-consensus-slots",
- "sp-inherents",
- "sp-runtime",
- "sp-timestamp",
-]
-
-[[package]]
-name = "sp-consensus-babe"
-version = "0.39.0"
-source = "git+https://github.com/paritytech/polkadot-sdk.git?branch=release-crates-io-v1.13.0#d3e98d95dcc0659e5af3f0f7334fb2a665c18131"
-dependencies = [
- "async-trait",
- "parity-scale-codec",
- "scale-info",
- "serde",
- "sp-api",
- "sp-application-crypto",
- "sp-consensus-slots",
- "sp-core",
  "sp-inherents",
  "sp-runtime",
  "sp-timestamp",
