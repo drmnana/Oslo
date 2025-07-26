@@ -87,19 +87,17 @@ pub type DigestItem = generic::DigestItem;
 pub mod currency {
 	use super::Balance;
 
-	pub const SUPPLY_FACTOR: Balance = 100;
-
 	pub const WEI: Balance = 1;
 	pub const MILLIOSLO: Balance = 1_000;
 	pub const OSLO: Balance = 1_000_000;
 	pub const KILOOSLO: Balance = 1_000_000_000;
 
-	pub const TRANSACTION_BYTE_FEE: Balance = 1 * WEI * SUPPLY_FACTOR;
-	pub const STORAGE_BYTE_FEE: Balance = 10 * WEI * SUPPLY_FACTOR;
-	pub const WEIGHT_FEE: Balance = 10 * WEI * SUPPLY_FACTOR;
+	pub const TRANSACTION_BYTE_FEE: Balance = 1 * WEI;
+	pub const STORAGE_BYTE_FEE: Balance = 10 * WEI;
+	pub const WEIGHT_FEE: Balance = 10 * WEI;
 
 	pub const fn deposit(items: u32, bytes: u32) -> Balance {
-		items as Balance * 100 * MILLIOSLO * SUPPLY_FACTOR + (bytes as Balance) * STORAGE_BYTE_FEE
+		items as Balance * 100 * MILLIOSLO + (bytes as Balance) * STORAGE_BYTE_FEE
 	}
 }
 
