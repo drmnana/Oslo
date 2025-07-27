@@ -14,7 +14,7 @@
   "protocolId": "Oslo-Network-Mainnet",
   "properties": {
     "ss58Format": 42,
-    "tokenDecimals": 12,
+    "tokenDecimals": 9,
     "tokenSymbol": "OSLO"
   },
   "codeSubstitutes": {},
