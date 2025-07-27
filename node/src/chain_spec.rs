@@ -31,7 +31,7 @@ where
 
 pub fn chainspec_properties() -> Properties {
 	let mut properties = Properties::new();
-	properties.insert("tokenDecimals".into(), 9.into());
+	properties.insert("tokenDecimals".into(), 12.into());
 	properties.insert("tokenSymbol".into(), "OSLO".into());
 	properties.insert("ss58Format".into(), SS58Prefix::get().into());
 	properties
