@@ -93,11 +93,11 @@ pub mod currency {
 	pub const KILOOSLO: Balance = 1_000_000_000_000;
 
 	pub const TRANSACTION_BYTE_FEE: Balance = 1 * WEI;
-	pub const STORAGE_BYTE_FEE: Balance = 10 * WEI;
-	pub const WEIGHT_FEE: Balance = 10 * WEI;
+	pub const STORAGE_BYTE_FEE: Balance = 1 * WEI;
+	pub const WEIGHT_FEE: Balance = 1 * WEI;
 
 	pub const fn deposit(items: u32, bytes: u32) -> Balance {
-		items as Balance * 100 * MILLIOSLO + (bytes as Balance) * STORAGE_BYTE_FEE
+		items as Balance * 1 * MILLIOSLO + (bytes as Balance) * STORAGE_BYTE_FEE
 	}
 }
 
